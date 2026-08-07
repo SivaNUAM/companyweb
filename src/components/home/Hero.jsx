@@ -9,25 +9,25 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight } from "lucide-react";
 import { hero } from "../../data/home";
 
 const ease = [0.16, 1, 0.3, 1];
 const cinematic = [0.22, 1, 0.36, 1];
-const AUTO_MS = 5200; // image dwell
-const SLIDE_MS = 0.95; // cinematic crossfade
+const AUTO_MS = 5200;
+const SLIDE_MS = 0.95;
 
-/** Glassmorphic brand mark — frosted panel, minimal glow */
+/** Brand mark — clean letters, no frosted/blur panel */
 const BrandMark = ({ reduceMotion }) => {
   const wrapRef = useRef(null);
   const letters = hero.brand.split("");
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
-  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [4, -4]), {
+  const rotateX = useSpring(useTransform(my, [-0.5, 0.5], [5, -5]), {
     stiffness: 120,
     damping: 28,
   });
-  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-6, 6]), {
+  const rotateY = useSpring(useTransform(mx, [-0.5, 0.5], [-7, 7]), {
     stiffness: 120,
     damping: 28,
   });
@@ -48,31 +48,21 @@ const BrandMark = ({ reduceMotion }) => {
     <div
       ref={wrapRef}
       className="relative w-fit"
-      style={{ perspective: 1200 }}
+      style={{ perspective: 1400 }}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
     >
       <motion.div
-        className="relative overflow-hidden rounded-2xl border border-white/20 bg-white/[0.08] px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-xl md:rounded-3xl md:px-8 md:py-6"
+        className="relative"
         style={
           reduceMotion
             ? undefined
             : { rotateX, rotateY, transformStyle: "preserve-3d" }
         }
-        initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.85, ease }}
+        initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.95, ease }}
       >
-        {/* Soft glass highlight — no glow bloom */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-white/[0.03]"
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -left-1/4 -top-1/2 h-full w-1/2 rotate-12 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-        />
-
         <h2 className="sr-only">{hero.brand}</h2>
         <p
           aria-hidden
@@ -83,22 +73,25 @@ const BrandMark = ({ reduceMotion }) => {
               key={`${letter}-${i}`}
               className="inline-block origin-bottom"
               initial={
-                reduceMotion
-                  ? false
-                  : { opacity: 0, y: "0.4em" }
+                reduceMotion ? false : { opacity: 0, y: "0.45em" }
               }
               animate={{ opacity: 1, y: 0 }}
               transition={{
-                duration: 0.75,
-                delay: 0.12 + i * 0.06,
+                duration: 0.8,
+                delay: 0.14 + i * 0.07,
                 ease,
               }}
               whileHover={
                 reduceMotion
                   ? undefined
                   : {
-                      y: -3,
-                      transition: { type: "spring", stiffness: 400, damping: 24 },
+                      y: -4,
+                      color: "#6b8aff",
+                      transition: {
+                        type: "spring",
+                        stiffness: 420,
+                        damping: 22,
+                      },
                     }
               }
             >
@@ -108,14 +101,17 @@ const BrandMark = ({ reduceMotion }) => {
         </p>
 
         <motion.div
-          className="relative mt-3 flex items-center gap-3 md:mt-4"
+          className="relative mt-3 flex flex-wrap items-center gap-3 md:mt-4"
           initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.65, duration: 0.6, ease }}
+          transition={{ delay: 0.7, duration: 0.6, ease }}
         >
-          <span className="h-px w-8 bg-white/50 md:w-10" />
-          <span className="text-[0.6rem] font-semibold uppercase tracking-[0.36em] text-white/55">
+          <span className="h-px w-8 bg-[var(--accent)] md:w-10" />
+          <span className="text-[0.6rem] font-semibold uppercase tracking-[0.36em] text-white/60">
             Technologies
+          </span>
+          <span className="text-[0.55rem] font-semibold tracking-[0.14em] text-white/40">
+            PVT LTD
           </span>
         </motion.div>
       </motion.div>
@@ -152,14 +148,14 @@ const Hero = () => {
       setProgress(0);
       lastTs.current = null;
     },
-    [slides.length]
+    [slides.length],
   );
 
   const next = useCallback(() => goTo(index + 1), [goTo, index]);
   const prev = useCallback(() => goTo(index - 1), [goTo, index]);
-  const isVideoSlide = active.type === "video" && !!active.video && !reduceMotion;
+  const isVideoSlide =
+    active.type === "video" && !!active.video && !reduceMotion;
 
-  // Play video; advance carousel when it finishes
   useEffect(() => {
     const el = videoRef.current;
     if (!el || !isVideoSlide) return;
@@ -192,7 +188,6 @@ const Hero = () => {
     };
   }, [index, isVideoSlide, slides.length]);
 
-  // Timer auto-advance for image slides only
   useEffect(() => {
     if (reduceMotion || slides.length < 2 || isVideoSlide) return;
 
@@ -201,7 +196,10 @@ const Hero = () => {
       if (lastTs.current == null) lastTs.current = ts;
       if (!paused) {
         const delta = ts - lastTs.current;
-        progressRef.current = Math.min(1, progressRef.current + delta / AUTO_MS);
+        progressRef.current = Math.min(
+          1,
+          progressRef.current + delta / AUTO_MS,
+        );
         setProgress(progressRef.current);
         if (progressRef.current >= 1) {
           progressRef.current = 0;
@@ -229,7 +227,6 @@ const Hero = () => {
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev]);
 
-  // Preload image slides so swaps feel instant
   useEffect(() => {
     slides.forEach((slide) => {
       if (!slide.image) return;
@@ -313,64 +310,109 @@ const Hero = () => {
         </AnimatePresence>
       </motion.div>
 
-      {/* Grading */}
+      {/* Cinematic grading */}
       <div
         className="pointer-events-none absolute inset-0 z-[1]"
         style={{
           background:
-            "linear-gradient(180deg, rgba(8,12,28,0.5) 0%, rgba(8,12,28,0.1) 30%, rgba(8,12,28,0.4) 60%, rgba(6,8,18,0.96) 100%)",
+            "linear-gradient(180deg, rgba(8,12,28,0.55) 0%, rgba(8,12,28,0.12) 28%, rgba(8,12,28,0.35) 58%, rgba(6,8,18,0.97) 100%)",
         }}
       />
       <div
         className="pointer-events-none absolute inset-0 z-[1]"
         style={{
           background:
-            "radial-gradient(ellipse 70% 55% at 75% 40%, rgba(107,138,255,0.2) 0%, transparent 55%)",
+            "radial-gradient(ellipse 70% 55% at 78% 38%, rgba(107,138,255,0.22) 0%, transparent 55%)",
         }}
       />
       <div
         className="pointer-events-none absolute inset-0 z-[1]"
         style={{
           background:
-            "radial-gradient(ellipse 90% 70% at 15% 85%, transparent 0%, rgba(6,8,18,0.5) 100%)",
+            "radial-gradient(ellipse 90% 70% at 12% 88%, transparent 0%, rgba(6,8,18,0.55) 100%)",
         }}
       />
-      <div className="noise-overlay pointer-events-none absolute inset-0 z-[1] opacity-[0.26]" />
+      <div className="noise-overlay pointer-events-none absolute inset-0 z-[1] opacity-[0.28]" />
+
+      {/* Film frame */}
+      <div className="pointer-events-none absolute inset-5 z-[2] md:inset-8">
+        <span className="absolute left-0 top-0 h-9 w-9 border-l border-t border-white/20 md:h-11 md:w-11" />
+        <span className="absolute right-0 top-0 h-9 w-9 border-r border-t border-white/20 md:h-11 md:w-11" />
+        <span className="absolute bottom-0 left-0 h-9 w-9 border-b border-l border-white/20 md:h-11 md:w-11" />
+        <span className="absolute bottom-0 right-0 h-9 w-9 border-b border-r border-white/20 md:h-11 md:w-11" />
+      </div>
+
+      {/* Top HUD */}
+      <div className="pointer-events-none absolute inset-x-0 top-[calc(var(--nav-height)+0.5rem)] z-[3] hidden px-8 md:block lg:px-12">
+        <div className="container-custom flex items-center justify-between">
+          <motion.p
+            className="text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-white/35"
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            Nuam · Est. 2025
+          </motion.p>
+          <motion.div
+            className="flex items-center gap-2"
+            initial={reduceMotion ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            {isVideoSlide && (
+              <>
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inset-0 animate-ping rounded-full bg-red-500/70" />
+                  <span className="relative h-1.5 w-1.5 rounded-full bg-red-500" />
+                </span>
+                <span className="text-[0.6rem] font-semibold tracking-[0.22em] text-white/45">
+                  FILM
+                </span>
+              </>
+            )}
+            {!isVideoSlide && (
+              <span className="text-[0.6rem] font-semibold tracking-[0.22em] text-white/35">
+                STILL
+              </span>
+            )}
+          </motion.div>
+        </div>
+      </div>
 
       {/* Content */}
       <motion.div
         className="relative z-10 flex min-h-[100svh] flex-col justify-end"
-        style={reduceMotion ? undefined : { y: contentY, opacity: contentOpacity }}
+        style={
+          reduceMotion ? undefined : { y: contentY, opacity: contentOpacity }
+        }
       >
         <div className="container-custom w-full px-5 pb-24 pt-[calc(var(--nav-height)+2.5rem)] md:px-8 md:pb-28 lg:pb-32">
-          {/* Brand — class 3D letter mark */}
           <BrandMark reduceMotion={reduceMotion} />
 
           {/* Slide label */}
-          <div className="mt-8 h-5 overflow-hidden md:mt-10">
-            <AnimatePresence mode="wait">
-              <motion.p
-                key={active.label}
-                className="label-premium !text-white/45"
-                initial={reduceMotion ? false : { y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -14, opacity: 0 }}
-                transition={{ duration: 0.55, ease: cinematic }}
-              >
-                {active.label}
-              </motion.p>
-            </AnimatePresence>
+          <div className="mt-8 flex items-center gap-3 md:mt-10">
+            <span className="h-px w-6 bg-[var(--accent)]" />
+            <div className="h-5 overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={active.label}
+                  className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-white/50"
+                  initial={reduceMotion ? false : { y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -14, opacity: 0 }}
+                  transition={{ duration: 0.55, ease: cinematic }}
+                >
+                  {active.label}
+                </motion.p>
+              </AnimatePresence>
+            </div>
           </div>
 
           <div className="mt-4 grid gap-8 lg:mt-6 lg:grid-cols-12 lg:items-end lg:gap-14">
             <div className="lg:col-span-8">
-              <h1 className="font-display max-w-[16ch] text-[clamp(1.75rem,4.2vw,3.65rem)] font-bold leading-[1.06] tracking-[-0.03em]">
+              <h1 className="font-display max-w-[16ch] text-[clamp(1.85rem,4.4vw,3.85rem)] font-bold leading-[1.05] tracking-[-0.035em]">
                 <AnimatePresence mode="wait">
-                  <motion.span
-                    key={active.id}
-                    className="inline"
-                    initial={false}
-                  >
+                  <motion.span key={active.id} className="inline" initial={false}>
                     {words.map((word, i) => (
                       <span
                         key={`${active.id}-${word}-${i}`}
@@ -424,7 +466,7 @@ const Hero = () => {
                   className="group inline-flex items-center gap-3 border-b border-white/25 pb-2.5 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-white transition-colors duration-300 hover:border-[var(--accent)] hover:text-[var(--accent)]"
                 >
                   {hero.cta.label}
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)] transition-transform duration-500 ease-expo group-hover:translate-x-1 group-hover:bg-[var(--accent-soft)]">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)] transition-transform duration-500 ease-expo group-hover:translate-x-1 group-hover:scale-105">
                     <ArrowRight size={15} strokeWidth={2.5} />
                   </span>
                 </Link>
@@ -439,7 +481,11 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 1, ease }}
           >
-            <div className="flex items-center gap-3" role="tablist" aria-label="Hero slides">
+            <div
+              className="flex items-center gap-3"
+              role="tablist"
+              aria-label="Hero slides"
+            >
               {slides.map((slide, i) => {
                 const isActive = i === index;
                 return (
@@ -453,15 +499,15 @@ const Hero = () => {
                     className="group relative flex h-10 items-center"
                   >
                     <span
-                      className={`relative block h-px overflow-hidden rounded-full transition-all duration-500 ease-expo ${
+                      className={`relative block h-[2px] overflow-hidden rounded-full transition-all duration-500 ease-expo ${
                         isActive
-                          ? "w-14 bg-white/20"
+                          ? "w-16 bg-white/15"
                           : "w-7 bg-white/25 hover:bg-white/45"
                       }`}
                     >
                       {isActive && (
                         <span
-                          className="absolute inset-y-0 left-0 bg-[var(--accent)]"
+                          className="absolute inset-y-0 left-0 rounded-full bg-[var(--accent)] shadow-[0_0_12px_rgba(107,138,255,0.6)]"
                           style={{
                             width: reduceMotion
                               ? "100%"
@@ -476,7 +522,7 @@ const Hero = () => {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="mr-3 hidden font-display text-xs tracking-[0.2em] text-white/35 sm:inline">
+              <span className="mr-3 hidden font-display text-xs tracking-[0.2em] text-white/40 sm:inline">
                 {String(index + 1).padStart(2, "0")}
                 <span className="text-white/20"> / </span>
                 {String(slides.length).padStart(2, "0")}
@@ -485,7 +531,7 @@ const Hero = () => {
                 type="button"
                 onClick={prev}
                 aria-label="Previous slide"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white transition-colors duration-300 hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)]"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white backdrop-blur-sm transition-all duration-300 hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)]"
               >
                 <ArrowLeft size={16} strokeWidth={2} />
               </button>
@@ -493,13 +539,26 @@ const Hero = () => {
                 type="button"
                 onClick={next}
                 aria-label="Next slide"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white transition-colors duration-300 hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)]"
+                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white backdrop-blur-sm transition-all duration-300 hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)]"
               >
                 <ArrowRight size={16} strokeWidth={2} />
               </button>
             </div>
           </motion.div>
         </div>
+
+        {/* Scroll cue */}
+        <motion.div
+          className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex"
+          initial={reduceMotion ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.3, duration: 0.6 }}
+        >
+          <span className="text-[0.55rem] font-semibold uppercase tracking-[0.28em] text-white/30">
+            Scroll
+          </span>
+          <ArrowDown size={14} className="animate-bounce text-[var(--accent)]/70" />
+        </motion.div>
       </motion.div>
     </section>
   );
