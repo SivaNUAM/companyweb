@@ -1,10 +1,17 @@
-import StubPage from "./StubPage";
+import CareersHero from "../components/careers/CareersHero";
+import CareersOpenings from "../components/careers/CareersOpenings";
+import CareersCulture from "../components/careers/CareersCulture";
+import CareersCTA from "../components/careers/CareersCTA";
 
-const Careers = () => (
-  <StubPage
-    title="Careers"
-    description="We're building a place people want to grow. Roles and culture details land here next."
-  />
-);
+const Careers = () => {
+  return (
+    <>
+      <CareersHero />
+      <CareersOpenings />
+      <CareersCulture />
+      <CareersCTA />
+    </>
+  );
+};
 
 export default Careers;

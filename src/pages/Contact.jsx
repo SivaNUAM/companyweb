@@ -1,23 +1,30 @@
-import Reveal from "../components/ui/Reveal";
+import ContactHero from "../components/contact/ContactHero";
+import ContactChannels from "../components/contact/ContactChannels";
+import ContactFormPanel from "../components/contact/ContactFormPanel";
 
 const Contact = () => {
   return (
-    <section className="section-surface section-padding pt-[calc(var(--nav-height)+3rem)] min-h-[80vh]">
-      <div className="container-custom max-w-3xl">
-        <Reveal>
-          <p className="label-premium mb-4">Contact</p>
-          <h1 className="font-display text-5xl font-bold tracking-tight md:text-6xl lg:text-7xl">
-            Let&apos;s talk.
-          </h1>
-          <p className="mt-6 text-lg leading-relaxed text-[var(--text-secondary)]">
-            Tell us about your product, brand, or platform. We typically reply within one business day.
-          </p>
-          <a href="mailto:hello@nuam.tech" className="btn-accent mt-10 inline-flex">
-            hello@nuam.tech
-          </a>
-        </Reveal>
-      </div>
-    </section>
+    <>
+      <ContactHero />
+
+      <section className="relative overflow-hidden section-surface section-padding">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -left-4 top-16 select-none font-display text-[min(36vw,14rem)] font-extrabold leading-none tracking-[-0.06em] text-[var(--ink)]/[0.03]"
+        >
+          HELLO
+        </span>
+
+        <div className="container-custom relative grid gap-16 lg:grid-cols-12 lg:gap-16 xl:gap-20">
+          <div className="lg:col-span-5">
+            <ContactChannels />
+          </div>
+          <div className="lg:col-span-7">
+            <ContactFormPanel />
+          </div>
+        </div>
+      </section>
+    </>
   );
 };
 

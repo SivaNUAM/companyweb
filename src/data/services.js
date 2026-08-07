@@ -4,8 +4,8 @@ export const servicesHero = {
   support:
     "Nuam Technologies Pvt Ltd — from first sketch to production scale. Strategy, design, and engineering under one corporate roof since 2025.",
   image:
-    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=2400&q=85",
-  imageAlt: "Abstract technology and light trails",
+    "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=2400&q=85",
+  imageAlt: "Earth from orbit — technology and global systems",
 };
 
 export const serviceOfferings = [

@@ -13,18 +13,20 @@ import { works, worksSection } from "../../data/home";
 /** Shared pin line under the fixed header — every card sticks here */
 const STICKY_TOP = "calc(var(--nav-height) + 0.75rem)";
 
-/** Scroll gap before the next card covers this one — tapers so the end doesn’t drag */
+/** Scroll gap before the next card covers this one — tapers hard at the end to avoid stuck */
 const coverGap = (index, total) => {
   if (index >= total - 1) return 0;
-  // Earlier cards: room to read; later cards: quicker handoff
-  const base = 36 - index * 4;
+  const fromEnd = total - 1 - index;
+  // Final handoffs stay short so Lenis doesn’t fight sticky release
+  if (fromEnd === 1) return 10;
+  if (fromEnd === 2) return 14;
+  const base = 30 - index * 3;
   return Math.max(16, base);
 };
 
 /**
  * Classic sticky deck: each card is sticky at the same top.
- * Later cards (higher z-index) slide up and sit on top of earlier ones.
- * Last card is NOT sticky so the stack releases cleanly (no end-of-deck stuck feel).
+ * Gaps live on SEPARATE spacer nodes (not margin on sticky) — fixes end-of-stack stuck.
  */
 const WorkCard = ({ work, index, total }) => {
   const cardRef = useRef(null);
@@ -33,7 +35,6 @@ const WorkCard = ({ work, index, total }) => {
   const isLast = index === total - 1;
   const gap = coverGap(index, total);
 
-  // Progress while this card is pinned and the next one climbs over it
   const { scrollYProgress } = useScroll({
     target: cardRef,
     offset: ["start start", "end start"],
@@ -41,100 +42,110 @@ const WorkCard = ({ work, index, total }) => {
 
   const scale = useTransform(
     scrollYProgress,
-    [0, 0.2, 1],
+    [0, 0.25, 1],
     reduceMotion || isLast ? [1, 1, 1] : [1, 1, 0.95],
   );
   const overlayOpacity = useTransform(
     scrollYProgress,
-    [0, 0.2, 1],
+    [0, 0.25, 1],
     reduceMotion || isLast ? [0, 0, 0] : [0, 0, 0.32],
   );
 
   return (
-    <div
-      ref={cardRef}
-      className={`px-3 md:px-4 lg:px-5 ${isLast ? "relative" : "sticky"}`}
-      style={{
-        top: isLast ? undefined : STICKY_TOP,
-        zIndex: index + 1,
-        marginBottom: gap ? `${gap}vh` : undefined,
-      }}
-    >
-      {/* Transform only on INNER content — never on the sticky node itself */}
-      <motion.div
-        style={reduceMotion ? undefined : { scale }}
-        className="origin-center will-change-transform"
+    <>
+      <div
+        ref={cardRef}
+        className="sticky px-3 md:px-4 lg:px-5"
+        style={{
+          top: STICKY_TOP,
+          zIndex: index + 1,
+        }}
       >
-        <Link
-          to="/portfolio"
-          className="group relative block outline-none"
-          aria-label={`${work.client} — ${work.industry}`}
+        {/* Transform only on INNER content — never on the sticky node itself */}
+        <motion.div
+          style={reduceMotion ? undefined : { scale }}
+          className="origin-center will-change-transform"
         >
-          <article className="relative overflow-hidden rounded-2xl bg-ink shadow-[0_24px_64px_rgba(0,0,0,0.35)] md:rounded-3xl">
-            <div className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-[16/10] lg:aspect-[2.1/1] lg:max-h-[min(68vh,38rem)]">
-              <img
-                src={work.image}
-                alt=""
-                aria-hidden
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.4s] ease-expo group-hover:scale-[1.04]"
-                loading={index === 0 ? "eager" : "lazy"}
-                sizes="100vw"
-              />
+          <Link
+            to="/portfolio"
+            className="group relative block outline-none"
+            aria-label={`${work.client} — ${work.industry}`}
+          >
+            <article className="relative overflow-hidden rounded-2xl bg-ink shadow-[0_24px_64px_rgba(0,0,0,0.35)] md:rounded-3xl">
+              <div className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-[16/10] lg:aspect-[2.1/1] lg:max-h-[min(68vh,38rem)]">
+                <img
+                  src={work.image}
+                  alt=""
+                  aria-hidden
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.4s] ease-expo group-hover:scale-[1.04]"
+                  loading={index === 0 ? "eager" : "lazy"}
+                  sizes="100vw"
+                />
 
-              <div
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(180deg, rgba(11,11,11,0.15) 0%, rgba(11,11,11,0.05) 40%, rgba(11,11,11,0.72) 78%, rgba(11,11,11,0.94) 100%)",
-                }}
-              />
-              <div className="pointer-events-none absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/20" />
-              <div className="noise-overlay pointer-events-none absolute inset-0 opacity-20" />
+                <div
+                  className="pointer-events-none absolute inset-0"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, rgba(11,11,11,0.15) 0%, rgba(11,11,11,0.05) 40%, rgba(11,11,11,0.72) 78%, rgba(11,11,11,0.94) 100%)",
+                  }}
+                />
+                <div className="pointer-events-none absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/20" />
+                <div className="noise-overlay pointer-events-none absolute inset-0 opacity-20" />
 
-              <motion.div
-                aria-hidden
-                className="pointer-events-none absolute inset-0 bg-black"
-                style={{ opacity: overlayOpacity }}
-              />
-            </div>
-
-            <div className="absolute inset-0 flex flex-col justify-between p-5 sm:p-7 md:p-10 lg:p-12">
-              <div className="flex items-start justify-between gap-4">
-                <span className="font-display text-sm font-semibold tracking-[0.2em] text-white/45 md:text-base">
-                  {number}
-                </span>
-                <span className="label-premium !text-white/50 transition-colors duration-300 group-hover:!text-[var(--accent)]">
-                  {work.industry}
-                </span>
+                <motion.div
+                  aria-hidden
+                  className="pointer-events-none absolute inset-0 bg-black"
+                  style={{ opacity: overlayOpacity }}
+                />
               </div>
 
-              <div className="flex items-end justify-between gap-6">
-                <div className="min-w-0 max-w-3xl">
-                  <h3 className="font-display text-[clamp(1.65rem,3.8vw,3.25rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white transition-transform duration-500 ease-expo group-hover:-translate-y-1">
-                    {work.client}
-                  </h3>
-
-                  <div className="mt-3 h-px w-0 bg-[var(--accent)] transition-all duration-500 ease-expo group-hover:w-16" />
-
-                  <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/70 transition-all duration-500 ease-expo md:text-base md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
-                    {work.title}
-                  </p>
+              <div className="absolute inset-0 flex flex-col justify-between p-5 sm:p-7 md:p-10 lg:p-12">
+                <div className="flex items-start justify-between gap-4">
+                  <span className="font-display text-sm font-semibold tracking-[0.2em] text-white/45 md:text-base">
+                    {number}
+                  </span>
+                  <span className="label-premium !text-white/50 transition-colors duration-300 group-hover:!text-[var(--accent)]">
+                    {work.industry}
+                  </span>
                 </div>
 
-                <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/25 text-white transition-all duration-500 ease-expo group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-[var(--accent-ink)] sm:h-14 sm:w-14">
-                  <ArrowUpRight
-                    size={20}
-                    className="transition-transform duration-500 ease-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  />
-                </span>
-              </div>
-            </div>
+                <div className="flex items-end justify-between gap-6">
+                  <div className="min-w-0 max-w-3xl">
+                    <h3 className="font-display text-[clamp(1.65rem,3.8vw,3.25rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white transition-transform duration-500 ease-expo group-hover:-translate-y-1">
+                      {work.client}
+                    </h3>
 
-            <span className="pointer-events-none absolute inset-0 ring-0 ring-[var(--accent)] transition-[box-shadow] duration-300 group-focus-visible:ring-2" />
-          </article>
-        </Link>
-      </motion.div>
-    </div>
+                    <div className="mt-3 h-px w-0 bg-[var(--accent)] transition-all duration-500 ease-expo group-hover:w-16" />
+
+                    <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/70 transition-all duration-500 ease-expo md:text-base md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
+                      {work.title}
+                    </p>
+                  </div>
+
+                  <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/25 text-white transition-all duration-500 ease-expo group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-[var(--accent-ink)] sm:h-14 sm:w-14">
+                    <ArrowUpRight
+                      size={20}
+                      className="transition-transform duration-500 ease-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                  </span>
+                </div>
+              </div>
+
+              <span className="pointer-events-none absolute inset-0 ring-0 ring-[var(--accent)] transition-[box-shadow] duration-300 group-focus-visible:ring-2" />
+            </article>
+          </Link>
+        </motion.div>
+      </div>
+
+      {/* Spacer outside sticky — prevents margin-on-sticky release bug */}
+      {gap > 0 && (
+        <div
+          aria-hidden
+          className="pointer-events-none"
+          style={{ height: `${gap}vh` }}
+        />
+      )}
+    </>
   );
 };
 
@@ -176,7 +187,7 @@ const SelectedWorks = () => {
       </div>
 
       {/* Sibling sticky cards = true deck stack */}
-      <div className="relative pb-10 md:pb-16">
+      <div className="relative isolate pb-8 md:pb-12">
         {works.map((work, index) => (
           <WorkCard
             key={work.id}
