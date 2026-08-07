@@ -48,7 +48,13 @@
     font-family: var(--font-body);
     background-color: var(--surface);
     color: var(--text-primary);
-    overflow-x: hidden;
+    /* clip keeps sticky positioning working (hidden breaks position:sticky) */
+    overflow-x: clip;
+  }
+
+  html.welcome-loading,
+  html.welcome-loading body {
+    overflow: hidden;
   }
 
   h1,
