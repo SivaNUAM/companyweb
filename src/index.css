@@ -1,0 +1,269 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Syne:wght@500;600;700;800&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #0b0b0b;
+  --color-surface: #f6f5f2;
+  --color-accent: #6b8aff;
+  --font-display: "Syne", system-ui, sans-serif;
+  --font-sans: "DM Sans", system-ui, sans-serif;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  --ink: #0b0b0b;
+  --surface: #f6f5f2;
+  --surface-elevated: #ffffff;
+  --border-subtle: rgba(11, 11, 11, 0.08);
+  --border-strong: rgba(11, 11, 11, 0.16);
+  --text-primary: #0b0b0b;
+  --text-secondary: #4a4a4a;
+  --text-muted: #8a8a8a;
+  /* Matches hero1.png screen UI — electric blue (replaces lime) */
+  --accent: #6b8aff;
+  --accent-soft: #8b7cf7;
+  --accent-ink: #ffffff;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --font-display: "Syne", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --nav-height: 7rem;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--surface);
+    color: var(--text-primary);
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-display {
+    font-family: var(--font-display);
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--ink);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    max-width: 100%;
+    display: block;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--ink);
+    color: white;
+    font-family: var(--font-body);
+    font-weight: 600;
+    padding: 1rem 1.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: transform 0.35s var(--ease-out-expo), background-color 0.25s,
+      color 0.25s;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--accent);
+    color: var(--accent-ink);
+    transform: scale(1.02);
+  }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-strong);
+    font-weight: 600;
+    padding: 1rem 1.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: background-color 0.25s, border-color 0.25s, color 0.25s;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--ink);
+    background-color: var(--ink);
+    color: white;
+  }
+
+  .btn-accent {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 700;
+    padding: 1rem 1.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: transform 0.35s var(--ease-out-expo), opacity 0.25s;
+  }
+
+  .btn-accent:hover {
+    transform: scale(1.02);
+    opacity: 0.92;
+  }
+
+  .section-padding {
+    padding: 5rem 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .section-padding {
+      padding: 6.5rem 2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-padding {
+      padding: 8rem 2.5rem;
+    }
+  }
+
+  .container-custom {
+    max-width: 90rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .label-premium {
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .noise-overlay {
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee 40s linear infinite;
+    will-change: transform;
+  }
+
+  .marquee-track-reverse {
+    display: flex;
+    width: max-content;
+    animation: marquee-reverse 48s linear infinite;
+    will-change: transform;
+  }
+
+  .marquee-track:hover,
+  .marquee-track-reverse:hover {
+    animation-play-state: paused;
+  }
+
+  .client-name-outline {
+    -webkit-text-stroke: 1.25px rgba(11, 11, 11, 0.22);
+    color: transparent;
+    transition: color 0.35s var(--ease-out-expo),
+      -webkit-text-stroke-color 0.35s var(--ease-out-expo);
+  }
+
+  .client-name-outline:hover {
+    color: var(--ink);
+    -webkit-text-stroke-color: transparent;
+  }
+
+  .page-shell {
+    min-height: 100vh;
+  }
+
+  .section-ink {
+    background-color: var(--ink);
+    color: white;
+  }
+
+  .section-surface {
+    background-color: var(--surface);
+    color: var(--text-primary);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@keyframes marquee-reverse {
+  from {
+    transform: translate3d(-50%, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .marquee-track-reverse {
+    animation: none;
+  }
+
+  .btn-primary:hover,
+  .btn-accent:hover {
+    transform: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
