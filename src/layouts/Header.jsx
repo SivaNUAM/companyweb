@@ -79,6 +79,14 @@ const Header = () => {
     };
   }, [open]);
 
+  // Hard unlock if component remounts mid-open (HMR / route edge cases)
+  useEffect(() => {
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.classList.remove("mobile-nav-open");
+    };
+  }, []);
+
   return (
     <>
       <header

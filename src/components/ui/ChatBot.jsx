@@ -366,6 +366,21 @@ const ChatBot = () => {
     if (open) endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing, open]);
 
+  // Close chat when mobile menu opens
+  useEffect(() => {
+    const root = document.documentElement;
+    const sync = () => {
+      if (root.classList.contains("mobile-nav-open")) {
+        setOpen(false);
+        setMood("idle");
+      }
+    };
+    sync();
+    const observer = new MutationObserver(sync);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
   const send = (raw) => {
     const text = (raw ?? input).trim();
     if (!text) return;

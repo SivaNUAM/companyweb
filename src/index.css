@@ -51,7 +51,8 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
+    /* clip (not hidden) — hidden forces overflow-y:auto and breaks Lenis + sticky */
+    overflow-x: clip;
     max-width: 100%;
   }
 
@@ -68,7 +69,6 @@
     font-family: var(--font-body);
     background-color: var(--surface);
     color: var(--text-primary);
-    /* clip keeps sticky positioning working (hidden breaks position:sticky) */
     overflow-x: clip;
     max-width: 100%;
     width: 100%;
@@ -1526,15 +1526,15 @@
     color: rgba(255, 255, 255, 0.45);
   }
 
-  /* Mobile: scrub track so sticky panel holds through full list */
+  /* Mobile: normal flow (no sticky scrub) — sticky only from md up */
   .site-wwd-track {
     position: relative;
-    height: 140vh;
+    height: auto;
   }
 
   .site-wwd-sticky {
-    position: sticky;
-    top: calc(var(--nav-height) + 0.5rem);
+    position: relative;
+    top: auto;
     z-index: 2;
     display: flex;
     align-items: flex-start;
@@ -1546,7 +1546,7 @@
     width: 100%;
     height: auto;
     align-items: flex-start;
-    padding-bottom: 1.25rem;
+    padding-bottom: 2.5rem;
   }
 
   .site-wwd-panel {
@@ -1619,6 +1619,8 @@
     }
 
     .site-wwd-sticky {
+      position: sticky;
+      top: calc(var(--nav-height) + 0.5rem);
       align-items: center;
       height: calc(100svh - var(--nav-height) - 1rem);
       max-height: calc(100svh - var(--nav-height) - 1rem);
@@ -3092,6 +3094,18 @@
     gap: 0.5rem;
     width: max-content;
     max-width: calc(100vw - 1.25rem);
+    transition:
+      opacity 0.25s ease,
+      visibility 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  /* Hide chatbot while mobile nav menu is open */
+  html.mobile-nav-open .site-chat {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(10px) scale(0.96);
   }
 
   .site-chat-fab-wrap {

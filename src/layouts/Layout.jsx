@@ -15,6 +15,15 @@ const Layout = () => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  // Clear leftover scroll locks (HMR / menu) without fighting PageLoader
+  useEffect(() => {
+    document.documentElement.classList.remove(
+      "welcome-loading",
+      "mobile-nav-open",
+    );
+    document.body.style.overflow = "";
+  }, [pathname]);
+
   return (
     <div className="page-shell max-w-full overflow-x-clip bg-[var(--surface)] text-[var(--text-primary)]">
       <CustomCursor />
