@@ -15,9 +15,9 @@ function App() {
   return (
     <>
       <WelcomeLoader onDone={onWelcomeDone} />
+      {/* Keep the page painted under the loader — no opacity fade / white flash */}
       <div
-        className={ready ? "opacity-100" : "opacity-0"}
-        style={{ transition: "opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1)" }}
+        className={ready ? undefined : "pointer-events-none select-none"}
         aria-hidden={!ready}
       >
         <AppRoutes />

@@ -4,8 +4,8 @@ export const contactHero = {
   support:
     "Tell Nuam Technologies Pvt Ltd about your product, platform, or transformation. We typically reply within one business day.",
   image:
-    "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=2400&q=90",
-  imageAlt: "Team collaborating in a bright, colorful modern office",
+    "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=2400&q=90",
+  imageAlt: "Dark modern workspace with screens and deep ambient light",
 };
 
 export const contactChannels = [

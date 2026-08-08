@@ -6,7 +6,7 @@ import { contactChannels, contactDetails } from "../../data/contact";
 
 const ContactChannels = () => {
   return (
-    <div>
+    <div className="site-contact-channels">
       <Reveal>
         <p className="label-premium mb-8">Reach us</p>
         <ul className="space-y-0">
@@ -25,7 +25,7 @@ const ContactChannels = () => {
                   </p>
                   <a
                     href={ch.href}
-                    className="mt-3 inline-flex items-center gap-2 font-display text-xl font-bold tracking-tight transition-colors hover:text-[var(--accent)] md:text-2xl lg:text-3xl"
+                    className="site-contact-channel-value font-display mt-3 inline-flex items-center gap-2 transition-colors hover:text-[var(--accent)]"
                   >
                     {ch.value}
                     <ArrowUpRight

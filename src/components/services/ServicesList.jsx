@@ -15,7 +15,7 @@ const ServiceRow = ({ service, index }) => {
     <Reveal delay={Math.min(index * 0.04, 0.16)} amount={0.18}>
       <article
         id={service.id}
-        className="group/row scroll-mt-28 border-t border-[var(--border-subtle)] py-16 md:py-24"
+        className="site-svc-row group/row scroll-mt-28 border-t border-[var(--border-subtle)]"
       >
         <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-16">
           {/* Media */}
@@ -52,11 +52,7 @@ const ServiceRow = ({ service, index }) => {
                   <span className="h-px w-8 bg-[var(--accent)]" />
                 </div>
 
-                {/* Giant ghost number */}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -bottom-6 right-2 font-display text-[clamp(5rem,14vw,9rem)] font-extrabold leading-none tracking-[-0.06em] text-white/[0.07] select-none"
-                >
+                <span aria-hidden className="site-svc-ghost select-none">
                   {number}
                 </span>
               </div>
@@ -70,7 +66,7 @@ const ServiceRow = ({ service, index }) => {
             <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-[var(--accent)]">
               Capability {number}
             </p>
-            <h2 className="font-display mt-3 text-[clamp(1.9rem,3.6vw,3.15rem)] font-bold leading-[1.05] tracking-[-0.035em]">
+            <h2 className="site-svc-copy-title font-display mt-3 leading-[1.05]">
               {service.title}
             </h2>
             <p className="mt-3 max-w-md text-sm font-medium leading-relaxed text-[var(--text-muted)] md:text-[0.95rem]">
@@ -111,13 +107,13 @@ const ServiceRow = ({ service, index }) => {
 
 const ServicesList = () => {
   return (
-    <section className="section-surface section-padding !pt-12 md:!pt-16">
+    <section className="site-svc-list section-surface section-padding !pt-12 md:!pt-16">
       <div className="container-custom">
         <Reveal>
           <div className="mb-6 flex flex-col gap-6 border-b border-[var(--border-subtle)] pb-12 md:mb-4 md:flex-row md:items-end md:justify-between md:pb-14">
             <div>
               <p className="label-premium mb-4">Offerings</p>
-              <h2 className="font-display text-[clamp(2.25rem,5vw,4rem)] font-bold leading-[0.95] tracking-[-0.035em]">
+              <h2 className="site-svc-list-title font-display">
                 Six ways we
                 <span className="block text-[var(--text-muted)]">
                   create leverage.

@@ -36,11 +36,7 @@ const TypeLine = ({ text, active, emphasize, reduceMotion, onDone }) => {
   if (!show && !reduceMotion) return null;
 
   return (
-    <p
-      className={`font-display text-[clamp(1.35rem,2.8vw,2.35rem)] font-semibold leading-[1.25] tracking-[-0.025em] ${
-        emphasize ? "text-[var(--ink)]" : "text-[var(--text-secondary)]"
-      }`}
-    >
+    <p className={`site-about-manif-line${emphasize ? " is-em" : ""}`}>
       {text.slice(0, n)}
       {active && n < text.length && (
         <motion.span
@@ -65,10 +61,10 @@ const AboutManifesto = () => {
   }, [reduceMotion]);
 
   return (
-    <section className="relative overflow-hidden section-surface section-padding">
+    <section className="site-about-manif section-surface section-padding">
       <motion.span
         aria-hidden
-        className="pointer-events-none absolute -right-8 top-10 select-none font-display text-[min(40vw,18rem)] font-extrabold leading-none tracking-[-0.06em] text-[var(--ink)]/[0.03]"
+        className="site-about-manif-mark"
         initial={reduceMotion ? false : { opacity: 0, x: 40 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
@@ -77,8 +73,8 @@ const AboutManifesto = () => {
         STORY
       </motion.span>
 
-      <div className="container-custom relative grid gap-12 lg:grid-cols-12 lg:gap-12">
-        <Reveal className="lg:col-span-4">
+      <div className="site-about-manif-grid container-custom">
+        <Reveal className="site-about-manif-aside">
           <div className="lg:sticky lg:top-28">
             <p className="label-premium mb-5">{aboutManifesto.label}</p>
             <div className="h-px w-12 bg-[var(--accent)]" />
@@ -94,11 +90,8 @@ const AboutManifesto = () => {
           </div>
         </Reveal>
 
-        <div className="lg:col-span-8" ref={ref}>
-          <span
-            aria-hidden
-            className="font-display mb-2 block text-6xl font-extrabold leading-none text-[var(--accent)] md:text-7xl"
-          >
+        <div className="site-about-manif-body" ref={ref}>
+          <span aria-hidden className="site-about-manif-quote">
             “
           </span>
           <div className="space-y-7 md:space-y-9">

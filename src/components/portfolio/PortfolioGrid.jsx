@@ -25,7 +25,7 @@ const WorkCard = ({ work, index }) => {
         aria-label={`${work.client} — ${work.industry}`}
       >
         <article className="relative overflow-hidden bg-ink">
-          <div className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-[16/10] lg:aspect-[21/9]">
+          <div className="site-folio-card w-full">
             <motion.div
               className="absolute inset-0"
               initial={reduceMotion ? false : { scale: 1.1 }}
@@ -54,7 +54,7 @@ const WorkCard = ({ work, index }) => {
             <div className="noise-overlay pointer-events-none absolute inset-0 opacity-20" />
           </div>
 
-          <div className="absolute inset-0 flex flex-col justify-between p-5 sm:p-7 md:p-10 lg:p-12">
+          <div className="site-folio-overlay absolute inset-0 flex flex-col justify-between">
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-4">
                 <span className="font-display text-sm font-semibold tracking-[0.2em] text-white/45">
@@ -71,7 +71,7 @@ const WorkCard = ({ work, index }) => {
 
             <div className="flex items-end justify-between gap-6">
               <div className="min-w-0 max-w-3xl">
-                <h3 className="font-display text-[clamp(1.65rem,3.8vw,3.25rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white transition-transform duration-500 ease-expo group-hover:-translate-y-1">
+                <h3 className="site-folio-client font-display text-white transition-transform duration-500 ease-expo group-hover:-translate-y-1">
                   {work.client}
                 </h3>
                 <div className="mt-3 h-px w-0 bg-[var(--accent)] transition-all duration-500 ease-expo group-hover:w-16" />
@@ -93,7 +93,7 @@ const WorkCard = ({ work, index }) => {
                 </ul>
               </div>
 
-              <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/25 text-white transition-all duration-500 ease-expo group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-[var(--accent-ink)] sm:h-14 sm:w-14">
+              <span className="site-folio-arrow relative flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/25 text-white transition-all duration-500 ease-expo group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-[var(--accent-ink)]">
                 <ArrowUpRight
                   size={20}
                   className="transition-transform duration-500 ease-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -118,14 +118,14 @@ const PortfolioGrid = () => {
   }, [filter]);
 
   return (
-    <section className="section-surface overflow-hidden">
+    <section className="site-folio section-surface">
       <div className="section-padding pb-8 md:pb-10">
         <div className="container-custom">
           <Reveal>
             <div className="mb-10 flex flex-col gap-8 border-b border-[var(--border-subtle)] pb-10 md:mb-12 md:flex-row md:items-end md:justify-between md:pb-12">
               <div>
                 <p className="label-premium mb-4">Case studies</p>
-                <h2 className="font-display text-[clamp(2rem,4.5vw,3.5rem)] font-bold leading-[0.95] tracking-[-0.035em]">
+                <h2 className="site-folio-title font-display">
                   Archive
                   <span className="block text-[var(--text-muted)]">
                     {String(filtered.length).padStart(2, "0")} projects
@@ -168,7 +168,7 @@ const PortfolioGrid = () => {
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 px-3 pb-[4.5rem] md:gap-4 md:px-4 md:pb-28 lg:px-5">
+      <div className="site-folio-deck">
         <AnimatePresence mode="popLayout">
           {filtered.map((work, index) => (
             <WorkCard key={work.id} work={work} index={index} />

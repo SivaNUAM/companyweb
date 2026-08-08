@@ -8,7 +8,7 @@ const PortfolioHero = () => {
   const words = portfolioHero.headline.split(" ");
 
   return (
-    <section className="relative min-h-[75svh] overflow-hidden bg-ink text-white">
+    <section className="site-phero is-portfolio">
       <motion.div
         className="absolute inset-0"
         initial={reduceMotion ? false : { scale: 1.12 }}
@@ -33,7 +33,7 @@ const PortfolioHero = () => {
       />
       <div className="noise-overlay pointer-events-none absolute inset-0 opacity-30" />
 
-      <div className="relative z-10 flex min-h-[75svh] flex-col justify-end px-5 pb-16 pt-[calc(var(--nav-height)+3rem)] md:px-8 md:pb-24">
+      <div className="site-phero-content">
         <div className="container-custom w-full">
           <motion.p
             className="label-premium !text-white/45"
@@ -51,7 +51,7 @@ const PortfolioHero = () => {
             transition={{ duration: 0.9, ease, delay: 0.2 }}
           />
 
-          <h1 className="mt-7 max-w-4xl font-display text-[clamp(2rem,5vw,4.25rem)] font-bold leading-[1.05] tracking-[-0.035em]">
+          <h1 className="site-phero-headline">
             {words.map((word, i) => (
               <span
                 key={`${word}-${i}`}
@@ -74,7 +74,7 @@ const PortfolioHero = () => {
           </h1>
 
           <motion.p
-            className="mt-6 max-w-xl text-base leading-relaxed text-white/70 md:text-lg"
+            className="site-phero-support"
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{

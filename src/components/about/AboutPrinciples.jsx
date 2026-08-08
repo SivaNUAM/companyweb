@@ -4,7 +4,7 @@ import { aboutPrinciples } from "../../data/about";
 
 const AboutPrinciples = () => {
   return (
-    <section className="relative overflow-hidden section-ink section-padding">
+    <section className="site-about-prin section-ink section-padding">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -right-24 top-1/4 h-[28rem] w-[28rem] rounded-full bg-[var(--accent)]/12 blur-[120px]" />
         <div className="noise-overlay absolute inset-0 opacity-20" />
@@ -15,7 +15,7 @@ const AboutPrinciples = () => {
           <div className="mb-14 flex flex-col gap-6 border-b border-white/10 pb-10 md:mb-20 md:flex-row md:items-end md:justify-between md:pb-12">
             <div>
               <p className="label-premium !text-white/35 mb-4">Principles</p>
-              <h2 className="font-display text-[clamp(2.25rem,5vw,4rem)] font-bold leading-[0.95] tracking-[-0.035em] text-white">
+              <h2 className="site-about-prin-title font-display text-white">
                 What we
                 <span className="block text-white/35">won’t compromise.</span>
               </h2>
@@ -26,7 +26,7 @@ const AboutPrinciples = () => {
           </div>
         </Reveal>
 
-        <div className="grid md:grid-cols-2">
+        <div className="site-about-prin-grid">
           {aboutPrinciples.map((item, i) => {
             const isLeft = i % 2 === 0;
             const isTop = i < 2;
@@ -34,7 +34,7 @@ const AboutPrinciples = () => {
               <Reveal key={item.id} delay={Math.min(i * 0.08, 0.24)}>
                 <article
                   className={[
-                    "group relative overflow-hidden py-10 md:py-14",
+                    "site-about-prin-card group py-10 md:py-14",
                     isLeft ? "md:pr-12 md:border-r md:border-white/10" : "md:pl-12",
                     isTop ? "border-b border-white/10" : "",
                     !isTop ? "border-b border-white/10 md:border-b-0" : "",
@@ -44,7 +44,7 @@ const AboutPrinciples = () => {
                 >
                   <motion.div
                     aria-hidden
-                    className="pointer-events-none absolute -right-4 top-4 font-display text-[6rem] font-extrabold leading-none text-white/[0.03] transition-colors duration-500 group-hover:text-[var(--accent)]/[0.08]"
+                    className="site-about-prin-ghost transition-colors duration-500 group-hover:text-[var(--accent)]/[0.08]"
                   >
                     {String(i + 1).padStart(2, "0")}
                   </motion.div>

@@ -22,7 +22,7 @@ const FooterLink = ({ to, label }) => (
   <li>
     <Link
       to={to}
-      className="group inline-flex items-center gap-2 text-[0.95rem] text-white/55 transition-colors duration-300 hover:text-white"
+      className="group inline-flex min-h-11 items-center gap-2 py-1 text-[0.9rem] text-white/55 transition-colors duration-300 hover:text-white sm:min-h-0 sm:text-[0.95rem]"
     >
       <span className="relative">
         {label}
@@ -36,22 +36,25 @@ const Footer = () => {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden section-ink">
+    <footer className="site-footer relative overflow-hidden section-ink">
       <div className="noise-overlay pointer-events-none absolute inset-0 opacity-20" />
 
       <div className="container-custom relative section-padding !pb-8 md:!pb-10">
-        {/* Top brand band */}
         <Reveal>
-          <div className="flex flex-col gap-8 border-b border-white/10 pb-12 md:flex-row md:items-end md:justify-between md:pb-16">
-            <div>
-              <Link to="/" className="inline-flex items-center" aria-label="Nuam home">
+          <div className="site-footer-brand flex flex-col border-b border-white/10 md:flex-row md:items-end md:justify-between">
+            <div className="min-w-0">
+              <Link
+                to="/"
+                className="site-footer-logo inline-flex max-w-full items-center"
+                aria-label="Nuam home"
+              >
                 <BrandLogo
                   tone="light"
                   size="footer"
                   className="drop-shadow-[0_4px_20px_rgba(107,138,255,0.25)]"
                 />
               </Link>
-              <p className="mt-6 max-w-md text-[0.95rem] leading-relaxed text-white/50 md:text-base">
+              <p className="mt-5 max-w-md text-sm leading-relaxed text-white/50 sm:mt-6 sm:text-[0.95rem] md:text-base">
                 Nuam Technologies Pvt Ltd — founded 2025, corporate technology
                 partner in 2026. Brands, platforms, and experiences that move
                 businesses forward.
@@ -60,60 +63,64 @@ const Footer = () => {
 
             <a
               href="mailto:hello@nuam.tech"
-              className="group inline-flex items-center gap-3 self-start md:self-auto"
+              className="group mt-2 inline-flex max-w-full items-center gap-3 self-start break-all md:mt-0 md:self-auto"
             >
-              <span className="border-b border-white/25 pb-1 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white transition-colors duration-300 group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
+              <span className="border-b border-white/25 pb-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white transition-colors duration-300 group-hover:border-[var(--accent)] group-hover:text-[var(--accent)] sm:text-[0.7rem] sm:tracking-[0.18em]">
                 hello@nuam.tech
               </span>
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)] transition-transform duration-500 ease-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)] transition-transform duration-500 ease-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
                 <ArrowUpRight size={15} strokeWidth={2.5} />
               </span>
             </a>
           </div>
         </Reveal>
 
-        {/* Link columns */}
-        <div className="grid gap-12 py-12 md:grid-cols-12 md:gap-8 md:py-16">
-          <Reveal className="md:col-span-4" delay={0.05}>
-            <p className="font-display text-[clamp(1.5rem,3vw,2rem)] font-bold leading-snug tracking-[-0.03em] text-white">
+        <div className="site-footer-grid">
+          <Reveal className="site-footer-cta" delay={0.05}>
+            <p className="font-display text-[clamp(1.35rem,5vw,2rem)] font-bold leading-snug tracking-[-0.03em] text-white">
               Let&apos;s build
               <span className="block text-white/35">what comes next.</span>
             </p>
             <Link
               to="/contact"
-              className="mt-6 inline-flex items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-[var(--accent)] transition-opacity hover:opacity-70"
+              className="mt-5 inline-flex min-h-11 items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-[var(--accent)] transition-opacity hover:opacity-70 sm:mt-6 sm:min-h-0"
             >
               Start a project
               <ArrowUpRight size={14} />
             </Link>
           </Reveal>
 
-          <Reveal className="md:col-span-4 md:pl-6" delay={0.1}>
-            <p className="label-premium !text-white/30 mb-5">Company</p>
-            <ul className="space-y-3.5">
-              {companyLinks.map((link) => (
-                <FooterLink key={link.label} {...link} />
-              ))}
-            </ul>
-          </Reveal>
+          <div className="site-footer-links">
+            <Reveal delay={0.1}>
+              <p className="label-premium mb-4 !text-white/30 sm:mb-5">
+                Company
+              </p>
+              <ul className="space-y-1 sm:space-y-3.5">
+                {companyLinks.map((link) => (
+                  <FooterLink key={link.label} {...link} />
+                ))}
+              </ul>
+            </Reveal>
 
-          <Reveal className="md:col-span-4 md:pl-6" delay={0.15}>
-            <p className="label-premium !text-white/30 mb-5">Services</p>
-            <ul className="space-y-3.5">
-              {serviceLinks.map((link) => (
-                <FooterLink key={link.label} {...link} />
-              ))}
-            </ul>
-          </Reveal>
+            <Reveal delay={0.15}>
+              <p className="label-premium mb-4 !text-white/30 sm:mb-5">
+                Services
+              </p>
+              <ul className="space-y-1 sm:space-y-3.5">
+                {serviceLinks.map((link) => (
+                  <FooterLink key={link.label} {...link} />
+                ))}
+              </ul>
+            </Reveal>
+          </div>
         </div>
 
-        {/* Bottom meta */}
         <Reveal delay={0.2}>
-          <div className="flex flex-col gap-4 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-[0.7rem] tracking-[0.08em] text-white/30">
+          <div className="site-footer-meta flex border-t border-white/10">
+            <p className="text-[0.65rem] tracking-[0.08em] text-white/30 sm:text-[0.7rem]">
               © {year} Nuam. All rights reserved.
             </p>
-            <p className="text-[0.7rem] tracking-[0.08em] text-white/30">
+            <p className="text-[0.65rem] tracking-[0.08em] text-white/30 sm:text-[0.7rem]">
               Crafted for the next digital leap.
             </p>
           </div>

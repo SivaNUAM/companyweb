@@ -13,15 +13,15 @@ import { works, worksSection } from "../../data/home";
 /** Shared pin line under the fixed header — every card sticks here */
 const STICKY_TOP = "calc(var(--nav-height) + 0.75rem)";
 
-/** Scroll gap before the next card covers this one — tapers hard at the end to avoid stuck */
+/** Scroll gap before the next card covers this one — short + hard taper so Lenis doesn’t stick */
 const coverGap = (index, total) => {
   if (index >= total - 1) return 0;
   const fromEnd = total - 1 - index;
-  // Final handoffs stay short so Lenis doesn’t fight sticky release
-  if (fromEnd === 1) return 10;
-  if (fromEnd === 2) return 14;
-  const base = 30 - index * 3;
-  return Math.max(16, base);
+  if (fromEnd === 1) return 5;
+  if (fromEnd === 2) return 7;
+  if (fromEnd === 3) return 9;
+  const base = 16 - index * 2;
+  return Math.max(8, base);
 };
 
 /**
@@ -34,6 +34,7 @@ const WorkCard = ({ work, index, total }) => {
   const number = String(index + 1).padStart(2, "0");
   const isLast = index === total - 1;
   const gap = coverGap(index, total);
+  const trackScroll = !reduceMotion && !isLast && index < total - 2;
 
   const { scrollYProgress } = useScroll({
     target: cardRef,
@@ -42,43 +43,43 @@ const WorkCard = ({ work, index, total }) => {
 
   const scale = useTransform(
     scrollYProgress,
-    [0, 0.25, 1],
-    reduceMotion || isLast ? [1, 1, 1] : [1, 1, 0.95],
+    [0, 0.35, 1],
+    trackScroll ? [1, 1, 0.97] : [1, 1, 1],
   );
   const overlayOpacity = useTransform(
     scrollYProgress,
-    [0, 0.25, 1],
-    reduceMotion || isLast ? [0, 0, 0] : [0, 0, 0.32],
+    [0, 0.35, 1],
+    trackScroll ? [0, 0, 0.22] : [0, 0, 0],
   );
 
   return (
     <>
       <div
         ref={cardRef}
-        className="sticky px-3 md:px-4 lg:px-5"
+        className={`site-works-card-slot ${isLast ? "relative" : "sticky"}`}
         style={{
-          top: STICKY_TOP,
+          top: isLast ? undefined : STICKY_TOP,
           zIndex: index + 1,
         }}
       >
-        {/* Transform only on INNER content — never on the sticky node itself */}
         <motion.div
-          style={reduceMotion ? undefined : { scale }}
-          className="origin-center will-change-transform"
+          style={trackScroll ? { scale } : undefined}
+          className="origin-center"
         >
           <Link
             to="/portfolio"
             className="group relative block outline-none"
             aria-label={`${work.client} — ${work.industry}`}
           >
-            <article className="relative overflow-hidden rounded-2xl bg-ink shadow-[0_24px_64px_rgba(0,0,0,0.35)] md:rounded-3xl">
-              <div className="relative aspect-[4/5] w-full overflow-hidden sm:aspect-[16/10] lg:aspect-[2.1/1] lg:max-h-[min(68vh,38rem)]">
+            <article className="site-works-card relative">
+              <div className="site-works-media">
                 <img
                   src={work.image}
                   alt=""
                   aria-hidden
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.4s] ease-expo group-hover:scale-[1.04]"
-                  loading={index === 0 ? "eager" : "lazy"}
+                  loading={index < 3 ? "eager" : "lazy"}
+                  decoding="async"
                   sizes="100vw"
                 />
 
@@ -92,16 +93,18 @@ const WorkCard = ({ work, index, total }) => {
                 <div className="pointer-events-none absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/20" />
                 <div className="noise-overlay pointer-events-none absolute inset-0 opacity-20" />
 
-                <motion.div
-                  aria-hidden
-                  className="pointer-events-none absolute inset-0 bg-black"
-                  style={{ opacity: overlayOpacity }}
-                />
+                {trackScroll && (
+                  <motion.div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 bg-black"
+                    style={{ opacity: overlayOpacity }}
+                  />
+                )}
               </div>
 
-              <div className="absolute inset-0 flex flex-col justify-between p-5 sm:p-7 md:p-10 lg:p-12">
-                <div className="flex items-start justify-between gap-4">
-                  <span className="font-display text-sm font-semibold tracking-[0.2em] text-white/45 md:text-base">
+              <div className="site-works-body">
+                <div className="flex items-start justify-between gap-3 sm:gap-4">
+                  <span className="font-display text-xs font-semibold tracking-[0.2em] text-white/45 sm:text-sm md:text-base">
                     {number}
                   </span>
                   <span className="label-premium !text-white/50 transition-colors duration-300 group-hover:!text-[var(--accent)]">
@@ -109,22 +112,20 @@ const WorkCard = ({ work, index, total }) => {
                   </span>
                 </div>
 
-                <div className="flex items-end justify-between gap-6">
+                <div className="flex items-end justify-between gap-4 sm:gap-6">
                   <div className="min-w-0 max-w-3xl">
-                    <h3 className="font-display text-[clamp(1.65rem,3.8vw,3.25rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white transition-transform duration-500 ease-expo group-hover:-translate-y-1">
+                    <h3 className="site-works-client font-display transition-transform duration-500 ease-expo group-hover:-translate-y-1">
                       {work.client}
                     </h3>
 
-                    <div className="mt-3 h-px w-0 bg-[var(--accent)] transition-all duration-500 ease-expo group-hover:w-16" />
+                    <div className="mt-2 h-px w-0 bg-[var(--accent)] transition-all duration-500 ease-expo group-hover:w-16 sm:mt-3" />
 
-                    <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/70 transition-all duration-500 ease-expo md:text-base md:translate-y-2 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
-                      {work.title}
-                    </p>
+                    <p className="site-works-desc">{work.title}</p>
                   </div>
 
-                  <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/25 text-white transition-all duration-500 ease-expo group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-[var(--accent-ink)] sm:h-14 sm:w-14">
+                  <span className="site-works-arrow transition-all duration-500 ease-expo group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-[var(--accent-ink)]">
                     <ArrowUpRight
-                      size={20}
+                      size={18}
                       className="transition-transform duration-500 ease-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                     />
                   </span>
@@ -137,7 +138,6 @@ const WorkCard = ({ work, index, total }) => {
         </motion.div>
       </div>
 
-      {/* Spacer outside sticky — prevents margin-on-sticky release bug */}
       {gap > 0 && (
         <div
           aria-hidden
@@ -151,43 +151,38 @@ const WorkCard = ({ work, index, total }) => {
 
 const SelectedWorks = () => {
   return (
-    <section className="section-surface" id="works">
-      <div className="section-padding pb-8 md:pb-10">
-        <div className="container-custom">
-          <div className="flex flex-col gap-8 border-b border-[var(--border-subtle)] pb-10 md:flex-row md:items-end md:justify-between md:pb-14">
-            <Reveal>
-              <p className="label-premium mb-4">{worksSection.label}</p>
-              <h2 className="font-display max-w-2xl text-[clamp(2.5rem,6vw,4.75rem)] font-bold leading-[0.95] tracking-[-0.035em]">
-                {worksSection.title[0]}
-                <span className="block text-[var(--text-muted)]">
-                  {worksSection.title[1]}
-                </span>
-              </h2>
-            </Reveal>
+    <section className="site-works section-surface" id="works">
+      <div className="site-works-intro container-custom">
+        <div className="site-works-intro-row">
+          <Reveal>
+            <p className="label-premium mb-3 sm:mb-4">{worksSection.label}</p>
+            <h2 className="site-works-title font-display">
+              {worksSection.title[0]}
+              <span className="block text-[var(--text-muted)]">
+                {worksSection.title[1]}
+              </span>
+            </h2>
+          </Reveal>
 
-            <Reveal delay={0.12}>
-              <div className="flex flex-col items-start gap-4 md:items-end md:text-right">
-                <p className="max-w-xs text-sm leading-relaxed text-[var(--text-secondary)] md:text-[0.95rem]">
-                  {worksSection.support}
-                </p>
-                <Link
-                  to={worksSection.cta.to}
-                  className="group inline-flex items-center gap-2 border-b border-[var(--ink)] pb-1 text-[0.7rem] font-semibold uppercase tracking-[0.18em] transition-opacity hover:opacity-55"
-                >
-                  {worksSection.cta.label}
-                  <ArrowUpRight
-                    size={15}
-                    className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  />
-                </Link>
-              </div>
-            </Reveal>
-          </div>
+          <Reveal delay={0.12}>
+            <div className="site-works-aside flex flex-col items-start gap-3 sm:gap-4">
+              <p className="site-works-support">{worksSection.support}</p>
+              <Link
+                to={worksSection.cta.to}
+                className="group inline-flex min-h-11 items-center gap-2 border-b border-[var(--ink)] pb-1 text-[0.65rem] font-semibold uppercase tracking-[0.18em] transition-opacity hover:opacity-55 sm:min-h-0 sm:text-[0.7rem]"
+              >
+                {worksSection.cta.label}
+                <ArrowUpRight
+                  size={15}
+                  className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
+              </Link>
+            </div>
+          </Reveal>
         </div>
       </div>
 
-      {/* Sibling sticky cards = true deck stack */}
-      <div className="relative isolate pb-8 md:pb-12">
+      <div className="site-works-deck">
         {works.map((work, index) => (
           <WorkCard
             key={work.id}

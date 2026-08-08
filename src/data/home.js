@@ -208,6 +208,111 @@ export const clients = [
   "Solace",
 ];
 
+export const processSection = {
+  label: "Process",
+  title: ["How we", "ship."],
+  support:
+    "Four gates. Clear ownership. No mystery between brief and release.",
+};
+
+export const process = [
+  {
+    step: "01",
+    title: "Discover",
+    body: "Market, users, and constraints mapped before a single pixel or commit.",
+  },
+  {
+    step: "02",
+    title: "Design",
+    body: "Prototypes and systems tested early — visual language locked with intent.",
+  },
+  {
+    step: "03",
+    title: "Build",
+    body: "Clean architecture, modern stacks, and performance treated as a feature.",
+  },
+  {
+    step: "04",
+    title: "Evolve",
+    body: "Launch is a milestone. We stay to measure, iterate, and raise the bar.",
+  },
+];
+
+export const industriesSection = {
+  label: "Industries",
+  title: ["Where we", "operate."],
+  support:
+    "Corporate platforms across sectors that demand clarity, compliance, and craft.",
+};
+
+export const industries = [
+  {
+    id: "fintech",
+    name: "Fintech",
+    detail: "Banking flows, compliance-ready UX, and trust at every tap.",
+    image:
+      "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    id: "retail",
+    name: "Retail & Commerce",
+    detail: "Discovery, checkout, and peak-load platforms for modern brands.",
+    image:
+      "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    id: "health",
+    name: "Healthcare",
+    detail: "Calm care journeys with reliable systems behind the interface.",
+    image:
+      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    id: "education",
+    name: "Education",
+    detail: "Digital campuses for students, faculty, and operations alike.",
+    image:
+      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    id: "enterprise",
+    name: "Enterprise SaaS",
+    detail: "Internal tools and customer platforms that scale with the org.",
+    image:
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80",
+  },
+];
+
+export const voicesSection = {
+  label: "Voices",
+  title: ["What partners", "say."],
+  support: "Feedback from teams we’ve shipped with since 2025.",
+};
+
+export const voices = [
+  {
+    id: "orbit",
+    quote:
+      "Nuam treated our banking product like it was their own — sharp UX, clean delivery, and zero drama at launch.",
+    name: "Priya Menon",
+    role: "Head of Product, Orbit Finance",
+  },
+  {
+    id: "northline",
+    quote:
+      "They rebuilt our retail platform for peak season and it held. Clear process, honest timelines, corporate-grade craft.",
+    name: "James Okonkwo",
+    role: "CTO, Northline Commerce",
+  },
+  {
+    id: "pulse",
+    quote:
+      "Calm interfaces for a high-stakes care product. Nuam understood both the users and the regulators.",
+    name: "Dr. Anika Shah",
+    role: "Founder, Pulse Health",
+  },
+];
+
 export const cta = {
   title: "Build with a corporate technology partner.",
   support:

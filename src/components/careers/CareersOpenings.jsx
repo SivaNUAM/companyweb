@@ -11,11 +11,11 @@ const CareersOpenings = () => {
   const hasRoles = openings.length > 0;
 
   return (
-    <section className="relative overflow-hidden section-surface section-padding" id="openings">
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -right-4 top-8 select-none font-display text-[min(38vw,16rem)] font-extrabold leading-none tracking-[-0.06em] text-[var(--ink)]/[0.03]"
-      >
+    <section
+      className="site-careers-open section-surface section-padding"
+      id="openings"
+    >
+      <span aria-hidden className="site-careers-open-mark">
         ROLES
       </span>
 
@@ -74,7 +74,7 @@ const CareersOpenings = () => {
         ) : (
           <Reveal>
             <motion.div
-              className="relative overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] md:rounded-3xl"
+              className="site-careers-empty relative overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] md:rounded-3xl"
               initial={reduceMotion ? false : { opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -93,7 +93,7 @@ const CareersOpenings = () => {
               <span className="pointer-events-none absolute bottom-5 left-5 h-8 w-8 border-b border-l border-[var(--border-strong)] md:bottom-8 md:left-8" />
               <span className="pointer-events-none absolute bottom-5 right-5 h-8 w-8 border-b border-r border-[var(--border-strong)] md:bottom-8 md:right-8" />
 
-              <div className="relative grid items-center gap-10 px-6 py-16 md:grid-cols-12 md:gap-12 md:px-12 md:py-24 lg:px-16">
+              <div className="relative grid items-center gap-10 md:grid-cols-12 md:gap-12">
                 <div className="md:col-span-5">
                   <motion.span
                     className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white text-[var(--accent)] shadow-[0_12px_40px_rgba(107,138,255,0.15)]"

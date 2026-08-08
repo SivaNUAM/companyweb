@@ -39,7 +39,7 @@ const ContactFormPanel = () => {
     <Reveal>
       <motion.div
         id="contact-form"
-        className="relative scroll-mt-28 overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] md:rounded-3xl"
+        className="site-contact-form relative scroll-mt-28 overflow-hidden rounded-2xl border border-[var(--border-subtle)] bg-[var(--surface-elevated)] md:rounded-3xl"
         initial={reduceMotion ? false : { opacity: 0, y: 28 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.2 }}
@@ -55,14 +55,14 @@ const ContactFormPanel = () => {
 
         <form
           onSubmit={onSubmit}
-          className="relative space-y-8 px-6 py-10 md:px-10 md:py-14 lg:px-12"
+          className="site-contact-form-inner relative space-y-8"
         >
           <div className="flex flex-col gap-4 border-b border-[var(--border-subtle)] pb-8 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="font-display text-[0.65rem] font-semibold tracking-[0.28em] text-[var(--accent)]">
                 01 — INQUIRY
               </p>
-              <h2 className="font-display mt-2 text-2xl font-bold tracking-tight md:text-3xl lg:text-4xl">
+              <h2 className="site-contact-form-title font-display mt-2">
                 {contactForm.title}
               </h2>
               <p className="mt-2 text-sm text-[var(--text-secondary)]">

@@ -8,13 +8,13 @@ const AboutApproach = () => {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden section-surface section-padding">
+    <section className="site-about-approach section-surface section-padding">
       <div className="container-custom">
         <Reveal>
           <div className="mb-14 flex flex-col gap-6 md:mb-20 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="label-premium mb-4">Approach</p>
-              <h2 className="font-display max-w-2xl text-[clamp(2.25rem,5vw,4rem)] font-bold leading-[0.95] tracking-[-0.035em]">
+              <h2 className="site-about-approach-title font-display max-w-2xl">
                 How we
                 <span className="block text-[var(--text-muted)]">
                   move work forward.
@@ -42,7 +42,7 @@ const AboutApproach = () => {
           <div className="flex flex-col">
             {aboutApproach.map((step, i) => (
               <Reveal key={step.step} delay={Math.min(i * 0.07, 0.28)}>
-                <div className="group relative grid gap-4 border-t border-[var(--border-subtle)] py-10 md:grid-cols-12 md:items-start md:gap-8 md:py-14">
+                <div className="site-about-approach-row group relative grid gap-4 border-t border-[var(--border-subtle)] md:grid-cols-12 md:items-start md:gap-8">
                   <div className="relative z-10 flex items-center gap-4 md:col-span-2">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--accent)]/40 bg-[var(--surface)] font-display text-[0.65rem] font-bold tracking-wide text-[var(--accent)] shadow-[0_0_20px_rgba(107,138,255,0.15)] md:ml-0">
                       {step.step}

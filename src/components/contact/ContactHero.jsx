@@ -9,7 +9,7 @@ const ContactHero = () => {
   const words = contactHero.headline.split(" ");
 
   return (
-    <section className="relative min-h-[85svh] overflow-hidden bg-[var(--surface)] text-[var(--ink)]">
+    <section className="site-phero is-contact" data-cursor-tone="dark">
       <motion.div
         className="absolute inset-0"
         initial={reduceMotion ? false : { scale: 1.1 }}
@@ -26,25 +26,23 @@ const ContactHero = () => {
         />
       </motion.div>
 
-      {/* Soft color wash — keeps HD photo visible and readable */}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "linear-gradient(110deg, rgba(246,245,242,0.92) 0%, rgba(246,245,242,0.72) 40%, rgba(246,245,242,0.28) 72%, rgba(246,245,242,0.1) 100%)",
+            "radial-gradient(ellipse 55% 45% at 18% 70%, rgba(107,138,255,0.18) 0%, transparent 55%), linear-gradient(180deg, rgba(11,11,11,0.45) 0%, rgba(11,11,11,0.3) 42%, rgba(5,5,5,0.92) 100%)",
         }}
       />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--surface)]/50 via-transparent to-transparent" />
-      <div className="noise-overlay pointer-events-none absolute inset-0 opacity-15" />
+      <div className="noise-overlay pointer-events-none absolute inset-0 opacity-30" />
 
-      <div className="pointer-events-none absolute inset-6 z-20 md:inset-10">
-        <span className="absolute left-0 top-0 h-10 w-10 border-l border-t border-[var(--ink)]/12" />
-        <span className="absolute right-0 top-0 h-10 w-10 border-r border-t border-[var(--ink)]/12" />
-        <span className="absolute bottom-0 left-0 h-10 w-10 border-b border-l border-[var(--ink)]/12" />
-        <span className="absolute bottom-0 right-0 h-10 w-10 border-b border-r border-[var(--ink)]/12" />
+      <div className="site-phero-frame">
+        <span />
+        <span />
+        <span />
+        <span />
       </div>
 
-      <div className="relative z-10 flex min-h-[85svh] flex-col justify-end px-5 pb-20 pt-[calc(var(--nav-height)+3rem)] md:px-8 md:pb-28">
+      <div className="site-phero-content">
         <div className="container-custom w-full">
           <motion.div
             className="flex flex-wrap items-center gap-4"
@@ -52,8 +50,8 @@ const ContactHero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.65, ease }}
           >
-            <p className="label-premium">{contactHero.label}</p>
-            <span className="rounded-full border border-[var(--border-subtle)] bg-white/80 px-3 py-1 text-[0.65rem] font-semibold tracking-[0.16em] text-[var(--accent)] backdrop-blur-sm">
+            <p className="label-premium !text-white/40">{contactHero.label}</p>
+            <span className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[0.65rem] font-semibold tracking-[0.16em] text-[var(--accent)] backdrop-blur-sm">
               REPLY · 1 BUSINESS DAY
             </span>
           </motion.div>
@@ -65,7 +63,7 @@ const ContactHero = () => {
             transition={{ duration: 0.85, ease, delay: 0.2 }}
           />
 
-          <h1 className="mt-7 max-w-4xl font-display text-[clamp(2.5rem,7vw,5.5rem)] font-extrabold leading-[0.94] tracking-[-0.045em]">
+          <h1 className="site-phero-headline">
             {words.map((word, i) => (
               <span
                 key={`${word}-${i}`}
@@ -88,7 +86,7 @@ const ContactHero = () => {
           </h1>
 
           <motion.p
-            className="mt-6 max-w-xl text-base leading-relaxed text-[var(--text-secondary)] md:text-lg"
+            className="site-phero-support"
             initial={reduceMotion ? false : { opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.55, ease }}
@@ -98,7 +96,7 @@ const ContactHero = () => {
 
           <motion.a
             href="#contact-form"
-            className="mt-12 inline-flex items-center gap-3 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-[var(--text-muted)] transition-colors hover:text-[var(--accent)]"
+            className="site-phero-cue transition-colors hover:text-[var(--accent)]"
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.95, duration: 0.55 }}

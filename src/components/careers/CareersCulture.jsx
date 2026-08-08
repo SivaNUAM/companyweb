@@ -8,7 +8,7 @@ const CareersCulture = () => {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden section-ink section-padding">
+    <section className="site-careers-culture section-ink section-padding">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -left-24 top-1/4 h-[28rem] w-[28rem] rounded-full bg-[var(--accent)]/12 blur-[120px]" />
         <div className="absolute bottom-0 right-0 h-[20rem] w-[20rem] rounded-full bg-[var(--accent)]/8 blur-[90px]" />
@@ -22,7 +22,7 @@ const CareersCulture = () => {
               <p className="label-premium !text-white/35 mb-4">
                 {careersCulture.label}
               </p>
-              <h2 className="font-display max-w-xl text-[clamp(2.25rem,5vw,4rem)] font-bold leading-[0.95] tracking-[-0.035em] text-white">
+              <h2 className="site-careers-culture-title font-display max-w-xl text-white">
                 {careersCulture.title.split(". ").map((part, i, arr) => (
                   <span key={part} className={i > 0 ? "block text-white/35" : "block"}>
                     {part}
@@ -42,13 +42,13 @@ const CareersCulture = () => {
           {careersCulture.items.map((item, i) => (
             <Reveal key={item.id} delay={i * 0.1}>
               <article
-                className={`group relative overflow-hidden border-t border-white/10 py-10 md:border-t-0 md:px-8 md:py-4 ${
+                className={`site-careers-culture-card group border-t border-white/10 py-10 md:border-t-0 md:px-8 md:py-4 ${
                   i > 0 ? "md:border-l md:border-white/10" : "md:pl-0"
                 } ${i < careersCulture.items.length - 1 ? "border-b border-white/10 md:border-b-0" : ""}`}
               >
                 <motion.span
                   aria-hidden
-                  className="pointer-events-none absolute -right-2 top-0 font-display text-[5.5rem] font-extrabold leading-none text-white/[0.04] transition-colors duration-500 group-hover:text-[var(--accent)]/[0.1]"
+                  className="site-careers-culture-ghost transition-colors duration-500 group-hover:text-[var(--accent)]/[0.1]"
                   initial={reduceMotion ? false : { opacity: 0 }}
                   whileInView={{ opacity: 1 }}
                   viewport={{ once: true }}

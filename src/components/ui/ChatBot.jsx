@@ -405,7 +405,7 @@ const ChatBot = () => {
   };
 
   return (
-    <div className="pointer-events-none fixed bottom-4 right-4 z-[60] flex flex-col items-end gap-2 md:bottom-7 md:right-7">
+    <div className="site-chat">
       <AnimatePresence>
         {open && (
           <motion.div
@@ -413,7 +413,7 @@ const ChatBot = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 14, scale: 0.94 }}
             transition={{ duration: 0.38, ease }}
-            className="pointer-events-auto flex h-[min(34rem,72vh)] w-[min(23rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-[1.75rem] border border-white/12 bg-[#0d0f16]/97 text-white shadow-[0_28px_70px_rgba(0,0,0,0.4)] backdrop-blur-xl"
+            className="site-chat-panel pointer-events-auto"
             role="dialog"
             aria-label="Nuam chat assistant"
           >
@@ -504,7 +504,7 @@ const ChatBot = () => {
             </div>
 
             {/* Quick replies */}
-            <div className="flex gap-2 overflow-x-auto px-4 pb-2 scrollbar-none">
+            <div className="site-chat-quick">
               {quickReplies.map((q) => (
                 <button
                   key={q}
@@ -550,7 +550,7 @@ const ChatBot = () => {
               initial={{ opacity: 0, x: 12, scale: 0.85 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 8, scale: 0.9 }}
-              className="absolute bottom-[72%] right-[88%] z-10 whitespace-nowrap"
+              className="site-chat-hi whitespace-nowrap"
             >
               <div className="relative rounded-2xl rounded-br-sm bg-white px-3.5 py-2 font-display text-sm font-bold text-ink shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
                 Hi!
@@ -570,7 +570,7 @@ const ChatBot = () => {
             e.preventDefault();
             if (!open) setMoodTemp("dance", 2600);
           }}
-          className="relative flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-[1.35rem] border border-white/20 bg-gradient-to-br from-[#1a2248] to-[#0b0b0b] shadow-[0_14px_36px_rgba(107,138,255,0.38)] outline-none ring-offset-2 transition hover:scale-105 focus-visible:ring-2 focus-visible:ring-[var(--accent)] md:h-20 md:w-20"
+          className="site-chat-fab outline-none ring-offset-2 transition hover:scale-105 focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           aria-label={open ? "Close chat" : "Open Nuam bot"}
           aria-expanded={open}
           whileTap={{ scale: 0.92 }}
@@ -585,7 +585,7 @@ const ChatBot = () => {
               <X size={22} strokeWidth={2.5} />
             </motion.span>
           ) : (
-            <BotFace mood={mood} size={70} />
+            <BotFace mood={mood} size={58} />
           )}
 
           {!open && (

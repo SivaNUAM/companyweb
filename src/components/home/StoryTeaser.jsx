@@ -17,7 +17,7 @@ const sentences = story.body
  */
 const TypewriterStory = ({ lines, reduceMotion }) => {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.35 });
+  const inView = useInView(ref, { once: true, amount: 0.3 });
   const [lineIndex, setLineIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [done, setDone] = useState(false);
@@ -38,7 +38,6 @@ const TypewriterStory = ({ lines, reduceMotion }) => {
       return () => clearTimeout(id);
     }
 
-    // Line complete — pause, then next line
     if (lineIndex < lines.length - 1) {
       const id = window.setTimeout(() => {
         setLineIndex((i) => i + 1);
@@ -54,7 +53,7 @@ const TypewriterStory = ({ lines, reduceMotion }) => {
   return (
     <h2
       ref={ref}
-      className="font-display text-[clamp(1.65rem,3.6vw,3.15rem)] font-semibold leading-[1.2] tracking-[-0.03em] text-[var(--ink)]"
+      className="site-story-body"
       aria-label={lines.join(" ")}
     >
       {lines.map((line, i) => {
@@ -72,7 +71,7 @@ const TypewriterStory = ({ lines, reduceMotion }) => {
         return (
           <span
             key={line}
-            className={`block ${i > 0 ? "mt-5 text-[var(--text-secondary)]" : ""}`}
+            className={`line block ${i > 0 ? "" : ""}`}
           >
             {visible}
             {showCursor && (
@@ -100,39 +99,34 @@ const StoryTeaser = () => {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden section-surface section-padding">
+    <section className="site-story section-surface">
       <motion.span
         aria-hidden
-        className="pointer-events-none absolute -left-4 top-8 select-none font-display text-[min(42vw,22rem)] font-extrabold leading-none tracking-[-0.06em] text-[var(--ink)]/[0.035] md:top-4 lg:-left-8"
-        initial={reduceMotion ? false : { opacity: 0, x: -24 }}
-        whileInView={{ opacity: 1, x: 0 }}
+        className="site-story-mark"
+        initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+        whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 1.2, ease }}
+        transition={{ duration: 1, ease }}
       >
         NUAM
       </motion.span>
 
       <div className="container-custom relative">
-        <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
-          <div className="lg:col-span-4">
+        <div className="site-story-grid">
+          <div className="site-story-aside">
             <Reveal>
-              <div className="lg:sticky lg:top-28">
-                <p className="label-premium mb-5">{story.label}</p>
-                <div className="h-px w-12 origin-left bg-[var(--accent)]" />
-                <p className="mt-6 max-w-[22ch] text-sm leading-relaxed text-[var(--text-secondary)] md:text-[0.95rem]">
-                  {story.aside}
-                </p>
+              <div className="site-story-aside-inner">
+                <p className="label-premium mb-4 sm:mb-5">{story.label}</p>
+                <div className="h-px w-10 origin-left bg-[var(--accent)] sm:w-12" />
+                <p>{story.aside}</p>
               </div>
             </Reveal>
           </div>
 
-          <div className="lg:col-span-8">
+          <div className="site-story-main">
             <div className="relative">
               <Reveal>
-                <span
-                  aria-hidden
-                  className="font-display mb-4 block text-6xl font-extrabold leading-none text-[var(--accent)] md:text-7xl"
-                >
+                <span aria-hidden className="site-story-quote">
                   “
                 </span>
               </Reveal>
@@ -140,13 +134,13 @@ const StoryTeaser = () => {
               <TypewriterStory lines={sentences} reduceMotion={reduceMotion} />
 
               <Reveal delay={0.2}>
-                <div className="mt-12 flex flex-col gap-6 border-t border-[var(--border-subtle)] pt-8 sm:flex-row sm:items-center sm:justify-between">
+                <div className="site-story-foot">
                   <p className="text-sm text-[var(--text-muted)]">
                     {story.footer}
                   </p>
                   <Link
                     to={story.cta.to}
-                    className="group inline-flex items-center gap-3 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-[var(--ink)]"
+                    className="group inline-flex min-h-11 items-center gap-3 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[var(--ink)] sm:min-h-0 sm:text-[0.7rem]"
                   >
                     <span className="border-b border-[var(--ink)] pb-1 transition-colors duration-300 group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
                       {story.cta.label}

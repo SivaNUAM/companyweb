@@ -23,13 +23,18 @@ const StatValue = ({ value, active }) => {
     }
 
     let frame;
-    const duration = 1400;
+    let lastShown = -1;
+    const duration = 900;
     const start = performance.now();
 
     const tick = (now) => {
       const t = Math.min(1, (now - start) / duration);
       const eased = 1 - Math.pow(1 - t, 3);
-      setDisplay(Math.round(target * eased));
+      const next = Math.round(target * eased);
+      if (next !== lastShown) {
+        lastShown = next;
+        setDisplay(next);
+      }
       if (t < 1) frame = requestAnimationFrame(tick);
     };
 
@@ -47,7 +52,7 @@ const StatValue = ({ value, active }) => {
 
 const StatItem = ({ stat, index }) => {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, amount: 0.5 });
+  const inView = useInView(ref, { once: true, amount: 0.35 });
   const reduceMotion = useReducedMotion();
   const number = String(index + 1).padStart(2, "0");
   const digitLen = String(stat.value).replace(/\D/g, "").length;
@@ -56,32 +61,26 @@ const StatItem = ({ stat, index }) => {
   return (
     <motion.div
       ref={ref}
-      className="group relative flex min-w-0 flex-col justify-between overflow-hidden py-2 lg:min-h-[11rem]"
-      initial={reduceMotion ? false : { opacity: 0, y: 32 }}
+      className="site-impact-item group"
+      initial={reduceMotion ? false : { opacity: 0, y: 18 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.4 }}
-      transition={{ duration: 0.85, delay: index * 0.1, ease }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.55, delay: index * 0.05, ease }}
     >
-      <div className="mb-8 flex items-center justify-between lg:mb-auto">
-        <span className="font-display text-[0.65rem] font-semibold tracking-[0.22em] text-white/30">
+      <div className="site-impact-meta">
+        <span className="font-display text-[0.6rem] font-semibold tracking-[0.22em] text-white/30 sm:text-[0.65rem]">
           {number}
         </span>
-        <span className="h-px w-8 origin-right bg-white/15 transition-all duration-500 ease-expo group-hover:w-14 group-hover:bg-[var(--accent)]" />
+        <span className="h-px w-6 origin-right bg-white/15 transition-all duration-500 ease-expo group-hover:w-12 group-hover:bg-[var(--accent)] sm:w-8 group-hover:sm:w-14" />
       </div>
 
       <div className="min-w-0">
         <p
-          className={`font-display font-extrabold leading-[0.9] text-[var(--accent)] ${
-            isWide
-              ? "text-[clamp(1.85rem,3.8vw,3.25rem)] tracking-[-0.05em]"
-              : "text-[clamp(2.75rem,6.5vw,5.5rem)] tracking-[-0.04em]"
-          }`}
+          className={`site-impact-value ${isWide ? "is-wide" : ""}`}
         >
           <StatValue value={stat.value} active={inView} />
         </p>
-        <p className="mt-4 max-w-[14ch] text-[0.8rem] font-medium leading-snug tracking-[0.04em] text-white/55 md:text-[0.95rem]">
-          {stat.label}
-        </p>
+        <p className="site-impact-label">{stat.label}</p>
       </div>
     </motion.div>
   );
@@ -89,27 +88,20 @@ const StatItem = ({ stat, index }) => {
 
 const ImpactStrip = () => {
   return (
-    <section className="relative overflow-hidden section-ink">
+    <section className="site-impact section-ink">
       <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.18]" />
 
-      <div className="container-custom relative section-padding !py-16 md:!py-24 lg:!py-28">
+      <div className="site-impact-inner container-custom">
         <Reveal>
-          <div className="mb-12 flex items-end justify-between gap-6 border-b border-white/10 pb-6 md:mb-16 md:pb-8">
+          <div className="site-impact-head">
             <p className="label-premium !text-white/35">{impactSection.label}</p>
-            <p className="hidden max-w-xs text-right text-sm leading-relaxed text-white/35 md:block">
-              {impactSection.support}
-            </p>
+            <p className="site-impact-support">{impactSection.support}</p>
           </div>
         </Reveal>
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:gap-x-10 lg:grid-cols-4 lg:gap-x-0">
+        <div className="site-impact-grid">
           {stats.map((stat, i) => (
-            <div
-              key={stat.label}
-              className={`min-w-0 lg:px-5 xl:px-8 ${
-                i > 0 ? "lg:border-l lg:border-white/10" : "lg:pl-0"
-              } ${i === stats.length - 1 ? "lg:pr-0" : ""}`}
-            >
+            <div key={stat.label} className="site-impact-cell">
               <StatItem stat={stat} index={i} />
             </div>
           ))}

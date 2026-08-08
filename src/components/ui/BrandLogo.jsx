@@ -1,14 +1,16 @@
 /**
  * Crisp vector Nuam lockup — icon + wordmark (no raster blur).
  * @param {"light"|"dark"} tone - light = white (on dark UI), dark = ink (on light UI)
- * @param {"header"|"footer"} size
+ * @param {"header"|"footer"|"loader"} size
  */
 const BrandLogo = ({ tone = "dark", size = "header", className = "" }) => {
   const fill = tone === "light" ? "#ffffff" : "#0b0b0b";
   const sizeClass =
-    size === "footer"
-      ? "h-16 w-auto md:h-20"
-      : "h-[3.25rem] w-auto md:h-16";
+    size === "loader"
+      ? "h-28 w-auto md:h-36 lg:h-40"
+      : size === "footer"
+        ? "h-16 w-auto md:h-20"
+        : "h-[3.25rem] w-auto md:h-16";
 
   // Manual letter positions — avoids SVG letterSpacing clipping the first glyph
   const letters = [

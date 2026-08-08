@@ -8,7 +8,7 @@ const ServicesEngagement = () => {
   const reduceMotion = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden section-ink section-padding">
+    <section className="site-svc-engage section-ink section-padding">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute left-1/2 top-0 h-px w-[70%] -translate-x-1/2 bg-gradient-to-r from-transparent via-[var(--accent)]/40 to-transparent" />
         <div className="absolute -left-20 top-1/3 h-[24rem] w-[24rem] rounded-full bg-[var(--accent)]/10 blur-[110px]" />
@@ -20,7 +20,7 @@ const ServicesEngagement = () => {
           <div className="mb-16 flex flex-col gap-6 md:mb-20 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="label-premium !text-white/35 mb-4">Engagement</p>
-              <h2 className="font-display max-w-2xl text-[clamp(2.25rem,5vw,4rem)] font-bold leading-[0.95] tracking-[-0.035em] text-white">
+              <h2 className="site-svc-engage-title font-display max-w-2xl text-white">
                 How we
                 <span className="block text-white/35">work with you.</span>
               </h2>
@@ -43,11 +43,11 @@ const ServicesEngagement = () => {
             style={{ width: "100%" }}
           />
 
-          <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0">
+          <div className="site-svc-engage-grid gap-12 lg:gap-0">
             {servicesEngagement.map((item, i) => (
               <Reveal key={item.step} delay={i * 0.1}>
                 <div
-                  className={`relative lg:px-8 ${
+                  className={`site-svc-engage-card relative py-2 lg:px-8 lg:py-0 ${
                     i > 0 ? "lg:border-l lg:border-white/10" : "lg:pl-0"
                   }`}
                 >
@@ -56,7 +56,7 @@ const ServicesEngagement = () => {
                       {item.step}
                     </span>
                   </div>
-                  <h3 className="font-display text-2xl font-bold tracking-[-0.03em] text-white md:text-[1.75rem]">
+                  <h3 className="font-display font-bold tracking-[-0.03em] text-white">
                     {item.title}
                   </h3>
                   <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/50">

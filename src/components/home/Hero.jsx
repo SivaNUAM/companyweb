@@ -47,13 +47,13 @@ const BrandMark = ({ reduceMotion }) => {
   return (
     <div
       ref={wrapRef}
-      className="relative w-fit"
+      className="site-hero-brand-wrap relative"
       style={{ perspective: 1400 }}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
     >
       <motion.div
-        className="relative"
+        className="relative max-w-full"
         style={
           reduceMotion
             ? undefined
@@ -66,7 +66,7 @@ const BrandMark = ({ reduceMotion }) => {
         <h2 className="sr-only">{hero.brand}</h2>
         <p
           aria-hidden
-          className="relative m-0 flex font-display text-[clamp(3.5rem,14vw,10rem)] font-extrabold leading-[0.78] tracking-[-0.05em] text-white"
+          className="site-hero-brand relative m-0 flex font-display font-extrabold text-white"
         >
           {letters.map((letter, i) => (
             <motion.span
@@ -101,16 +101,16 @@ const BrandMark = ({ reduceMotion }) => {
         </p>
 
         <motion.div
-          className="relative mt-3 flex flex-wrap items-center gap-3 md:mt-4"
+          className="site-hero-brand-meta relative flex flex-wrap items-center"
           initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.6, ease }}
         >
-          <span className="h-px w-8 bg-[var(--accent)] md:w-10" />
-          <span className="text-[0.6rem] font-semibold uppercase tracking-[0.36em] text-white/60">
+          <span className="h-px w-7 bg-[var(--accent)] sm:w-8 md:w-10" />
+          <span className="tag font-semibold uppercase text-white/60">
             Technologies
           </span>
-          <span className="text-[0.55rem] font-semibold tracking-[0.14em] text-white/40">
+          <span className="text-[0.5rem] font-semibold tracking-[0.12em] text-white/40 sm:text-[0.55rem] sm:tracking-[0.14em]">
             PVT LTD
           </span>
         </motion.div>
@@ -238,7 +238,8 @@ const Hero = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[100svh] w-full overflow-hidden bg-ink text-white"
+      className="site-hero relative w-full max-w-full overflow-hidden bg-ink text-white"
+      data-cursor-tone="dark"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-roledescription="carousel"
@@ -280,7 +281,7 @@ const Hero = () => {
               <video
                 ref={videoRef}
                 key={`${active.id}-video`}
-                className="h-full w-full scale-105 object-cover object-center"
+                className="h-full w-full object-cover object-[center_30%] sm:object-center"
                 autoPlay
                 muted
                 playsInline
@@ -293,7 +294,7 @@ const Hero = () => {
               <motion.img
                 src={active.image}
                 alt={active.imageAlt}
-                className="h-full w-full object-cover object-center will-change-transform"
+                className="h-full w-full object-cover object-[center_30%] will-change-transform sm:object-center"
                 fetchPriority="high"
                 decoding="async"
                 sizes="100vw"
@@ -335,15 +336,15 @@ const Hero = () => {
       <div className="noise-overlay pointer-events-none absolute inset-0 z-[1] opacity-[0.28]" />
 
       {/* Film frame */}
-      <div className="pointer-events-none absolute inset-5 z-[2] md:inset-8">
-        <span className="absolute left-0 top-0 h-9 w-9 border-l border-t border-white/20 md:h-11 md:w-11" />
-        <span className="absolute right-0 top-0 h-9 w-9 border-r border-t border-white/20 md:h-11 md:w-11" />
-        <span className="absolute bottom-0 left-0 h-9 w-9 border-b border-l border-white/20 md:h-11 md:w-11" />
-        <span className="absolute bottom-0 right-0 h-9 w-9 border-b border-r border-white/20 md:h-11 md:w-11" />
+      <div className="site-hero-frame pointer-events-none absolute z-[2]">
+        <span className="absolute left-0 top-0 border-l border-t border-white/20" />
+        <span className="absolute right-0 top-0 border-r border-t border-white/20" />
+        <span className="absolute bottom-0 left-0 border-b border-l border-white/20" />
+        <span className="absolute bottom-0 right-0 border-b border-r border-white/20" />
       </div>
 
       {/* Top HUD */}
-      <div className="pointer-events-none absolute inset-x-0 top-[calc(var(--nav-height)+0.5rem)] z-[3] hidden px-8 md:block lg:px-12">
+      <div className="site-hero-hud pointer-events-none absolute inset-x-0 z-[3]">
         <div className="container-custom flex items-center justify-between">
           <motion.p
             className="text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-white/35"
@@ -381,22 +382,21 @@ const Hero = () => {
 
       {/* Content */}
       <motion.div
-        className="relative z-10 flex min-h-[100svh] flex-col justify-end"
+        className="site-hero-content relative z-10"
         style={
           reduceMotion ? undefined : { y: contentY, opacity: contentOpacity }
         }
       >
-        <div className="container-custom w-full px-5 pb-24 pt-[calc(var(--nav-height)+2.5rem)] md:px-8 md:pb-28 lg:pb-32">
+        <div className="site-hero-inner container-custom">
           <BrandMark reduceMotion={reduceMotion} />
 
-          {/* Slide label */}
-          <div className="mt-8 flex items-center gap-3 md:mt-10">
+          <div className="site-hero-slide-label flex items-center gap-3">
             <span className="h-px w-6 bg-[var(--accent)]" />
             <div className="h-5 overflow-hidden">
               <AnimatePresence mode="wait">
                 <motion.p
                   key={active.label}
-                  className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-white/50"
+                  className="text-[0.6rem] font-semibold uppercase tracking-[0.24em] text-white/50 sm:text-[0.65rem] sm:tracking-[0.28em]"
                   initial={reduceMotion ? false : { y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -14, opacity: 0 }}
@@ -408,9 +408,9 @@ const Hero = () => {
             </div>
           </div>
 
-          <div className="mt-4 grid gap-8 lg:mt-6 lg:grid-cols-12 lg:items-end lg:gap-14">
-            <div className="lg:col-span-8">
-              <h1 className="font-display max-w-[16ch] text-[clamp(1.85rem,4.4vw,3.85rem)] font-bold leading-[1.05] tracking-[-0.035em]">
+          <div className="site-hero-grid">
+            <div className="site-hero-copy">
+              <h1 className="site-hero-headline font-display font-bold">
                 <AnimatePresence mode="wait">
                   <motion.span key={active.id} className="inline" initial={false}>
                     {words.map((word, i) => (
@@ -440,12 +440,12 @@ const Hero = () => {
               </h1>
             </div>
 
-            <div className="flex flex-col gap-7 lg:col-span-4 lg:pb-1">
-              <div className="min-h-[4.5rem]">
+            <div className="site-hero-aside flex flex-col gap-5 lg:gap-7">
+              <div className="site-hero-support">
                 <AnimatePresence mode="wait">
                   <motion.p
                     key={`${active.id}-support`}
-                    className="max-w-sm text-[0.95rem] leading-[1.7] text-white/68 md:text-[1.05rem]"
+                    className="text-white/68"
                     initial={reduceMotion ? false : { opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
@@ -457,16 +457,17 @@ const Hero = () => {
               </div>
 
               <motion.div
+                className="site-hero-cta"
                 initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.75, delay: 0.85, ease }}
               >
                 <Link
                   to={hero.cta.to}
-                  className="group inline-flex items-center gap-3 border-b border-white/25 pb-2.5 text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-white transition-colors duration-300 hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                  className="group inline-flex items-center gap-3 border-b border-white/25 pb-2.5 font-semibold uppercase tracking-[0.2em] text-white transition-colors duration-300 hover:border-[var(--accent)] hover:text-[var(--accent)]"
                 >
                   {hero.cta.label}
-                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)] transition-transform duration-500 ease-expo group-hover:translate-x-1 group-hover:scale-105">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)] transition-transform duration-500 ease-expo group-hover:translate-x-1 group-hover:scale-105 sm:h-9 sm:w-9">
                     <ArrowRight size={15} strokeWidth={2.5} />
                   </span>
                 </Link>
@@ -474,15 +475,14 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Controls */}
           <motion.div
-            className="mt-12 flex items-center justify-between gap-6 md:mt-16"
+            className="site-hero-controls flex items-center justify-between"
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 1, ease }}
           >
             <div
-              className="flex items-center gap-3"
+              className="site-hero-dots flex items-center gap-2 sm:gap-3"
               role="tablist"
               aria-label="Hero slides"
             >
@@ -496,13 +496,13 @@ const Hero = () => {
                     aria-selected={isActive}
                     aria-label={`Show slide ${i + 1}: ${slide.label}`}
                     onClick={() => goTo(i)}
-                    className="group relative flex h-10 items-center"
+                    className="group relative flex items-center"
                   >
                     <span
                       className={`relative block h-[2px] overflow-hidden rounded-full transition-all duration-500 ease-expo ${
                         isActive
-                          ? "w-16 bg-white/15"
-                          : "w-7 bg-white/25 hover:bg-white/45"
+                          ? "dot-active bg-white/15"
+                          : "dot-idle bg-white/25 hover:bg-white/45"
                       }`}
                     >
                       {isActive && (
@@ -521,8 +521,8 @@ const Hero = () => {
               })}
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="mr-3 hidden font-display text-xs tracking-[0.2em] text-white/40 sm:inline">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="mr-2 hidden font-display text-xs tracking-[0.2em] text-white/40 sm:mr-3 sm:inline">
                 {String(index + 1).padStart(2, "0")}
                 <span className="text-white/20"> / </span>
                 {String(slides.length).padStart(2, "0")}
@@ -531,7 +531,7 @@ const Hero = () => {
                 type="button"
                 onClick={prev}
                 aria-label="Previous slide"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white backdrop-blur-sm transition-all duration-300 hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)]"
+                className="site-hero-nav-btn flex items-center justify-center rounded-full border border-white/20 text-white backdrop-blur-sm transition-all duration-300 hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)]"
               >
                 <ArrowLeft size={16} strokeWidth={2} />
               </button>
@@ -539,7 +539,7 @@ const Hero = () => {
                 type="button"
                 onClick={next}
                 aria-label="Next slide"
-                className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-white backdrop-blur-sm transition-all duration-300 hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)]"
+                className="site-hero-nav-btn flex items-center justify-center rounded-full border border-white/20 text-white backdrop-blur-sm transition-all duration-300 hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)]"
               >
                 <ArrowRight size={16} strokeWidth={2} />
               </button>
@@ -547,9 +547,8 @@ const Hero = () => {
           </motion.div>
         </div>
 
-        {/* Scroll cue */}
         <motion.div
-          className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 md:flex"
+          className="site-hero-scroll-cue pointer-events-none absolute left-1/2 -translate-x-1/2 flex-col items-center gap-2"
           initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.3, duration: 0.6 }}

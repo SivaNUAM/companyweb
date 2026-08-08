@@ -10,7 +10,7 @@ const CareersHero = () => {
   const openCount = openings.length;
 
   return (
-    <section className="relative min-h-[90svh] overflow-hidden bg-ink text-white">
+    <section className="site-phero is-careers">
       <motion.div
         className="absolute inset-0"
         initial={reduceMotion ? false : { scale: 1.14 }}
@@ -35,14 +35,14 @@ const CareersHero = () => {
       />
       <div className="noise-overlay pointer-events-none absolute inset-0 opacity-35" />
 
-      <div className="pointer-events-none absolute inset-6 z-20 md:inset-10">
-        <span className="absolute left-0 top-0 h-10 w-10 border-l border-t border-white/20" />
-        <span className="absolute right-0 top-0 h-10 w-10 border-r border-t border-white/20" />
-        <span className="absolute bottom-0 left-0 h-10 w-10 border-b border-l border-white/20" />
-        <span className="absolute bottom-0 right-0 h-10 w-10 border-b border-r border-white/20" />
+      <div className="site-phero-frame">
+        <span />
+        <span />
+        <span />
+        <span />
       </div>
 
-      <div className="relative z-10 flex min-h-[90svh] flex-col justify-end px-5 pb-20 pt-[calc(var(--nav-height)+3rem)] md:px-8 md:pb-28">
+      <div className="site-phero-content">
         <div className="container-custom w-full">
           <motion.div
             className="flex flex-wrap items-center gap-4"
@@ -65,7 +65,7 @@ const CareersHero = () => {
             transition={{ duration: 0.9, ease, delay: 0.2 }}
           />
 
-          <h1 className="mt-7 max-w-4xl font-display text-[clamp(2.75rem,8vw,6rem)] font-extrabold leading-[0.92] tracking-[-0.045em]">
+          <h1 className="site-phero-headline">
             {words.map((word, i) => (
               <span
                 key={`${word}-${i}`}
@@ -88,7 +88,7 @@ const CareersHero = () => {
           </h1>
 
           <motion.p
-            className="mt-6 max-w-xl text-base leading-relaxed text-white/65 md:text-lg"
+            className="site-phero-support"
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, delay: 0.65, ease }}
@@ -98,7 +98,7 @@ const CareersHero = () => {
 
           <motion.a
             href="#openings"
-            className="mt-12 inline-flex items-center gap-3 text-[0.65rem] font-semibold uppercase tracking-[0.22em] text-white/40 transition-colors hover:text-[var(--accent)]"
+            className="site-phero-cue transition-colors hover:text-[var(--accent)]"
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1, duration: 0.6 }}
