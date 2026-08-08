@@ -543,7 +543,7 @@ const ChatBot = () => {
       </AnimatePresence>
 
       {/* Floating interactive bot toggle */}
-      <div className="pointer-events-auto relative">
+      <div className="site-chat-fab-wrap pointer-events-auto">
         <AnimatePresence>
           {!open && showHi && (
             <motion.div
@@ -597,7 +597,7 @@ const ChatBot = () => {
         </motion.button>
 
         {!open && (
-          <p className="pointer-events-none mt-1.5 text-center text-[0.6rem] font-semibold tracking-wide text-ink/45">
+          <p className="site-chat-hint pointer-events-none">
             double-tap = dance
           </p>
         )}

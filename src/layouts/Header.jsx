@@ -83,133 +83,118 @@ const Header = () => {
     <>
       <header
         data-site-header
-        className={`site-header fixed inset-x-0 top-0 z-50 transition-[background-color,border-color,backdrop-filter,color] duration-500 ease-expo ${
-          solid
-            ? "border-b border-[var(--border-subtle)] bg-[var(--surface)]/92 backdrop-blur-xl"
-            : onDark && scrolled && !open
-              ? "border-b border-white/10 bg-ink/55 backdrop-blur-xl"
-              : "border-b border-transparent bg-transparent"
-        }`}
+        className={`site-header${scrolled ? " is-scrolled" : ""}${solid ? " is-solid" : ""}${onDark && scrolled && !open ? " is-on-dark" : ""}${open ? " is-menu-open" : ""}${lightNav ? " is-light" : ""}`}
       >
-        <div
-          className={`site-header-inner container-custom flex items-center justify-between transition-[height] duration-500 ease-expo ${
-            scrolled && !open ? "is-compact" : ""
-          }`}
-        >
-          <Link
-            to="/"
-            className="site-header-logo relative z-50 flex shrink-0 items-center py-1"
-            onClick={() => setOpen(false)}
-            aria-label="Nuam home"
+        <div className="site-header-shell">
+          <div
+            className={`site-header-inner container-custom flex items-center justify-between ${
+              scrolled && !open ? "is-compact" : ""
+            }`}
           >
-            <BrandLogo
-              tone={lightNav ? "light" : "dark"}
-              size="header"
-              className={
-                lightNav ? "drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]" : ""
-              }
-            />
-          </Link>
-
-          <nav
-            className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-0.5 lg:flex xl:gap-1"
-            aria-label="Primary"
-          >
-            {navLinks.map((link) => (
-              <NavLink
-                key={link.to}
-                to={link.to}
-                className={({ isActive }) =>
-                  `group relative px-2.5 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.14em] transition-colors duration-300 xl:px-3.5 xl:text-[0.78rem] ${
-                    lightNav
-                      ? isActive
-                        ? "text-white"
-                        : "text-white/60 hover:text-white"
-                      : isActive
-                        ? "text-[var(--ink)]"
-                        : "text-[var(--text-secondary)] hover:text-[var(--ink)]"
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    {link.label}
-                    <span
-                      className={`absolute bottom-1 left-2.5 right-2.5 h-px origin-left transition-transform duration-500 ease-expo xl:left-3.5 xl:right-3.5 ${
-                        lightNav ? "bg-[var(--accent)]" : "bg-[var(--ink)]"
-                      } ${
-                        isActive
-                          ? "scale-x-100"
-                          : "scale-x-0 group-hover:scale-x-100"
-                      }`}
-                    />
-                  </>
-                )}
-              </NavLink>
-            ))}
-          </nav>
-
-          <div className="relative z-50 flex items-center gap-2 sm:gap-3">
             <Link
-              to="/contact"
-              className={`group hidden items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.16em] transition-colors duration-300 lg:inline-flex ${
-                lightNav
-                  ? "text-white hover:text-[var(--accent)]"
-                  : "text-[var(--ink)] hover:text-[var(--text-secondary)]"
-              }`}
+              to="/"
+              className="site-header-logo relative z-50 flex shrink-0 items-center py-1"
+              onClick={() => setOpen(false)}
+              aria-label="Nuam home"
             >
-              <span
-                className={`border-b pb-0.5 transition-colors duration-300 ${
-                  lightNav
-                    ? "border-white/40 group-hover:border-[var(--accent)]"
-                    : "border-[var(--ink)] group-hover:border-[var(--text-muted)]"
-                }`}
-              >
-                Get started
-              </span>
-              <span
-                className={`inline-flex h-8 w-8 items-center justify-center rounded-full transition-all duration-500 ease-expo group-hover:translate-x-0.5 ${
-                  lightNav
-                    ? "bg-[var(--accent)] text-[var(--accent-ink)]"
-                    : "bg-ink text-white group-hover:bg-[var(--accent)] group-hover:text-[var(--accent-ink)]"
-                }`}
-              >
-                <ArrowUpRight size={14} strokeWidth={2.5} />
-              </span>
+              <BrandLogo
+                tone={lightNav ? "light" : "dark"}
+                size="header"
+                className={
+                  lightNav ? "drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]" : ""
+                }
+              />
             </Link>
 
-            <button
-              type="button"
-              className={`relative flex h-10 w-10 flex-col items-center justify-center gap-[5px] rounded-full border transition-colors duration-300 sm:h-11 sm:w-11 lg:hidden ${
-                lightNav
-                  ? "border-white/35 text-white"
-                  : "border-[var(--border-strong)] text-[var(--ink)]"
-              }`}
-              onClick={() => setOpen((v) => !v)}
-              aria-label={open ? "Close menu" : "Open menu"}
-              aria-expanded={open}
-              aria-controls="mobile-navigation"
+            <nav
+              className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-0.5 lg:flex xl:gap-1"
+              aria-label="Primary"
             >
-              <motion.span
-                className="block h-px w-4 origin-center bg-current"
-                animate={open ? { rotate: 45, y: 3 } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.35, ease }}
-              />
-              <motion.span
-                className="block h-px w-4 origin-center bg-current"
-                animate={open ? { rotate: -45, y: -3 } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.35, ease }}
-              />
-            </button>
+              {navLinks.map((link) => (
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  className={({ isActive }) =>
+                    `group relative px-2.5 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.14em] transition-colors duration-300 xl:px-3.5 xl:text-[0.78rem] ${
+                      lightNav
+                        ? isActive
+                          ? "text-white"
+                          : "text-white/60 hover:text-white"
+                        : isActive
+                          ? "text-[var(--ink)]"
+                          : "text-[var(--text-secondary)] hover:text-[var(--ink)]"
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      {link.label}
+                      <span
+                        className={`absolute bottom-1 left-2.5 right-2.5 h-px origin-left transition-transform duration-500 ease-expo xl:left-3.5 xl:right-3.5 ${
+                          lightNav ? "bg-[var(--accent)]" : "bg-[var(--ink)]"
+                        } ${
+                          isActive
+                            ? "scale-x-100"
+                            : "scale-x-0 group-hover:scale-x-100"
+                        }`}
+                      />
+                    </>
+                  )}
+                </NavLink>
+              ))}
+            </nav>
+
+            <div className="relative z-50 flex items-center gap-2 sm:gap-3">
+              <Link
+                to="/contact"
+                className={`group hidden items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.16em] transition-colors duration-300 lg:inline-flex ${
+                  lightNav
+                    ? "text-white hover:text-[var(--accent)]"
+                    : "text-[var(--ink)] hover:text-[var(--text-secondary)]"
+                }`}
+              >
+                <span
+                  className={`border-b pb-0.5 transition-colors duration-300 ${
+                    lightNav
+                      ? "border-white/40 group-hover:border-[var(--accent)]"
+                      : "border-[var(--ink)] group-hover:border-[var(--text-muted)]"
+                  }`}
+                >
+                  Get started
+                </span>
+                <span
+                  className={`inline-flex h-8 w-8 items-center justify-center rounded-full transition-all duration-500 ease-expo group-hover:translate-x-0.5 ${
+                    lightNav
+                      ? "bg-[var(--accent)] text-[var(--accent-ink)]"
+                      : "bg-ink text-white group-hover:bg-[var(--accent)] group-hover:text-[var(--accent-ink)]"
+                  }`}
+                >
+                  <ArrowUpRight size={14} strokeWidth={2.5} />
+                </span>
+              </Link>
+
+              <button
+                type="button"
+                className="site-header-menu-btn relative z-50 lg:hidden"
+                onClick={() => setOpen((v) => !v)}
+                aria-label={open ? "Close menu" : "Open menu"}
+                aria-expanded={open}
+                aria-controls="mobile-navigation"
+              >
+                <motion.span
+                  className="block h-px w-3.5 origin-center bg-current"
+                  animate={open ? { rotate: 45, y: 3 } : { rotate: 0, y: 0 }}
+                  transition={{ duration: 0.35, ease }}
+                />
+                <motion.span
+                  className="block h-px w-3.5 origin-center bg-current"
+                  animate={open ? { rotate: -45, y: -3 } : { rotate: 0, y: 0 }}
+                  transition={{ duration: 0.35, ease }}
+                />
+              </button>
+            </div>
           </div>
         </div>
-
-        <motion.div
-          className="absolute bottom-0 left-0 h-px w-full origin-left bg-[var(--accent)]"
-          initial={false}
-          animate={{ scaleX: solid ? 1 : 0 }}
-          transition={{ duration: 0.45, ease }}
-        />
       </header>
 
       <AnimatePresence>
