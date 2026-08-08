@@ -1530,15 +1530,15 @@
     color: rgba(255, 255, 255, 0.45);
   }
 
-  /* Mobile: normal flow (no sticky scrub) — sticky only from md up */
+  /* Mobile: sticky scrub through capabilities */
   .site-wwd-track {
     position: relative;
-    height: auto;
+    height: 140vh;
   }
 
   .site-wwd-sticky {
-    position: relative;
-    top: auto;
+    position: sticky;
+    top: calc(var(--nav-height) + 0.5rem);
     z-index: 2;
     display: flex;
     align-items: flex-start;
@@ -1550,7 +1550,7 @@
     width: 100%;
     height: auto;
     align-items: flex-start;
-    padding-bottom: 2.5rem;
+    padding-bottom: 1.25rem;
   }
 
   .site-wwd-panel {
