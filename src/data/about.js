@@ -76,5 +76,5 @@ export const aboutCta = {
   support:
     "Tell us what you’re building. Nuam Technologies Pvt Ltd will show you how we’d approach it.",
   button: { label: "Talk to us", to: "/contact" },
-  email: "hello@nuam.tech",
+  email: "nuamtechnologies@gmail.com",
 };

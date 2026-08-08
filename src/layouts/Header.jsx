@@ -269,10 +269,10 @@ const Header = () => {
                   <ArrowUpRight size={16} />
                 </Link>
                 <a
-                  href="mailto:hello@nuam.tech"
+                  href="mailto:nuamtechnologies@gmail.com"
                   className="break-all text-center text-sm text-white/45 transition-colors hover:text-[var(--accent)]"
                 >
-                  hello@nuam.tech
+                  nuamtechnologies@gmail.com
                 </a>
               </motion.div>
             </div>

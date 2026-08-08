@@ -62,11 +62,11 @@ const Footer = () => {
             </div>
 
             <a
-              href="mailto:hello@nuam.tech"
+              href="mailto:nuamtechnologies@gmail.com"
               className="group mt-2 inline-flex max-w-full items-center gap-3 self-start break-all md:mt-0 md:self-auto"
             >
               <span className="border-b border-white/25 pb-1 text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-white transition-colors duration-300 group-hover:border-[var(--accent)] group-hover:text-[var(--accent)] sm:text-[0.7rem] sm:tracking-[0.18em]">
-                hello@nuam.tech
+                nuamtechnologies@gmail.com
               </span>
               <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)] transition-transform duration-500 ease-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
                 <ArrowUpRight size={15} strokeWidth={2.5} />
@@ -118,10 +118,10 @@ const Footer = () => {
         <Reveal delay={0.2}>
           <div className="site-footer-meta flex border-t border-white/10">
             <p className="text-[0.65rem] tracking-[0.08em] text-white/30 sm:text-[0.7rem]">
-              © {year} Nuam. All rights reserved.
+              © {year} Nuam Technologies Pvt Ltd. All rights reserved.
             </p>
-            <p className="text-[0.65rem] tracking-[0.08em] text-white/30 sm:text-[0.7rem]">
-              Crafted for the next digital leap.
+            <p className="max-w-[18rem] text-right text-[0.65rem] leading-relaxed tracking-[0.04em] text-white/30 sm:max-w-none sm:text-[0.7rem]">
+              Kochi · +91 80896 23759
             </p>
           </div>
         </Reveal>

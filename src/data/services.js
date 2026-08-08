@@ -92,5 +92,5 @@ export const servicesCta = {
   title: "Ready to put capability to work?",
   support: "Tell us where you are — we’ll map the right mix of services.",
   button: { label: "Request a quote", to: "/contact" },
-  email: "hello@nuam.tech",
+  email: "nuamtechnologies@gmail.com",
 };

@@ -14,8 +14,11 @@ export const openings = [];
 export const careersEmpty = {
   title: "No openings right now",
   body: "We’re not hiring at the moment. When roles open, they’ll show up here first. You’re still welcome to say hello — we keep a shortlist for exceptional people.",
-  cta: { label: "Send your resume", href: "mailto:careers@nuam.tech?subject=Future%20opportunity%20—%20Nuam" },
-  altEmail: "hello@nuam.tech",
+  cta: {
+    label: "Send your resume",
+    href: "mailto:nuamtechnologies@gmail.com?subject=Future%20opportunity%20—%20Nuam",
+  },
+  altEmail: "nuamtechnologies@gmail.com",
 };
 
 export const careersCulture = {
@@ -44,6 +47,9 @@ export const careersCta = {
   title: "Not hiring — still listening.",
   support:
     "Share a short note and your resume. If something fits later, we’ll reach out.",
-  button: { label: "Email careers@", href: "mailto:careers@nuam.tech" },
-  email: "careers@nuam.tech",
+  button: {
+    label: "Email us",
+    href: "mailto:nuamtechnologies@gmail.com?subject=Careers%20—%20Nuam",
+  },
+  email: "nuamtechnologies@gmail.com",
 };

@@ -318,5 +318,5 @@ export const cta = {
   support:
     "Nuam Technologies Pvt Ltd — tell us what you’re shipping next. We’ll reply within one business day.",
   button: { label: "Request a quote", to: "/contact" },
-  email: "hello@nuam.tech",
+  email: "nuamtechnologies@gmail.com",
 };

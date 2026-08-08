@@ -59,7 +59,7 @@ const ContactChannels = () => {
                 <p className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-[var(--text-muted)]">
                   {d.label}
                 </p>
-                <p className="mt-1.5 text-[0.95rem] text-[var(--text-primary)]">
+                <p className="mt-1.5 text-[0.95rem] text-[var(--text-primary)] [overflow-wrap:anywhere]">
                   {d.value}
                 </p>
               </div>
@@ -79,10 +79,10 @@ const ContactChannels = () => {
                 Prefer a direct line?
               </p>
               <a
-                href="mailto:hello@nuam.tech"
+                href="mailto:nuamtechnologies@gmail.com"
                 className="mt-1 inline-block text-sm text-[var(--accent)] transition-opacity hover:opacity-80"
               >
-                hello@nuam.tech
+                nuamtechnologies@gmail.com
               </a>
               <p className="mt-3 text-sm text-[var(--text-muted)]">
                 Hiring?{" "}

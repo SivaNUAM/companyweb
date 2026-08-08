@@ -122,5 +122,5 @@ export const portfolioCta = {
   support:
     "Tell Nuam Technologies Pvt Ltd what you’re building — we’ll show you how we’d approach it.",
   button: { label: "Start a project", to: "/contact" },
-  email: "hello@nuam.tech",
+  email: "nuamtechnologies@gmail.com",
 };

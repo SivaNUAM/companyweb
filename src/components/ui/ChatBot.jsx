@@ -26,9 +26,9 @@ const botReply = (text) => {
     return "Selected case studies live on /portfolio — tell me your industry and I’ll vibe-check a fit.";
   }
   if (t.includes("talk") || t.includes("contact") || t.includes("team")) {
-    return "Let’s gooo — hello@nuam.tech or Contact page. We reply within one business day.";
+    return "Let’s gooo — nuamtechnologies@gmail.com or Contact page. We reply within one business day.";
   }
-  return "Got it! Share a bit about your project and I’ll point you next — or email hello@nuam.tech.";
+  return "Got it! Share a bit about your project and I’ll point you next — or email nuamtechnologies@gmail.com.";
 };
 
 /** Interactive SVG mascot — moods: idle | hi | dance | smile | think | happy */
@@ -450,10 +450,13 @@ const ChatBot = () => {
                     <p className="font-display text-base font-bold tracking-tight">
                       Nuam Bot
                     </p>
-                    <p className="mt-0.5 flex items-center gap-1.5 text-[0.7rem] text-white/50">
-                      <span className="relative flex h-2 w-2">
-                        <span className="absolute inset-0 animate-ping rounded-full bg-emerald-400/70" />
-                        <span className="relative h-2 w-2 rounded-full bg-emerald-400" />
+                    <p className="mt-0.5 flex items-center gap-2 text-[0.7rem] text-white/55">
+                      <span
+                        className="site-chat-online"
+                        aria-hidden
+                      >
+                        <span className="site-chat-online-ping" />
+                        <span className="site-chat-online-dot" />
                       </span>
                       Online · tap my face to dance
                     </p>
@@ -604,9 +607,9 @@ const ChatBot = () => {
           )}
 
           {!open && (
-            <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--accent)] opacity-60" />
-              <span className="relative inline-flex h-3.5 w-3.5 rounded-full border-2 border-[#0b0b0b] bg-emerald-400" />
+            <span className="site-chat-fab-online" aria-hidden>
+              <span className="site-chat-fab-online-ping" />
+              <span className="site-chat-fab-online-dot" />
             </span>
           )}
         </motion.button>

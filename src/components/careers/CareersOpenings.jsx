@@ -47,7 +47,7 @@ const CareersOpenings = () => {
             {openings.map((role, i) => (
               <li key={role.id}>
                 <a
-                  href={role.href || "mailto:careers@nuam.tech"}
+                  href={role.href || "mailto:nuamtechnologies@gmail.com"}
                   className="group flex flex-col gap-4 py-8 transition-colors md:flex-row md:items-center md:justify-between md:gap-8 md:py-10"
                 >
                   <div className="flex gap-5">

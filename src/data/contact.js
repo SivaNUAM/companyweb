@@ -8,20 +8,26 @@ export const contactHero = {
   imageAlt: "Dark modern workspace with screens and deep ambient light",
 };
 
+export const COMPANY_EMAIL = "nuamtechnologies@gmail.com";
+export const COMPANY_PHONE = "8089623759";
+export const COMPANY_PHONE_TEL = "+918089623759";
+export const COMPANY_ADDRESS =
+  "3rd floor, Al Bushara building, Pipeline Rd, Thrikkakara, Edappally, Kochi, Kerala 682021";
+
 export const contactChannels = [
   {
     id: "projects",
-    label: "Projects",
-    value: "hello@nuam.tech",
-    href: "mailto:hello@nuam.tech",
+    label: "Email",
+    value: COMPANY_EMAIL,
+    href: `mailto:${COMPANY_EMAIL}`,
     note: "New briefs, RFPs, and partnerships",
   },
   {
-    id: "careers",
-    label: "Careers",
-    value: "careers@nuam.tech",
-    href: "mailto:careers@nuam.tech",
-    note: "No openings right now — future interest welcome",
+    id: "phone",
+    label: "Phone",
+    value: COMPANY_PHONE,
+    href: `tel:${COMPANY_PHONE_TEL}`,
+    note: "Mon–Sat · business hours",
   },
 ];
 
@@ -32,9 +38,14 @@ export const contactDetails = [
     value: "Nuam Technologies Pvt Ltd",
   },
   {
-    id: "founded",
-    label: "Founded",
-    value: "2025 · Corporate practice in 2026",
+    id: "address",
+    label: "Address",
+    value: COMPANY_ADDRESS,
+  },
+  {
+    id: "phone",
+    label: "Phone",
+    value: COMPANY_PHONE,
   },
   {
     id: "reply",
@@ -53,5 +64,5 @@ export const contactForm = {
     message: "What are you building?",
   },
   submit: "Send message",
-  to: "hello@nuam.tech",
+  to: COMPANY_EMAIL,
 };
