@@ -83,11 +83,15 @@
 
   html.welcome-loading,
   html.welcome-loading body,
-  html.page-loading,
-  html.page-loading body,
   html.mobile-nav-open,
   html.mobile-nav-open body {
     overflow: hidden;
+  }
+
+  /* Soft route lock — overlay blocks input; do NOT set overflow:hidden
+     (that breaks sticky decks and can freeze Lenis after unlock). */
+  html.page-loading {
+    cursor: wait;
   }
 
   h1,

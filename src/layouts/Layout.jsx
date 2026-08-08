@@ -15,13 +15,15 @@ const Layout = () => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  // Clear leftover scroll locks (HMR / menu) without fighting PageLoader
+  // Clear leftover menu / welcome locks (PageLoader owns page-loading)
   useEffect(() => {
     document.documentElement.classList.remove(
       "welcome-loading",
       "mobile-nav-open",
     );
-    document.body.style.overflow = "";
+    if (!document.documentElement.classList.contains("page-loading")) {
+      document.body.style.overflow = "";
+    }
   }, [pathname]);
 
   return (

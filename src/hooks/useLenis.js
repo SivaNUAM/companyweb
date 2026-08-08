@@ -33,6 +33,12 @@ export function useLenis() {
         lenis.stop();
       } else {
         lenis.start();
+        // Recalculate after overflow/sticky disruption
+        try {
+          lenis.resize();
+        } catch {
+          /* ignore */
+        }
       }
     };
 
