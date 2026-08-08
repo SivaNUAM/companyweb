@@ -28,7 +28,7 @@ const ServiceRow = ({ service, index }) => {
                   src={service.image}
                   alt=""
                   aria-hidden
-                  className="h-full w-full object-cover transition-transform duration-[1.2s] ease-expo group-hover/row:scale-[1.05]"
+                  className="site-svc-media-img h-full w-full object-cover transition-transform duration-[1.2s] ease-expo group-hover/row:scale-[1.05]"
                   loading="lazy"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   initial={reduceMotion ? false : { scale: 1.12 }}

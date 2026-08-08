@@ -2725,6 +2725,13 @@
     padding-block: 2.5rem;
   }
 
+  .site-svc-media-img {
+    /* Slight zoom crops residual AI watermark corners */
+    transform: scale(1.04);
+    transform-origin: center center;
+    object-position: center 46%;
+  }
+
   .site-svc-ghost {
     pointer-events: none;
     position: absolute;
