@@ -1,5 +1,12 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
+import {
+  ArrowUpRight,
+  Linkedin,
+  Youtube,
+  Instagram,
+  Facebook,
+  Dribbble,
+} from "lucide-react";
 import Reveal from "../components/ui/Reveal";
 import BrandLogo from "../components/ui/BrandLogo";
 
@@ -17,6 +24,94 @@ const serviceLinks = [
   { to: "/services", label: "Mobile Platforms" },
   { to: "/services", label: "Cloud & DevOps" },
 ];
+
+const socialLinks = [
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/",
+    icon: Linkedin,
+  },
+  {
+    label: "YouTube",
+    href: "https://www.youtube.com/",
+    icon: Youtube,
+  },
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/",
+    icon: Instagram,
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/",
+    icon: Facebook,
+  },
+  {
+    label: "Dribbble",
+    href: "https://dribbble.com/",
+    icon: Dribbble,
+  },
+  {
+    label: "Behance",
+    href: "https://www.behance.net/",
+    icon: "behance",
+  },
+  {
+    label: "X",
+    href: "https://x.com/",
+    icon: "x",
+  },
+];
+
+const BehanceIcon = ({ size = 28 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden
+  >
+    <path d="M22 7h-7V5h7v2zm1.726 10c-.442 1.297-2.086 3-5.251 3-3.268 0-5.495-2.088-5.495-5.42 0-3.55 2.433-5.58 5.389-5.58 3.115 0 5.105 2.065 5.105 5.59 0 .3-.02.58-.055.85H13.4c.18 1.63 1.41 2.33 2.92 2.33.96 0 1.8-.36 2.22-1.2l2.186.95zM15.98 13h4.48c-.16-1.36-.95-1.95-2.13-1.95-1.28 0-2.1.66-2.35 1.95zM6.2 18.5H0V5.5h6.48c3.02 0 5.02 1.78 5.02 4.45 0 1.78-.95 3.15-2.55 3.72 1.95.48 3.2 2.05 3.2 4.05 0 2.9-2.35 4.78-5.95 4.78zm-2.9-7.7h2.55c1.45 0 2.3-.72 2.3-1.9 0-1.2-.85-1.85-2.25-1.85H3.3v3.75zm3 6.4c1.65 0 2.65-.8 2.65-2.15 0-1.35-1-2.15-2.7-2.15H3.3v4.3h3z" />
+  </svg>
+);
+
+const XIcon = ({ size = 26 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden
+  >
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.727-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z" />
+  </svg>
+);
+
+const SocialIcon = ({ item }) => {
+  const content =
+    item.icon === "behance" ? (
+      <BehanceIcon size={28} />
+    ) : item.icon === "x" ? (
+      <XIcon size={26} />
+    ) : (
+      (() => {
+        const Icon = item.icon;
+        return <Icon size={28} strokeWidth={1.75} />;
+      })()
+    );
+
+  return (
+    <a
+      href={item.href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="site-footer-social-link"
+      aria-label={item.label}
+    >
+      {content}
+    </a>
+  );
+};
 
 const FooterLink = ({ to, label }) => (
   <li>
@@ -116,13 +211,22 @@ const Footer = () => {
         </div>
 
         <Reveal delay={0.2}>
-          <div className="site-footer-meta flex border-t border-white/10">
-            <p className="text-[0.65rem] tracking-[0.08em] text-white/30 sm:text-[0.7rem]">
-              © {year} Nuam Technologies Pvt Ltd. All rights reserved.
+          <div className="site-footer-bar">
+            <p className="site-footer-copy">
+              NUAM Technologies Pvt Ltd © {year} All rights reserved
             </p>
-            <p className="max-w-[18rem] text-right text-[0.65rem] leading-relaxed tracking-[0.04em] text-white/30 sm:max-w-none sm:text-[0.7rem]">
-              Kochi · +91 80896 23759
-            </p>
+
+            <div className="site-footer-legal">
+              <Link to="/privacy">Privacy Policy</Link>
+              <span aria-hidden>|</span>
+              <Link to="/terms">Terms &amp; Conditions</Link>
+            </div>
+
+            <div className="site-footer-socials" aria-label="Social media">
+              {socialLinks.map((item) => (
+                <SocialIcon key={item.label} item={item} />
+              ))}
+            </div>
           </div>
         </Reveal>
       </div>

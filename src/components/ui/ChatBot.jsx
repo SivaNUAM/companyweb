@@ -9,8 +9,37 @@ const quickReplies = [
   "Tell me about services",
   "View our works",
   "Talk to the team",
+  "Who is Nuam?",
+  "Pricing & timeline",
+  "Careers at Nuam",
+  "Where are you based?",
+  "Product engineering",
+  "Experience design",
+  "Mobile apps",
+  "Cloud & DevOps",
+  "Brand systems",
+  "Growth & marketing",
+  "Start a project",
   "Dance!",
 ];
+
+const hiLines = [
+  "Hi! How can I help?",
+  "Building something? Let’s talk.",
+  "Got an idea? Ask me.",
+  "Need a partner? Say hello.",
+  "Curious about Nuam?",
+  "Ready to ship? I’m here.",
+];
+
+const pickHiLine = (prev) => {
+  if (hiLines.length < 2) return hiLines[0];
+  let next = hiLines[Math.floor(Math.random() * hiLines.length)];
+  while (next === prev) {
+    next = hiLines[Math.floor(Math.random() * hiLines.length)];
+  }
+  return next;
+};
 
 const botReply = (text) => {
   const t = text.toLowerCase();
@@ -20,14 +49,47 @@ const botReply = (text) => {
   if (t.includes("hi") || t.includes("hello") || t.includes("hey")) {
     return "Hiiii! I’m Nuam Bot — smile mode ON. What are we building today?";
   }
+  if (t.includes("who is nuam") || t.includes("about") || t.includes("founded")) {
+    return "Nuam Technologies Pvt Ltd — founded 2025, corporate in 2026. We partner on strategy, design, and engineering. Full story on /about.";
+  }
+  if (t.includes("product engineering") || t.includes("engineering")) {
+    return "Product engineering is our core — architecture, build, QA, and release for web & platform products. Details on /services.";
+  }
+  if (t.includes("experience design") || t.includes("ux") || t.includes("ui")) {
+    return "Experience design = research, flows, interfaces, and motion systems that feel sharp at corporate scale. See /services.";
+  }
+  if (t.includes("mobile")) {
+    return "We ship iOS & Android apps — native or cross-platform — with polish users notice. Ask on /contact to scope yours.";
+  }
+  if (t.includes("cloud") || t.includes("devops")) {
+    return "Cloud & DevOps: reliable deploys, observability, and infra that scales with your team. Happy to map a stack on /contact.";
+  }
+  if (t.includes("brand")) {
+    return "Brand systems — identity, UI language, and assets that stay consistent across every touchpoint. Peek at /services.";
+  }
+  if (t.includes("growth") || t.includes("marketing")) {
+    return "Growth & marketing tech — funnels, landing systems, and measurement so campaigns actually compound. Let’s talk scope on /contact.";
+  }
+  if (t.includes("start a project") || t.includes("start project") || t.includes("new project")) {
+    return "Let’s kick it off — share your brief at nuamtechnologies@gmail.com or /contact. We’ll reply within one business day.";
+  }
   if (t.includes("service")) {
     return "We offer product engineering, experience design, mobile, cloud, brand systems, and growth. Peek at /services!";
   }
   if (t.includes("work") || t.includes("portfolio")) {
     return "Selected case studies live on /portfolio — tell me your industry and I’ll vibe-check a fit.";
   }
-  if (t.includes("talk") || t.includes("contact") || t.includes("team")) {
-    return "Let’s gooo — nuamtechnologies@gmail.com or Contact page. We reply within one business day.";
+  if (t.includes("price") || t.includes("pricing") || t.includes("timeline") || t.includes("cost") || t.includes("budget")) {
+    return "Scopes vary by product depth — most builds start with a short discovery, then a clear timeline + estimate. Share your goal and we’ll map it on /contact.";
+  }
+  if (t.includes("career") || t.includes("job") || t.includes("hiring") || t.includes("join")) {
+    return "We’re always open to sharp builders and designers. See open roles on /careers — or email nuamtechnologies@gmail.com.";
+  }
+  if (t.includes("where") || t.includes("based") || t.includes("location") || t.includes("office") || t.includes("kochi")) {
+    return "We’re based in Kochi — Al Bushara building, Thrikkakara, Edappally. Call 8089623759 or hit /contact.";
+  }
+  if (t.includes("talk") || t.includes("contact") || t.includes("team") || t.includes("email") || t.includes("phone")) {
+    return "Let’s gooo — nuamtechnologies@gmail.com · 8089623759 · or the Contact page. We reply within one business day.";
   }
   return "Got it! Share a bit about your project and I’ll point you next — or email nuamtechnologies@gmail.com.";
 };
@@ -310,8 +372,12 @@ const BotFace = ({ mood = "idle", size = 64, lively = true }) => {
 const ChatBot = () => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
+  /** Mood inside the open chat panel only */
   const [mood, setMood] = useState("idle");
+  /** Mood on the floating toggle FAB only */
+  const [fabMood, setFabMood] = useState("idle");
   const [showHi, setShowHi] = useState(true);
+  const [hiLine, setHiLine] = useState(() => hiLines[0]);
   const [typing, setTyping] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -323,44 +389,63 @@ const ChatBot = () => {
   const endRef = useRef(null);
   const inputRef = useRef(null);
   const moodTimer = useRef(null);
-  const openRef = useRef(open);
-  openRef.current = open;
+  const fabTimer = useRef(null);
+  const fabMoodRef = useRef(fabMood);
+  fabMoodRef.current = fabMood;
 
   const setMoodTemp = useCallback((next, ms = 2200) => {
     clearTimeout(moodTimer.current);
     setMood(next);
-    moodTimer.current = setTimeout(
-      () => setMood(openRef.current ? "smile" : "idle"),
-      ms,
-    );
+    moodTimer.current = setTimeout(() => setMood("smile"), ms);
   }, []);
 
-  // Periodic hi + dance tease when closed
+  const setFabMoodTemp = useCallback((next, ms = 2800) => {
+    clearTimeout(fabTimer.current);
+    setFabMood(next);
+    fabTimer.current = setTimeout(() => setFabMood("idle"), ms);
+  }, []);
+
+  // Hi bubble when closed — skipped while FAB is dancing
   useEffect(() => {
     if (open) return undefined;
 
+    setHiLine((prev) => pickHiLine(prev));
     setShowHi(true);
-    setMoodTemp("hi", 2800);
+    setFabMoodTemp("hi", 2600);
 
+    const hiTimers = [];
     const hiLoop = setInterval(() => {
+      setHiLine((prev) => pickHiLine(prev));
       setShowHi(true);
-      setMoodTemp("hi", 2600);
-      setTimeout(() => setShowHi(false), 3200);
+      if (fabMoodRef.current !== "dance") setFabMoodTemp("hi", 2400);
+      hiTimers.push(setTimeout(() => setShowHi(false), 4200));
     }, 9000);
 
-    const danceLoop = setInterval(() => {
-      setMoodTemp("dance", 2400);
-    }, 16000);
-
-    const hideHi = setTimeout(() => setShowHi(false), 3500);
+    const hideHi = setTimeout(() => setShowHi(false), 4500);
 
     return () => {
       clearInterval(hiLoop);
-      clearInterval(danceLoop);
       clearTimeout(hideHi);
-      clearTimeout(moodTimer.current);
+      hiTimers.forEach(clearTimeout);
     };
-  }, [open, setMoodTemp]);
+  }, [open, setFabMoodTemp]);
+
+  // Auto-dance on the toggle FAB every 20s (not the open panel)
+  useEffect(() => {
+    if (open) {
+      clearTimeout(fabTimer.current);
+      setFabMood("idle");
+      return undefined;
+    }
+
+    const danceOnce = () => setFabMoodTemp("dance", 3000);
+    const danceLoop = setInterval(danceOnce, 20000);
+
+    return () => {
+      clearInterval(danceLoop);
+      clearTimeout(fabTimer.current);
+    };
+  }, [open, setFabMoodTemp]);
 
   useEffect(() => {
     if (open) {
@@ -382,6 +467,7 @@ const ChatBot = () => {
       if (root.classList.contains("mobile-nav-open")) {
         setOpen(false);
         setMood("idle");
+        setFabMood("idle");
       }
     };
     sync();
@@ -423,7 +509,12 @@ const ChatBot = () => {
 
   const toggle = () => {
     setOpen((v) => {
-      if (v) setMood("idle");
+      if (v) {
+        setMood("idle");
+        setFabMood("idle");
+      } else {
+        setShowHi(false);
+      }
       return !v;
     });
   };
@@ -574,14 +665,15 @@ const ChatBot = () => {
         <AnimatePresence>
           {!open && showHi && (
             <motion.div
+              key={hiLine}
               initial={{ opacity: 0, x: 12, scale: 0.85 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: 8, scale: 0.9 }}
-              className="site-chat-hi whitespace-nowrap"
+              className="site-chat-hi"
             >
-              <div className="relative rounded-2xl rounded-br-sm bg-white px-3.5 py-2 font-display text-sm font-bold text-ink shadow-[0_10px_28px_rgba(0,0,0,0.18)]">
-                Hi!
-                <span className="absolute -bottom-1 right-2 h-2.5 w-2.5 rotate-45 bg-white" />
+              <div className="site-chat-hi-bubble">
+                <p className="site-chat-hi-text">{hiLine}</p>
+                <span className="site-chat-hi-tail" aria-hidden />
               </div>
             </motion.div>
           )}
@@ -591,29 +683,42 @@ const ChatBot = () => {
           type="button"
           onClick={toggle}
           onMouseEnter={() => {
-            if (!open) setMoodTemp("smile", 1400);
+            if (!open && fabMood !== "dance") setFabMoodTemp("smile", 1400);
           }}
           onDoubleClick={(e) => {
             e.preventDefault();
-            if (!open) setMoodTemp("dance", 2600);
+            if (!open) setFabMoodTemp("dance", 3000);
           }}
           className="site-chat-fab outline-none ring-offset-2 transition hover:scale-105 focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
           aria-label={open ? "Close chat" : "Open Nuam bot"}
           aria-expanded={open}
           whileTap={{ scale: 0.92 }}
-          whileHover={!open ? { rotate: [0, -4, 4, 0] } : undefined}
         >
-          {open ? (
-            <motion.span
-              initial={{ rotate: -30, opacity: 0 }}
-              animate={{ rotate: 0, opacity: 1 }}
-              className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--accent)] text-[var(--accent-ink)]"
-            >
-              <X size={22} strokeWidth={2.5} />
-            </motion.span>
-          ) : (
-            <BotFace mood={mood} size={58} />
-          )}
+          <AnimatePresence mode="wait" initial={false}>
+            {open ? (
+              <motion.span
+                key="close"
+                initial={{ rotate: -40, scale: 0.7, opacity: 0 }}
+                animate={{ rotate: 0, scale: 1, opacity: 1 }}
+                exit={{ rotate: 20, scale: 0.7, opacity: 0 }}
+                transition={{ duration: 0.22, ease }}
+                className="site-chat-fab-close"
+              >
+                <X size={22} strokeWidth={2.5} />
+              </motion.span>
+            ) : (
+              <motion.span
+                key="bot"
+                initial={{ scale: 0.85, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.85, opacity: 0 }}
+                transition={{ duration: 0.22, ease }}
+                className="site-chat-fab-bot"
+              >
+                <BotFace mood={fabMood} size={72} />
+              </motion.span>
+            )}
+          </AnimatePresence>
 
           {!open && (
             <span className="site-chat-fab-online" aria-hidden>
@@ -622,12 +727,6 @@ const ChatBot = () => {
             </span>
           )}
         </motion.button>
-
-        {!open && (
-          <p className="site-chat-hint pointer-events-none">
-            double-tap = dance
-          </p>
-        )}
       </div>
     </div>
   );
