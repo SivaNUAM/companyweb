@@ -1163,6 +1163,12 @@
       height: 3.25rem !important;
     }
 
+    /* Desktop: hide hamburger — CSS display:flex was overriding Tailwind lg:hidden */
+    .site-header-menu-btn,
+    .site-mobile-nav-panel {
+      display: none !important;
+    }
+
     .site-header-shell:hover {
       transform: translateY(0.5px);
     }
