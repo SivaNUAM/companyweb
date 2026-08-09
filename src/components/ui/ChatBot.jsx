@@ -1,9 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 import { Send, X } from "lucide-react";
 import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const ease = [0.16, 1, 0.3, 1];
+const LOOK_SPRING = { stiffness: 280, damping: 22, mass: 0.35 };
+const TILT_SPRING = { stiffness: 180, damping: 18, mass: 0.4 };
 
 const quickReplies = [
   "Tell me about services",
@@ -95,18 +103,121 @@ const botReply = (text) => {
 };
 
 /** Interactive SVG mascot — moods: idle | hi | dance | smile | think | happy */
-const BotFace = ({ mood = "idle", size = 64, lively = true }) => {
-  const { freezeLoops } = useSimplifyMotion();
+const BotFace = ({
+  mood = "idle",
+  size = 64,
+  lively = true,
+  trackCursor = false,
+}) => {
+  const { freezeLoops, simplify } = useSimplifyMotion();
+  const wrapRef = useRef(null);
   const dancing = mood === "dance";
   const waving = mood === "hi";
-  const smiling = mood === "smile" || mood === "happy" || mood === "hi" || dancing;
+  const smiling =
+    mood === "smile" || mood === "happy" || mood === "hi" || dancing;
   const thinking = mood === "think";
   const canLoop = lively && !freezeLoops;
+  const canTrack = trackCursor && !simplify && !dancing && !thinking;
+  const [attentive, setAttentive] = useState(false);
+  const tracking = canTrack && attentive;
+
+  const lookX = useMotionValue(0);
+  const lookY = useMotionValue(0);
+  const tilt = useMotionValue(0);
+  const leanX = useMotionValue(0);
+  const leanY = useMotionValue(0);
+  const near = useMotionValue(0);
+
+  const pupilX = useSpring(lookX, LOOK_SPRING);
+  const pupilY = useSpring(lookY, LOOK_SPRING);
+  const headTilt = useSpring(tilt, TILT_SPRING);
+  const bodyX = useSpring(leanX, TILT_SPRING);
+  const bodyY = useSpring(leanY, TILT_SPRING);
+  const hoverBoost = useSpring(near, { stiffness: 220, damping: 20 });
+
+  const leftPupilCx = useTransform(pupilX, (v) => 48 + v);
+  const leftPupilCy = useTransform(pupilY, (v) => 53 + v);
+  const rightPupilCx = useTransform(pupilX, (v) => 76 + v);
+  const rightPupilCy = useTransform(pupilY, (v) => 53 + v);
+  const shineLX = useTransform(pupilX, (v) => 44 + v * 0.6);
+  const shineLY = useTransform(pupilY, (v) => 49 + v * 0.6);
+  const shineRX = useTransform(pupilX, (v) => 72 + v * 0.6);
+  const shineRY = useTransform(pupilY, (v) => 49 + v * 0.6);
+  const armReach = useTransform(pupilX, (v) => -8 + v * 1.2);
+  const scaleBoost = useTransform(hoverBoost, [0, 1], [1, 1.06]);
+  const antennaTilt = useTransform(headTilt, (v) => v * 0.6);
+
+  // Glance at cursor every 5s for a short burst — not constant focus
+  useEffect(() => {
+    if (!canTrack) {
+      setAttentive(false);
+      return undefined;
+    }
+
+    const ATTEND_MS = 1600;
+    const INTERVAL_MS = 5000;
+    let offTimer;
+
+    const pulse = () => {
+      setAttentive(true);
+      clearTimeout(offTimer);
+      offTimer = setTimeout(() => setAttentive(false), ATTEND_MS);
+    };
+
+    const loop = setInterval(pulse, INTERVAL_MS);
+
+    return () => {
+      clearInterval(loop);
+      clearTimeout(offTimer);
+      setAttentive(false);
+    };
+  }, [canTrack]);
+
+  useEffect(() => {
+    if (!tracking) {
+      lookX.set(0);
+      lookY.set(0);
+      tilt.set(0);
+      leanX.set(0);
+      leanY.set(0);
+      near.set(0);
+      return undefined;
+    }
+
+    const onMove = (e) => {
+      const el = wrapRef.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const dist = Math.hypot(dx, dy);
+
+      lookX.set(Math.max(-3.2, Math.min(3.2, (dx / rect.width) * 5.5)));
+      lookY.set(Math.max(-2.8, Math.min(2.8, (dy / rect.height) * 4.5)));
+      tilt.set(Math.max(-10, Math.min(10, (dx / rect.width) * 14)));
+      leanX.set(Math.max(-6, Math.min(6, (dx / rect.width) * 10)));
+      leanY.set(Math.max(-5, Math.min(5, (dy / rect.height) * 8)));
+      near.set(dist < 140 ? 1 : dist < 280 ? 0.45 : 0);
+    };
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, [tracking, lookX, lookY, tilt, leanX, leanY, near]);
 
   return (
     <motion.div
+      ref={wrapRef}
       className="relative select-none"
-      style={{ width: size, height: size }}
+      style={{
+        width: size,
+        height: size * (150 / 140),
+        x: tracking ? bodyX : 0,
+        y: tracking ? bodyY : 0,
+        rotate: tracking ? headTilt : 0,
+        scale: tracking ? scaleBoost : 1,
+      }}
       animate={
         dancing
           ? {
@@ -116,42 +227,104 @@ const BotFace = ({ mood = "idle", size = 64, lively = true }) => {
             }
           : waving
             ? { y: [0, -3, 0] }
-            : mood === "idle" && canLoop
+            : mood === "idle" && canLoop && !tracking
               ? { y: [0, -5, 0], rotate: [0, 2, -2, 0] }
-              : { y: 0, rotate: 0 }
+              : undefined
       }
       transition={
         dancing
           ? { duration: 0.85, repeat: Infinity, ease: "easeInOut" }
           : waving
             ? { duration: 0.7, repeat: 2, ease: "easeInOut" }
-            : mood === "idle" && canLoop
+            : mood === "idle" && canLoop && !tracking
               ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
               : { duration: 0.35, ease }
       }
     >
       <svg
-        viewBox="0 0 140 120"
+        viewBox="0 0 140 150"
         width={size}
-        height={size}
+        height={size * (150 / 140)}
         aria-hidden
         className="overflow-visible drop-shadow-[0_8px_20px_rgba(107,138,255,0.45)]"
       >
+        {/* Legs (under body) */}
+        <motion.g
+          style={{ transformOrigin: "42px 96px" }}
+          animate={
+            dancing
+              ? { rotate: [12, -22, 12], y: [0, -2, 0] }
+              : waving
+                ? { rotate: [0, -6, 0] }
+                : canLoop
+                  ? { rotate: [0, -4, 0, 3, 0] }
+                  : { rotate: 0 }
+          }
+          transition={
+            dancing
+              ? { duration: 0.45, repeat: Infinity, ease: "easeInOut" }
+              : waving
+                ? { duration: 0.7, repeat: 2, ease: "easeInOut" }
+                : canLoop
+                  ? { duration: 2.2, repeat: Infinity, ease: "easeInOut" }
+                  : { duration: 0.3 }
+          }
+        >
+          {/* Left thigh */}
+          <rect x="36" y="94" width="12" height="24" rx="6" fill="#6b8aff" />
+          {/* Left shin */}
+          <rect x="37" y="114" width="10" height="16" rx="5" fill="#8ba3ff" />
+          {/* Left foot */}
+          <rect x="30" y="128" width="20" height="9" rx="4.5" fill="#a8baff" />
+        </motion.g>
+
+        <motion.g
+          style={{ transformOrigin: "78px 96px" }}
+          animate={
+            dancing
+              ? { rotate: [-12, 22, -12], y: [0, -2, 0] }
+              : waving
+                ? { rotate: [0, 6, 0] }
+                : canLoop
+                  ? { rotate: [0, 3, 0, -4, 0] }
+                  : { rotate: 0 }
+          }
+          transition={
+            dancing
+              ? { duration: 0.45, repeat: Infinity, ease: "easeInOut" }
+              : waving
+                ? { duration: 0.7, repeat: 2, ease: "easeInOut" }
+                : canLoop
+                  ? { duration: 2.2, repeat: Infinity, ease: "easeInOut" }
+                  : { duration: 0.3 }
+          }
+        >
+          {/* Right thigh */}
+          <rect x="72" y="94" width="12" height="24" rx="6" fill="#6b8aff" />
+          {/* Right shin */}
+          <rect x="73" y="114" width="10" height="16" rx="5" fill="#8ba3ff" />
+          {/* Right foot */}
+          <rect x="70" y="128" width="20" height="9" rx="4.5" fill="#a8baff" />
+        </motion.g>
+
         {/* Antenna */}
         <motion.g
           animate={
             dancing
               ? { rotate: [0, 18, -18, 0] }
-              : canLoop
+              : canLoop && !tracking
                 ? { rotate: [0, 6, -6, 0] }
-                : { rotate: 0 }
+                : undefined
           }
           transition={
-            dancing || canLoop
+            dancing || (canLoop && !tracking)
               ? { duration: dancing ? 0.5 : 2.2, repeat: Infinity }
               : { duration: 0.2 }
           }
-          style={{ transformOrigin: "60px 18px" }}
+          style={{
+            transformOrigin: "60px 18px",
+            rotate: tracking ? antennaTilt : 0,
+          }}
         >
           <line
             x1="60"
@@ -243,24 +416,57 @@ const BotFace = ({ mood = "idle", size = 64, lively = true }) => {
             <>
               <circle cx="46" cy="52" r="7" fill="#fff" />
               <circle cx="74" cy="52" r="7" fill="#fff" />
-              <motion.circle
-                cx="48"
-                cy="53"
-                r="3.2"
-                fill="#0b0b0b"
-                animate={dancing ? { cx: [48, 50, 46, 48] } : {}}
-                transition={{ duration: 0.5, repeat: Infinity }}
-              />
-              <motion.circle
-                cx="76"
-                cy="53"
-                r="3.2"
-                fill="#0b0b0b"
-                animate={dancing ? { cx: [76, 78, 74, 76] } : {}}
-                transition={{ duration: 0.5, repeat: Infinity }}
-              />
-              <circle cx="44" cy="49" r="1.6" fill="#fff" opacity="0.9" />
-              <circle cx="72" cy="49" r="1.6" fill="#fff" opacity="0.9" />
+              {tracking && !dancing ? (
+                <>
+                  <motion.circle
+                    r="3.2"
+                    fill="#0b0b0b"
+                    cx={leftPupilCx}
+                    cy={leftPupilCy}
+                  />
+                  <motion.circle
+                    r="3.2"
+                    fill="#0b0b0b"
+                    cx={rightPupilCx}
+                    cy={rightPupilCy}
+                  />
+                  <motion.circle
+                    r="1.6"
+                    fill="#fff"
+                    opacity="0.9"
+                    cx={shineLX}
+                    cy={shineLY}
+                  />
+                  <motion.circle
+                    r="1.6"
+                    fill="#fff"
+                    opacity="0.9"
+                    cx={shineRX}
+                    cy={shineRY}
+                  />
+                </>
+              ) : (
+                <>
+                  <motion.circle
+                    cx="48"
+                    cy="53"
+                    r="3.2"
+                    fill="#0b0b0b"
+                    animate={dancing ? { cx: [48, 50, 46, 48] } : {}}
+                    transition={{ duration: 0.5, repeat: Infinity }}
+                  />
+                  <motion.circle
+                    cx="76"
+                    cy="53"
+                    r="3.2"
+                    fill="#0b0b0b"
+                    animate={dancing ? { cx: [76, 78, 74, 76] } : {}}
+                    transition={{ duration: 0.5, repeat: Infinity }}
+                  />
+                  <circle cx="44" cy="49" r="1.6" fill="#fff" opacity="0.9" />
+                  <circle cx="72" cy="49" r="1.6" fill="#fff" opacity="0.9" />
+                </>
+              )}
             </>
           )}
         </motion.g>
@@ -293,16 +499,21 @@ const BotFace = ({ mood = "idle", size = 64, lively = true }) => {
         {/* Left ear bolt */}
         <rect x="8" y="48" width="10" height="16" rx="4" fill="#6b8aff" />
 
-        {/* Right ear + waving robot arm (replaces emoji hand) */}
+        {/* Right ear + waving robot arm */}
         <rect x="102" y="48" width="10" height="16" rx="4" fill="#6b8aff" />
         <motion.g
-          style={{ transformOrigin: "112px 56px" }}
+          style={{
+            transformOrigin: "112px 56px",
+            rotate: tracking && !waving && !dancing ? armReach : undefined,
+          }}
           animate={
             waving
               ? { rotate: [-25, 35, -20, 40, -10, 30, -25] }
               : dancing
                 ? { rotate: [-15, 20, -15] }
-                : { rotate: -8 }
+                : tracking
+                  ? undefined
+                  : { rotate: -8 }
           }
           transition={
             waving
@@ -312,7 +523,6 @@ const BotFace = ({ mood = "idle", size = 64, lively = true }) => {
                 : { duration: 0.35, ease }
           }
         >
-          {/* Upper arm */}
           <rect
             x="108"
             y="52"
@@ -321,9 +531,7 @@ const BotFace = ({ mood = "idle", size = 64, lively = true }) => {
             rx="4.5"
             fill="#6b8aff"
           />
-          {/* Elbow joint */}
           <circle cx="130" cy="56.5" r="5" fill="#8ba3ff" />
-          {/* Forearm + palm */}
           <motion.g
             style={{ transformOrigin: "130px 56.5px" }}
             animate={
@@ -349,7 +557,6 @@ const BotFace = ({ mood = "idle", size = 64, lively = true }) => {
               rx="4.5"
               fill="#6b8aff"
             />
-            {/* Palm */}
             <rect
               x="123"
               y="40"
@@ -358,7 +565,6 @@ const BotFace = ({ mood = "idle", size = 64, lively = true }) => {
               rx="5"
               fill="#8ba3ff"
             />
-            {/* Fingers */}
             <rect x="124" y="34" width="3.2" height="8" rx="1.6" fill="#a8baff" />
             <rect x="128.5" y="32" width="3.2" height="10" rx="1.6" fill="#a8baff" />
             <rect x="133" y="34" width="3.2" height="8" rx="1.6" fill="#a8baff" />
@@ -544,7 +750,7 @@ const ChatBot = () => {
                     aria-label="Make bot dance"
                     title="Tap me to dance!"
                   >
-                    <BotFace mood={typing ? "think" : mood} size={56} />
+                    <BotFace mood={typing ? "think" : mood} size={56} trackCursor />
                   </button>
                   <div>
                     <p className="font-display text-base font-bold tracking-tight">
@@ -683,7 +889,13 @@ const ChatBot = () => {
           type="button"
           onClick={toggle}
           onMouseEnter={() => {
-            if (!open && fabMood !== "dance") setFabMoodTemp("smile", 1400);
+            if (!open && fabMoodRef.current !== "dance") setFabMoodTemp("smile", 2200);
+          }}
+          onMouseLeave={() => {
+            if (!open && fabMoodRef.current !== "dance") {
+              clearTimeout(fabTimer.current);
+              setFabMood("idle");
+            }
           }}
           onDoubleClick={(e) => {
             e.preventDefault();
@@ -693,6 +905,7 @@ const ChatBot = () => {
           aria-label={open ? "Close chat" : "Open Nuam bot"}
           aria-expanded={open}
           whileTap={{ scale: 0.92 }}
+          data-cursor="hover"
         >
           <AnimatePresence mode="wait" initial={false}>
             {open ? (
@@ -715,7 +928,7 @@ const ChatBot = () => {
                 transition={{ duration: 0.22, ease }}
                 className="site-chat-fab-bot"
               >
-                <BotFace mood={fabMood} size={72} />
+                <BotFace mood={fabMood} size={72} trackCursor />
               </motion.span>
             )}
           </AnimatePresence>
