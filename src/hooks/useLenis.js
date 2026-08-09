@@ -5,41 +5,37 @@ const isScrollLocked = () => {
   const root = document.documentElement;
   return (
     root.classList.contains("mobile-nav-open") ||
-    root.classList.contains("welcome-loading") ||
-    root.classList.contains("page-loading")
+    root.classList.contains("welcome-loading")
   );
 };
 
+/**
+ * Smooth scroll — skipped on touch/mobile for native performance.
+ * Never locks for page transitions (that caused stuck/lag).
+ */
 export function useLenis() {
   useEffect(() => {
     const prefersReduced = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    const narrow = window.matchMedia("(max-width: 1023px)").matches;
 
-    if (prefersReduced) return undefined;
+    // Native scroll on phones/tablets — far smoother than Lenis there
+    if (prefersReduced || coarse || narrow) return undefined;
 
     const lenis = new Lenis({
-      duration: 1.15,
+      duration: 0.85,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
-      // Avoid fighting native overflow locks / sticky sections
       syncTouch: false,
     });
 
     document.documentElement.classList.add("lenis", "lenis-smooth");
 
     const syncLock = () => {
-      if (isScrollLocked()) {
-        lenis.stop();
-      } else {
-        lenis.start();
-        // Recalculate after overflow/sticky disruption
-        try {
-          lenis.resize();
-        } catch {
-          /* ignore */
-        }
-      }
+      if (isScrollLocked()) lenis.stop();
+      else lenis.start();
     };
 
     syncLock();

@@ -88,11 +88,7 @@
     overflow: hidden;
   }
 
-  /* Soft route lock — overlay blocks input; do NOT set overflow:hidden
-     (that breaks sticky decks and can freeze Lenis after unlock). */
-  html.page-loading {
-    cursor: wait;
-  }
+  /* Soft route lock removed — page loader no longer blocks scroll */
 
   h1,
   h2,
@@ -121,6 +117,121 @@
   html.has-custom-cursor,
   html.has-custom-cursor * {
     cursor: none !important;
+  }
+
+  /* Lightweight page transition */
+  .site-page-loader {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 180;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: max(0.85rem, env(safe-area-inset-top, 0px));
+    background: transparent;
+    opacity: 1;
+    transition: opacity 0.16s ease;
+  }
+
+  .site-page-loader.is-out {
+    opacity: 0;
+  }
+
+  .site-page-loader-bar {
+    width: min(12rem, 55vw);
+    height: 2px;
+    overflow: hidden;
+    border-radius: 9999px;
+    background: rgba(11, 11, 11, 0.1);
+  }
+
+  .site-page-loader-bar::after {
+    content: "";
+    display: block;
+    height: 100%;
+    width: 100%;
+    border-radius: inherit;
+    background: var(--accent);
+    transform-origin: left center;
+    animation: site-page-loader-bar 0.28s cubic-bezier(0.45, 0, 0.15, 1) forwards;
+  }
+
+  .site-page-loader-label {
+    margin-top: 0.55rem;
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: rgba(11, 11, 11, 0.45);
+  }
+
+  /* On dark heroes, keep the chip readable via soft pill */
+  .site-page-loader-label {
+    padding: 0.35rem 0.7rem;
+    border-radius: 9999px;
+    background: rgba(246, 245, 242, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  @keyframes site-page-loader-bar {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  /* Custom cursor — black on light, white on dark */
+  .site-cursor-ring,
+  .site-cursor-dot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 9999px;
+    will-change: transform, opacity;
+    opacity: 0;
+    transition:
+      border-color 0.18s ease,
+      background-color 0.18s ease;
+  }
+
+  .site-cursor-ring {
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 1.5px solid #0b0b0b;
+    background: transparent;
+  }
+
+  .site-cursor-dot {
+    width: 0.35rem;
+    height: 0.35rem;
+    background: #0b0b0b;
+  }
+
+  .site-cursor.is-light .site-cursor-ring {
+    border-color: #0b0b0b;
+  }
+
+  .site-cursor.is-light .site-cursor-dot {
+    background: #0b0b0b;
+  }
+
+  .site-cursor.is-dark .site-cursor-ring {
+    border-color: #ffffff;
+  }
+
+  .site-cursor.is-dark .site-cursor-dot {
+    background: #ffffff;
+  }
+
+  .site-cursor.is-hover .site-cursor-ring {
+    width: 2.35rem;
+    height: 2.35rem;
   }
 }
 
@@ -2560,7 +2671,8 @@
   /* ——— About sections ——— */
   .site-about-manif {
     position: relative;
-    overflow: hidden;
+    /* clip (not hidden) so sticky scroll-scrub can pin */
+    overflow-x: clip;
     width: 100%;
     max-width: 100%;
   }
@@ -2581,6 +2693,20 @@
     letter-spacing: -0.06em;
     white-space: nowrap;
     color: rgba(11, 11, 11, 0.04);
+  }
+
+  .site-about-manif-track {
+    position: relative;
+    z-index: 1;
+    /* Short scrub distance — just enough to type, avoids empty mobile gaps */
+    height: 155vh;
+  }
+
+  .site-about-manif-sticky {
+    position: sticky;
+    top: 0;
+    /* Natural content height — do NOT force 100svh (that creates gaps) */
+    height: auto;
   }
 
   .site-about-manif-grid {
@@ -2614,6 +2740,16 @@
 
   .site-about-manif-line:not(.is-em) {
     color: var(--text-secondary);
+  }
+
+  .site-about-manif-caret {
+    animation: site-about-caret 0.85s steps(1) infinite;
+  }
+
+  @keyframes site-about-caret {
+    50% {
+      opacity: 0;
+    }
   }
 
   .site-about-prin,
@@ -2667,6 +2803,10 @@
       top: 2.5rem;
     }
 
+    .site-about-manif-track {
+      height: 180vh;
+    }
+
     .site-about-manif-quote {
       font-size: 4.5rem;
     }
@@ -2690,6 +2830,10 @@
   }
 
   @media (min-width: 1024px) {
+    .site-about-manif-track {
+      height: 200vh;
+    }
+
     .site-about-manif-grid {
       grid-template-columns: repeat(12, minmax(0, 1fr));
       gap: 3rem;

@@ -27,9 +27,11 @@ const Header = () => {
 
   useEffect(() => {
     let raf = 0;
+    let lastSample = 0;
 
     const sample = () => {
       raf = 0;
+      lastSample = performance.now();
       try {
         setOnDark(isDarkBehindHeader());
       } catch {
@@ -38,6 +40,9 @@ const Header = () => {
     };
 
     const requestSample = () => {
+      const now = performance.now();
+      // Throttle expensive elementsFromPoint sampling (Windows/laptop jank)
+      if (now - lastSample < 120) return;
       if (!raf) raf = requestAnimationFrame(sample);
     };
 
@@ -50,11 +55,12 @@ const Header = () => {
       if (window.matchMedia("(min-width: 1024px)").matches) {
         setOpen(false);
       }
+      lastSample = 0;
       requestSample();
     };
 
     onScroll();
-    requestSample();
+    sample();
 
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
