@@ -1,36 +1,31 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { useReducedMotion } from "framer-motion";
-
-const HOLD_MS = 140;
-const EXIT_MS = 160;
-const FAILSAFE_MS = 420;
+import BrandLogo from "./BrandLogo";
 
 const LABELS = {
   "/": "Home",
   "/about": "About",
   "/services": "Services",
-  "/portfolio": "Portfolio",
+  "/portfolio": "Works",
   "/careers": "Careers",
   "/contact": "Contact",
 };
 
 /**
- * Ultra-light route transition — CSS only, no Lenis lock, no heavy images.
- * Feels instant on mobile + Windows laptops.
+ * Logo-highlight page transition — CSS only, no scroll lock.
  */
 const PageLoader = () => {
   const { pathname } = useLocation();
-  const reduceMotion = useReducedMotion();
   const first = useRef(true);
-  const [phase, setPhase] = useState("idle"); // idle | in | out
-  const [targetPath, setTargetPath] = useState(pathname);
+  const [tick, setTick] = useState(0);
+  const [active, setActive] = useState(false);
+  const [path, setPath] = useState(pathname);
 
   const label = useMemo(() => {
-    if (LABELS[targetPath]) return LABELS[targetPath];
-    const slug = targetPath.replace(/^\//, "").split("/")[0];
+    if (LABELS[path]) return LABELS[path];
+    const slug = path.replace(/^\//, "").split("/")[0];
     return slug ? slug.charAt(0).toUpperCase() + slug.slice(1) : "Nuam";
-  }, [targetPath]);
+  }, [path]);
 
   useEffect(() => {
     if (first.current) {
@@ -38,48 +33,39 @@ const PageLoader = () => {
       return undefined;
     }
 
-    let cancelled = false;
-    setTargetPath(pathname);
-    setPhase("in");
+    setPath(pathname);
+    setTick((n) => n + 1);
+    setActive(true);
 
-    const hold = reduceMotion ? 40 : HOLD_MS;
-    const exit = reduceMotion ? 80 : EXIT_MS;
-
-    const holdTimer = window.setTimeout(() => {
-      if (cancelled) return;
-      setPhase("out");
-    }, hold);
-
-    const doneTimer = window.setTimeout(() => {
-      if (cancelled) return;
-      setPhase("idle");
-    }, hold + exit);
-
-    const failsafe = window.setTimeout(() => {
-      if (cancelled) return;
-      setPhase("idle");
-    }, FAILSAFE_MS);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(holdTimer);
-      window.clearTimeout(doneTimer);
-      window.clearTimeout(failsafe);
-      setPhase("idle");
-    };
-  }, [pathname, reduceMotion]);
-
-  if (phase === "idle") return null;
+    const done = window.setTimeout(() => setActive(false), 680);
+    return () => window.clearTimeout(done);
+  }, [pathname]);
 
   return (
     <div
-      className={`site-page-loader${phase === "out" ? " is-out" : ""}`}
+      className={`site-page-loader${active ? " is-active" : ""}`}
       role="status"
       aria-live="polite"
+      aria-busy={active}
       aria-label={`Loading ${label}`}
+      aria-hidden={!active}
     >
-      <div className="site-page-loader-bar" />
-      <p className="site-page-loader-label">{label}</p>
+      {active && (
+        <div key={tick} className="site-page-loader-inner">
+          <div className="site-page-loader-glow" aria-hidden />
+          <div className="site-page-loader-logo">
+            <BrandLogo
+              tone="light"
+              size="header"
+              className="site-page-loader-mark"
+            />
+          </div>
+          <p className="site-page-loader-label">{label}</p>
+          <div className="site-page-loader-track">
+            <span className="site-page-loader-bar" />
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -333,62 +333,134 @@
     cursor: none !important;
   }
 
-  /* Lightweight page transition */
+  /* Logo page loader — brand highlight on every route change */
   .site-page-loader {
     pointer-events: none;
     position: fixed;
     inset: 0;
-    z-index: 180;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(11, 11, 11, 0.92);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.22s ease,
+      visibility 0.22s ease;
+  }
+
+  .site-page-loader.is-active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .site-page-loader-inner {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    padding-top: max(0.85rem, env(safe-area-inset-top, 0px));
-    background: transparent;
-    opacity: 1;
-    transition: opacity 0.16s ease;
+    gap: 1rem;
+    padding: 1.5rem;
+    animation: site-page-loader-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  .site-page-loader.is-out {
-    opacity: 0;
+  .site-page-loader-glow {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    width: 11rem;
+    height: 11rem;
+    translate: -50% -50%;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle,
+      rgba(107, 138, 255, 0.35) 0%,
+      rgba(107, 138, 255, 0.08) 45%,
+      transparent 70%
+    );
+    animation: site-page-loader-glow 0.65s ease both;
   }
 
-  .site-page-loader-bar {
-    width: min(12rem, 55vw);
+  .site-page-loader-logo {
+    position: relative;
+    z-index: 1;
+    animation: site-page-loader-logo 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.05s
+      both;
+  }
+
+  .site-page-loader-mark {
+    height: 3.25rem !important;
+    width: auto !important;
+    filter: drop-shadow(0 0 18px rgba(107, 138, 255, 0.45));
+  }
+
+  .site-page-loader-label {
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.45);
+    animation: site-page-loader-in 0.4s ease 0.12s both;
+  }
+
+  .site-page-loader-track {
+    position: relative;
+    z-index: 1;
+    width: 5.5rem;
     height: 2px;
     overflow: hidden;
     border-radius: 9999px;
-    background: rgba(11, 11, 11, 0.1);
+    background: rgba(255, 255, 255, 0.12);
   }
 
-  .site-page-loader-bar::after {
-    content: "";
+  .site-page-loader-bar {
     display: block;
     height: 100%;
     width: 100%;
+    transform-origin: left center;
     border-radius: inherit;
     background: var(--accent);
-    transform-origin: left center;
-    animation: site-page-loader-bar 0.28s cubic-bezier(0.45, 0, 0.15, 1) forwards;
+    box-shadow: 0 0 10px rgba(107, 138, 255, 0.55);
+    animation: site-page-loader-bar 0.55s cubic-bezier(0.45, 0, 0.15, 1) 0.08s
+      both;
   }
 
-  .site-page-loader-label {
-    margin-top: 0.55rem;
-    font-family: var(--font-display);
-    font-size: 0.62rem;
-    font-weight: 600;
-    letter-spacing: 0.26em;
-    text-transform: uppercase;
-    color: rgba(11, 11, 11, 0.45);
+  @keyframes site-page-loader-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 8px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
   }
 
-  /* On dark heroes, keep the chip readable via soft pill */
-  .site-page-loader-label {
-    padding: 0.35rem 0.7rem;
-    border-radius: 9999px;
-    background: rgba(246, 245, 242, 0.88);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+  @keyframes site-page-loader-logo {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 10px, 0) scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+  }
+
+  @keyframes site-page-loader-glow {
+    from {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 
   @keyframes site-page-loader-bar {
@@ -397,6 +469,28 @@
     }
     to {
       transform: scaleX(1);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .site-page-loader-mark {
+      height: 3.75rem !important;
+    }
+
+    .site-page-loader-track {
+      width: 6.5rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-page-loader,
+    .site-page-loader-inner,
+    .site-page-loader-logo,
+    .site-page-loader-glow,
+    .site-page-loader-label,
+    .site-page-loader-bar {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
     }
   }
 

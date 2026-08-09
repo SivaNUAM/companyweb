@@ -15,15 +15,14 @@ const Layout = () => {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  // Clear leftover menu / welcome locks (PageLoader owns page-loading)
+  // Clear leftover menu / welcome locks
   useEffect(() => {
     document.documentElement.classList.remove(
       "welcome-loading",
       "mobile-nav-open",
+      "page-loading",
     );
-    if (!document.documentElement.classList.contains("page-loading")) {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = "";
   }, [pathname]);
 
   return (
