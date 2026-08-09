@@ -499,7 +499,7 @@ const BotFace = ({
         {/* Left ear bolt */}
         <rect x="8" y="48" width="10" height="16" rx="4" fill="#6b8aff" />
 
-        {/* Right ear + waving robot arm */}
+        {/* Right ear + right arm (waves hi) */}
         <rect x="102" y="48" width="10" height="16" rx="4" fill="#6b8aff" />
         <motion.g
           style={{
