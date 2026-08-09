@@ -1,9 +1,10 @@
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import Reveal from "../ui/Reveal";
 import { clients, clientsSection } from "../../data/home";
 
-const MarqueeRow = ({ items, reverse = false, outlined = false }) => {
+const MarqueeRow = ({ items, reverse = false, outlined = false, running }) => {
   const loop = [...items, ...items];
 
   return (
@@ -14,7 +15,7 @@ const MarqueeRow = ({ items, reverse = false, outlined = false }) => {
       <div
         className={`${
           reverse ? "marquee-track-reverse" : "marquee-track"
-        } items-center gap-0`}
+        } items-center gap-0${running ? "" : " is-paused"}`}
       >
         {loop.map((name, i) => (
           <div
@@ -42,11 +43,26 @@ const MarqueeRow = ({ items, reverse = false, outlined = false }) => {
 };
 
 const ClientMarquee = () => {
+  const sectionRef = useRef(null);
+  const [running, setRunning] = useState(true);
   const rowA = clients;
   const rowB = [...clients].reverse();
 
+  // Pause CSS marquee when off-screen — free continuous compositor work
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return undefined;
+
+    const io = new IntersectionObserver(
+      ([entry]) => setRunning(entry.isIntersecting),
+      { rootMargin: "80px 0px", threshold: 0.05 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <section className="site-clients section-surface">
+    <section ref={sectionRef} className="site-clients section-surface">
       <div className="site-clients-intro container-custom">
         <div className="site-clients-intro-row">
           <Reveal>
@@ -79,10 +95,10 @@ const ClientMarquee = () => {
 
       <div className="site-clients-tracks">
         <Reveal>
-          <MarqueeRow items={rowA} />
+          <MarqueeRow items={rowA} running={running} />
         </Reveal>
         <Reveal delay={0.08}>
-          <MarqueeRow items={rowB} reverse outlined />
+          <MarqueeRow items={rowB} reverse outlined running={running} />
         </Reveal>
       </div>
     </section>

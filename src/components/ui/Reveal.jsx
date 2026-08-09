@@ -1,4 +1,5 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const Reveal = ({
   children,
@@ -6,12 +7,12 @@ const Reveal = ({
   delay = 0,
   as = "div",
   once = true,
-  amount = 0.25,
+  amount = 0.2,
 }) => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, simplify, reveal } = useSimplifyMotion();
   const Component = motion[as] || motion.div;
 
-  if (reduceMotion) {
+  if (reduceMotion || !reveal) {
     const Tag = as === "div" ? "div" : as;
     return <Tag className={className}>{children}</Tag>;
   }
@@ -19,12 +20,12 @@ const Reveal = ({
   return (
     <Component
       className={className}
-      initial={{ opacity: 0, y: 28 }}
+      initial={{ opacity: 0, y: reveal.y }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once, amount }}
+      viewport={{ once, amount: simplify ? 0.12 : amount }}
       transition={{
-        duration: 0.75,
-        delay,
+        duration: reveal.duration,
+        delay: simplify ? Math.min(delay, 0.12) : delay,
         ease: [0.16, 1, 0.3, 1],
       }}
     >

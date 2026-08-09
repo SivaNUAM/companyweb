@@ -1,26 +1,28 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { serviceOfferings, servicesHero } from "../../data/services";
-
-const ease = [0.16, 1, 0.3, 1];
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const ServicesHero = () => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, kenBurns, ease } = useSimplifyMotion();
   const words = servicesHero.headline.split(" ");
 
   return (
     <section className="site-phero is-services relative overflow-hidden bg-ink text-white">
       <motion.div
         className="absolute inset-0"
-        initial={reduceMotion ? false : { scale: 1.14 }}
+        initial={kenBurns ? { scale: kenBurns.from } : false}
         animate={{ scale: 1 }}
-        transition={{ duration: 2.2, ease }}
+        transition={
+          kenBurns ? { duration: kenBurns.duration, ease } : undefined
+        }
       >
         <img
           src={servicesHero.image}
           alt={servicesHero.imageAlt}
           className="h-full w-full object-cover object-center"
           fetchPriority="high"
+          decoding="async"
           sizes="100vw"
         />
       </motion.div>

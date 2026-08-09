@@ -19,7 +19,7 @@
   --text-primary: #0b0b0b;
   --text-secondary: #4a4a4a;
   --text-muted: #8a8a8a;
-  /* Matches hero1.png screen UI — electric blue (replaces lime) */
+  /* Matches hero1.webp screen UI — electric blue (replaces lime) */
   --accent: #6b8aff;
   --accent-soft: #8b7cf7;
   --accent-ink: #ffffff;
@@ -86,6 +86,220 @@
   html.mobile-nav-open,
   html.mobile-nav-open body {
     overflow: hidden;
+  }
+
+  /* ——— Welcome loader (CSS-driven — smooth on mobile) ——— */
+  .site-welcome {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    background: var(--ink);
+    color: #fff;
+    transform: translate3d(0, 0, 0);
+    will-change: transform;
+    transition: transform var(--welcome-exit-ms, 0.85s)
+      cubic-bezier(0.76, 0, 0.24, 1);
+  }
+
+  .site-welcome.is-exit {
+    transform: translate3d(0, -100%, 0);
+    pointer-events: none;
+  }
+
+  .site-welcome-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.75rem 1.5rem 0;
+    animation: site-welcome-fade 0.35s ease both;
+  }
+
+  .site-welcome-logo-sm {
+    height: 2.25rem !important;
+    width: auto !important;
+  }
+
+  .site-welcome-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.35);
+  }
+
+  .site-welcome-center {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 1.5rem;
+  }
+
+  .site-welcome-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: site-welcome-rise 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+  }
+
+  .site-welcome.is-simple .site-welcome-brand {
+    animation-duration: 0.35s;
+  }
+
+  .site-welcome-logo {
+    height: 5.5rem !important;
+    width: auto !important;
+  }
+
+  .site-welcome-rule {
+    margin-top: 1.5rem;
+    height: 1px;
+    width: 3rem;
+    transform: scaleX(0);
+    transform-origin: center;
+    background: var(--accent);
+    animation: site-welcome-rule 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.25s
+      forwards;
+  }
+
+  .site-welcome-sub {
+    margin-top: 1.25rem;
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    animation: site-welcome-fade 0.4s ease 0.3s both;
+  }
+
+  .site-welcome-bottom {
+    padding: 0 1.5rem 2rem;
+  }
+
+  .site-welcome-meta {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+
+  .site-welcome-wait {
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .site-welcome-count {
+    font-size: clamp(2rem, 6vw, 3.25rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .site-welcome-pct {
+    font-size: 0.45em;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .site-welcome-track {
+    height: 2px;
+    width: 100%;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .site-welcome-bar {
+    height: 100%;
+    width: 100%;
+    transform: scaleX(0);
+    transform-origin: left center;
+    background: #fff;
+    will-change: transform;
+  }
+
+  @keyframes site-welcome-fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes site-welcome-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 16px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  @keyframes site-welcome-rule {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .site-welcome-top {
+      padding: 2.25rem 2.5rem 0;
+    }
+
+    .site-welcome-logo-sm {
+      height: 2.75rem !important;
+    }
+
+    .site-welcome-logo {
+      height: 9rem !important;
+    }
+
+    .site-welcome-rule {
+      margin-top: 2rem;
+    }
+
+    .site-welcome-sub {
+      margin-top: 1.5rem;
+    }
+
+    .site-welcome-bottom {
+      padding: 0 2.5rem 2.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .site-welcome-top,
+    .site-welcome-bottom {
+      padding-left: 3.5rem;
+      padding-right: 3.5rem;
+    }
+
+    .site-welcome-logo {
+      height: 10rem !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-welcome,
+    .site-welcome-top,
+    .site-welcome-brand,
+    .site-welcome-rule,
+    .site-welcome-sub {
+      animation: none !important;
+      transition-duration: 0.25s !important;
+    }
+
+    .site-welcome-rule {
+      transform: scaleX(1);
+    }
   }
 
   /* Soft route lock removed — page loader no longer blocks scroll */
@@ -338,9 +552,66 @@
     color: var(--text-muted);
   }
 
+  /* Static tiled grain — no SVG feTurbulence (that filter tanks mobile GPUs) */
   .noise-overlay {
     pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 128px 128px;
+  }
+
+  /* Mobile / touch: skip live filter paint — keep subtle opacity wash only */
+  @media (max-width: 1023px), (pointer: coarse) {
+    .noise-overlay {
+      background-image: none;
+      background-color: rgba(11, 11, 11, 0.03);
+    }
+
+    /* Huge atmosphere blurs are a primary scroll jank source on phones */
+    .blur-\[80px\],
+    .blur-\[90px\],
+    .blur-\[100px\],
+    .blur-\[110px\],
+    .blur-\[120px\],
+    .blur-\[130px\] {
+      display: none !important;
+    }
+
+    /* Home sections — skip offscreen layout/paint while scrolling */
+    .site-works,
+    .site-wwd,
+    .site-hww,
+    .site-industries,
+    .site-voices,
+    .site-impact,
+    .site-story,
+    .site-clients,
+    .site-cta {
+      content-visibility: auto;
+      contain-intrinsic-size: 1px 720px;
+    }
+
+    /* Hero stays eager; drop expensive will-change hints */
+    .site-hero [class*="will-change"] {
+      will-change: auto !important;
+    }
+
+    /* Prefer compositor-friendly transitions */
+    .site-phero img,
+    .site-svc-media-img,
+    .site-folio-card img {
+      will-change: auto;
+    }
+
+    /* Skip offscreen layout/paint work while scrolling */
+    .site-svc-row,
+    .site-folio-card,
+    .site-about-prin-card,
+    .site-careers-open,
+    .site-contact-grid {
+      content-visibility: auto;
+      contain-intrinsic-size: 1px 480px;
+    }
   }
 
   .marquee-track {
@@ -358,8 +629,26 @@
   }
 
   .marquee-track:hover,
-  .marquee-track-reverse:hover {
+  .marquee-track-reverse:hover,
+  .marquee-track.is-paused,
+  .marquee-track-reverse.is-paused {
     animation-play-state: paused;
+  }
+
+  @media (max-width: 1023px), (pointer: coarse) {
+    .marquee-track {
+      animation-duration: 70s;
+      will-change: auto;
+    }
+
+    .marquee-track-reverse {
+      animation-duration: 80s;
+      will-change: auto;
+    }
+  }
+
+  .site-story-caret {
+    animation: site-about-caret 0.85s steps(1) infinite;
   }
 
   .client-name-outline {
@@ -418,14 +707,12 @@
     -webkit-backdrop-filter: none;
     isolation: isolate;
     transition:
-      background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-      border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-      box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-      backdrop-filter 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-      transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      background-color 0.35s ease,
+      border-color 0.35s ease,
+      box-shadow 0.35s ease;
   }
 
-  /* Soft top sheen — Apple glass rim */
+  /* Soft top sheen — Apple glass rim (desktop only; blend modes are costly on mobile) */
   .site-header-shell::before {
     content: "";
     pointer-events: none;
@@ -439,8 +726,29 @@
       rgba(255, 255, 255, 0.06) 38%,
       transparent 62%
     );
-    opacity: 0.55;
-    mix-blend-mode: soft-light;
+    opacity: 0.45;
+  }
+
+  @media (max-width: 1023px) {
+    .site-header-shell::before {
+      display: none;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .site-header-shell::before {
+      opacity: 0.55;
+      mix-blend-mode: soft-light;
+    }
+
+    .site-header-shell {
+      transition:
+        background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+        border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+        backdrop-filter 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
   }
 
   .site-header-shell > * {
@@ -448,32 +756,25 @@
     z-index: 2;
   }
 
-  /* Frosted capsule — light surfaces */
+  /* Frosted capsule — light surfaces
+     Mobile: solid/opaque fill (no blur). Desktop: real glass blur. */
   .site-header.is-scrolled:not(.is-on-dark):not(.is-menu-open) .site-header-shell,
   .site-header.is-solid .site-header-shell {
     border-color: rgba(11, 11, 11, 0.07);
-    background: rgba(246, 245, 242, 0.78);
+    background: rgba(246, 245, 242, 0.94);
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.7) inset,
-      0 -0.5px 0 rgba(11, 11, 11, 0.04) inset,
-      0 8px 24px rgba(11, 11, 11, 0.08),
-      0 2px 6px rgba(11, 11, 11, 0.04);
-    backdrop-filter: saturate(1.55) blur(22px);
-    -webkit-backdrop-filter: saturate(1.55) blur(22px);
+      0 6px 18px rgba(11, 11, 11, 0.07);
   }
 
   /* Frosted capsule — over dark heroes */
   .site-header.is-on-dark .site-header-shell,
   .site-header.is-light:not(.is-menu-open) .site-header-shell {
     border-color: rgba(255, 255, 255, 0.16);
-    background: rgba(18, 18, 22, 0.52);
+    background: rgba(18, 18, 22, 0.88);
     box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.16) inset,
-      0 -0.5px 0 rgba(0, 0, 0, 0.35) inset,
-      0 10px 28px rgba(0, 0, 0, 0.32),
-      0 2px 8px rgba(0, 0, 0, 0.18);
-    backdrop-filter: saturate(1.6) blur(22px);
-    -webkit-backdrop-filter: saturate(1.6) blur(22px);
+      0 1px 0 rgba(255, 255, 255, 0.12) inset,
+      0 8px 22px rgba(0, 0, 0, 0.28);
   }
 
   .site-header.is-on-dark .site-header-shell::before,
@@ -484,22 +785,59 @@
   /* Top of page over light */
   .site-header:not(.is-scrolled):not(.is-light):not(.is-menu-open) .site-header-shell {
     border-color: rgba(11, 11, 11, 0.06);
-    background: rgba(255, 255, 255, 0.38);
+    background: rgba(255, 255, 255, 0.82);
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.55) inset,
-      0 6px 18px rgba(11, 11, 11, 0.06);
-    backdrop-filter: saturate(1.35) blur(16px);
-    -webkit-backdrop-filter: saturate(1.35) blur(16px);
+      0 4px 14px rgba(11, 11, 11, 0.05);
   }
 
   .site-header.is-menu-open .site-header-shell {
     border-color: rgba(255, 255, 255, 0.18);
-    background: rgba(11, 11, 11, 0.78);
+    background: rgba(11, 11, 11, 0.92);
     box-shadow:
       0 1px 0 rgba(255, 255, 255, 0.12) inset,
-      0 12px 30px rgba(0, 0, 0, 0.4);
-    backdrop-filter: saturate(1.4) blur(20px);
-    -webkit-backdrop-filter: saturate(1.4) blur(20px);
+      0 8px 22px rgba(0, 0, 0, 0.35);
+  }
+
+  @media (min-width: 1024px) {
+    .site-header.is-scrolled:not(.is-on-dark):not(.is-menu-open) .site-header-shell,
+    .site-header.is-solid .site-header-shell {
+      background: rgba(246, 245, 242, 0.78);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.7) inset,
+        0 -0.5px 0 rgba(11, 11, 11, 0.04) inset,
+        0 8px 24px rgba(11, 11, 11, 0.08),
+        0 2px 6px rgba(11, 11, 11, 0.04);
+      backdrop-filter: saturate(1.55) blur(22px);
+      -webkit-backdrop-filter: saturate(1.55) blur(22px);
+    }
+
+    .site-header.is-on-dark .site-header-shell,
+    .site-header.is-light:not(.is-menu-open) .site-header-shell {
+      background: rgba(18, 18, 22, 0.52);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.16) inset,
+        0 -0.5px 0 rgba(0, 0, 0, 0.35) inset,
+        0 10px 28px rgba(0, 0, 0, 0.32),
+        0 2px 8px rgba(0, 0, 0, 0.18);
+      backdrop-filter: saturate(1.6) blur(22px);
+      -webkit-backdrop-filter: saturate(1.6) blur(22px);
+    }
+
+    .site-header:not(.is-scrolled):not(.is-light):not(.is-menu-open) .site-header-shell {
+      background: rgba(255, 255, 255, 0.38);
+      box-shadow:
+        0 1px 0 rgba(255, 255, 255, 0.55) inset,
+        0 6px 18px rgba(11, 11, 11, 0.06);
+      backdrop-filter: saturate(1.35) blur(16px);
+      -webkit-backdrop-filter: saturate(1.35) blur(16px);
+    }
+
+    .site-header.is-menu-open .site-header-shell {
+      background: rgba(11, 11, 11, 0.78);
+      backdrop-filter: saturate(1.4) blur(20px);
+      -webkit-backdrop-filter: saturate(1.4) blur(20px);
+    }
   }
 
   .site-header-inner {
@@ -536,9 +874,80 @@
     border-radius: 9999px;
     border: 1px solid transparent;
     transition:
-      background-color 0.3s ease,
-      border-color 0.3s ease,
-      color 0.3s ease;
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease;
+  }
+
+  .site-header-menu-bar {
+    display: block;
+    height: 1px;
+    width: 0.875rem;
+    transform-origin: center;
+    background: currentColor;
+    transition: transform 0.28s ease, opacity 0.2s ease;
+  }
+
+  .site-header-menu-btn.is-open .site-header-menu-bar:first-child {
+    transform: translateY(3px) rotate(45deg);
+  }
+
+  .site-header-menu-btn.is-open .site-header-menu-bar:last-child {
+    transform: translateY(-3px) rotate(-45deg);
+  }
+
+  /* Mobile nav — CSS only (no Framer mount/unmount cost) */
+  .site-mobile-nav-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--ink);
+    color: #fff;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.22s ease,
+      visibility 0.22s ease;
+  }
+
+  .site-mobile-nav-panel.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .site-mobile-nav-panel .site-mobile-nav-link,
+  .site-mobile-nav-panel .site-mobile-nav-cta {
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 0.28s ease,
+      transform 0.28s ease;
+  }
+
+  .site-mobile-nav-panel.is-open .site-mobile-nav-link,
+  .site-mobile-nav-panel.is-open .site-mobile-nav-cta {
+    opacity: 1;
+    transform: none;
+    transition-delay: calc(0.04s * var(--i, 0));
+  }
+
+  .site-mobile-nav-panel.is-open .site-mobile-nav-cta {
+    transition-delay: 0.18s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-mobile-nav-panel,
+    .site-mobile-nav-panel .site-mobile-nav-link,
+    .site-mobile-nav-panel .site-mobile-nav-cta,
+    .site-header-menu-bar {
+      transition: none;
+    }
   }
 
   .site-header.is-light .site-header-menu-btn,
@@ -2698,8 +3107,19 @@
   .site-about-manif-track {
     position: relative;
     z-index: 1;
-    /* Short scrub distance — just enough to type, avoids empty mobile gaps */
-    height: 155vh;
+    /* Short scrub — less sticky scroll work on phones */
+    height: 130vh;
+  }
+
+  @media (pointer: coarse) {
+    .site-about-manif-track {
+      height: 120vh;
+    }
+
+    .site-about-manif-caret {
+      animation: none;
+      opacity: 1;
+    }
   }
 
   .site-about-manif-sticky {

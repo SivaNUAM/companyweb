@@ -1,9 +1,9 @@
-import productImg from "../assets/images/product.png";
-import designImg from "../assets/images/deisgn.png";
-import mobileImg from "../assets/images/mobile.png";
-import devopsImg from "../assets/images/deveopspng.png";
-import brandImg from "../assets/images/brand.png";
-import growthImg from "../assets/images/growth.png";
+import productImg from "../assets/images/product.webp";
+import designImg from "../assets/images/deisgn.webp";
+import mobileImg from "../assets/images/mobile.webp";
+import devopsImg from "../assets/images/deveopspng.webp";
+import brandImg from "../assets/images/brand.webp";
+import growthImg from "../assets/images/growth.webp";
 
 export const servicesHero = {
   label: "Services",

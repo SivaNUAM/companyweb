@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Send, X } from "lucide-react";
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const ease = [0.16, 1, 0.3, 1];
 
@@ -32,11 +33,13 @@ const botReply = (text) => {
 };
 
 /** Interactive SVG mascot — moods: idle | hi | dance | smile | think | happy */
-const BotFace = ({ mood = "idle", size = 64 }) => {
+const BotFace = ({ mood = "idle", size = 64, lively = true }) => {
+  const { freezeLoops } = useSimplifyMotion();
   const dancing = mood === "dance";
   const waving = mood === "hi";
   const smiling = mood === "smile" || mood === "happy" || mood === "hi" || dancing;
   const thinking = mood === "think";
+  const canLoop = lively && !freezeLoops;
 
   return (
     <motion.div
@@ -51,7 +54,7 @@ const BotFace = ({ mood = "idle", size = 64 }) => {
             }
           : waving
             ? { y: [0, -3, 0] }
-            : mood === "idle"
+            : mood === "idle" && canLoop
               ? { y: [0, -5, 0], rotate: [0, 2, -2, 0] }
               : { y: 0, rotate: 0 }
       }
@@ -60,7 +63,7 @@ const BotFace = ({ mood = "idle", size = 64 }) => {
           ? { duration: 0.85, repeat: Infinity, ease: "easeInOut" }
           : waving
             ? { duration: 0.7, repeat: 2, ease: "easeInOut" }
-            : mood === "idle"
+            : mood === "idle" && canLoop
               ? { duration: 2.4, repeat: Infinity, ease: "easeInOut" }
               : { duration: 0.35, ease }
       }
@@ -77,9 +80,15 @@ const BotFace = ({ mood = "idle", size = 64 }) => {
           animate={
             dancing
               ? { rotate: [0, 18, -18, 0] }
-              : { rotate: [0, 6, -6, 0] }
+              : canLoop
+                ? { rotate: [0, 6, -6, 0] }
+                : { rotate: 0 }
           }
-          transition={{ duration: dancing ? 0.5 : 2.2, repeat: Infinity }}
+          transition={
+            dancing || canLoop
+              ? { duration: dancing ? 0.5 : 2.2, repeat: Infinity }
+              : { duration: 0.2 }
+          }
           style={{ transformOrigin: "60px 18px" }}
         >
           <line
@@ -484,7 +493,7 @@ const ChatBot = () => {
                 >
                   {msg.role === "bot" && (
                     <div className="mb-0.5 shrink-0">
-                      <BotFace mood="smile" size={28} />
+                      <BotFace mood="smile" size={28} lively={false} />
                     </div>
                   )}
                   <div
@@ -501,17 +510,17 @@ const ChatBot = () => {
 
               {typing && (
                 <div className="flex items-end gap-2">
-                  <BotFace mood="think" size={28} />
+                  <BotFace mood="think" size={28} lively={false} />
                   <div className="flex gap-1 rounded-2xl rounded-bl-md border border-white/10 bg-white/[0.07] px-3.5 py-3">
                     {[0, 1, 2].map((i) => (
                       <motion.span
                         key={i}
                         className="h-1.5 w-1.5 rounded-full bg-white/55"
-                        animate={{ y: [0, -4, 0], opacity: [0.4, 1, 0.4] }}
+                        animate={{ opacity: [0.35, 1, 0.35] }}
                         transition={{
-                          duration: 0.55,
+                          duration: 0.7,
                           repeat: Infinity,
-                          delay: i * 0.12,
+                          delay: i * 0.14,
                         }}
                       />
                     ))}

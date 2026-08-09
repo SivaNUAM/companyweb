@@ -1,13 +1,12 @@
 import { Link } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowUpRight, Briefcase, Mail } from "lucide-react";
 import Reveal from "../ui/Reveal";
 import { careersEmpty, openings } from "../../data/careers";
-
-const ease = [0.16, 1, 0.3, 1];
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const CareersOpenings = () => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, freezeLoops, ease } = useSimplifyMotion();
   const hasRoles = openings.length > 0;
 
   return (
@@ -97,11 +96,7 @@ const CareersOpenings = () => {
                 <div className="md:col-span-5">
                   <motion.span
                     className="flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--border-subtle)] bg-white text-[var(--accent)] shadow-[0_12px_40px_rgba(107,138,255,0.15)]"
-                    animate={
-                      reduceMotion
-                        ? undefined
-                        : { y: [0, -6, 0] }
-                    }
+                    animate={freezeLoops ? undefined : { y: [0, -6, 0] }}
                     transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
                   >
                     <Briefcase size={26} strokeWidth={1.75} />

@@ -1,23 +1,21 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Reveal from "../ui/Reveal";
 import { portfolioFilters, portfolioWorks } from "../../data/portfolio";
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
-const ease = [0.16, 1, 0.3, 1];
-
-const WorkCard = ({ work, index }) => {
-  const reduceMotion = useReducedMotion();
+const WorkCard = ({ work, index, simplify, reduceMotion, ease }) => {
   const number = String(index + 1).padStart(2, "0");
 
   return (
     <motion.div
-      layout
-      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      layout={!simplify}
+      initial={reduceMotion ? false : { opacity: 0, y: simplify ? 12 : 24 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={reduceMotion ? undefined : { opacity: 0, y: 16 }}
-      transition={{ duration: 0.5, ease }}
+      exit={reduceMotion ? undefined : { opacity: 0, y: simplify ? 8 : 16 }}
+      transition={{ duration: simplify ? 0.35 : 0.5, ease }}
     >
       <Link
         to="/contact"
@@ -28,17 +26,24 @@ const WorkCard = ({ work, index }) => {
           <div className="site-folio-card w-full">
             <motion.div
               className="absolute inset-0"
-              initial={reduceMotion ? false : { scale: 1.1 }}
-              whileInView={{ scale: 1 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 1.2, ease }}
+              initial={
+                reduceMotion
+                  ? false
+                  : simplify
+                    ? { opacity: 0 }
+                    : { scale: 1.1 }
+              }
+              whileInView={simplify ? { opacity: 1 } : { scale: 1 }}
+              viewport={{ once: true, amount: 0.25 }}
+              transition={{ duration: simplify ? 0.4 : 1.2, ease }}
             >
               <img
                 src={work.image}
                 alt=""
                 aria-hidden
-                className="h-full w-full object-cover transition-transform duration-[1.4s] ease-expo group-hover:scale-[1.05]"
+                className="h-full w-full object-cover transition-transform duration-[1.4s] ease-expo md:group-hover:scale-[1.05]"
                 loading="lazy"
+                decoding="async"
                 sizes="100vw"
               />
             </motion.div>
@@ -111,6 +116,7 @@ const WorkCard = ({ work, index }) => {
 
 const PortfolioGrid = () => {
   const [filter, setFilter] = useState("All");
+  const { simplify, reduceMotion, ease } = useSimplifyMotion();
 
   const filtered = useMemo(() => {
     if (filter === "All") return portfolioWorks;
@@ -169,9 +175,16 @@ const PortfolioGrid = () => {
       </div>
 
       <div className="site-folio-deck">
-        <AnimatePresence mode="popLayout">
+        <AnimatePresence mode={simplify ? "sync" : "popLayout"}>
           {filtered.map((work, index) => (
-            <WorkCard key={work.id} work={work} index={index} />
+            <WorkCard
+              key={work.id}
+              work={work}
+              index={index}
+              simplify={simplify}
+              reduceMotion={reduceMotion}
+              ease={ease}
+            />
           ))}
         </AnimatePresence>
       </div>

@@ -2,12 +2,11 @@ import { useEffect, useState } from "react";
 import {
   AnimatePresence,
   motion,
-  useReducedMotion,
 } from "framer-motion";
 import Reveal from "../ui/Reveal";
 import { voices, voicesSection } from "../../data/home";
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
-const ease = [0.16, 1, 0.3, 1];
 const ROTATE_MS = 6200;
 
 const initials = (name) =>
@@ -19,7 +18,7 @@ const initials = (name) =>
     .toUpperCase();
 
 const Voices = () => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, simplify, freezeLoops, ease } = useSimplifyMotion();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [direction, setDirection] = useState(1);
@@ -30,9 +29,9 @@ const Voices = () => {
     const id = window.setInterval(() => {
       setDirection(1);
       setIndex((i) => (i + 1) % voices.length);
-    }, ROTATE_MS);
+    }, simplify ? ROTATE_MS + 1500 : ROTATE_MS);
     return () => clearInterval(id);
-  }, [reduceMotion, paused, index]);
+  }, [reduceMotion, paused, index, simplify]);
 
   const goTo = (next) => {
     setDirection(next > index ? 1 : -1);
@@ -41,12 +40,12 @@ const Voices = () => {
 
   const variants = {
     enter: (dir) =>
-      reduceMotion
+      reduceMotion || simplify
         ? { opacity: 0 }
         : { opacity: 0, y: dir > 0 ? 28 : -28 },
     center: { opacity: 1, y: 0 },
     exit: (dir) =>
-      reduceMotion
+      reduceMotion || simplify
         ? { opacity: 0 }
         : { opacity: 0, y: dir > 0 ? -20 : 20 },
   };
@@ -59,16 +58,18 @@ const Voices = () => {
     >
       <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.18]" />
 
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 h-[50%] w-[80%] -translate-x-1/2 rounded-full bg-[var(--accent)]/[0.08] blur-[130px]"
-        animate={
-          reduceMotion
-            ? undefined
-            : { opacity: [0.4, 0.75, 0.4], scale: [1, 1.08, 1] }
-        }
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {!simplify && (
+        <motion.div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-0 h-[50%] w-[80%] -translate-x-1/2 rounded-full bg-[var(--accent)]/[0.08] blur-[130px]"
+          animate={
+            freezeLoops
+              ? undefined
+              : { opacity: [0.4, 0.75, 0.4], scale: [1, 1.08, 1] }
+          }
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        />
+      )}
 
       {/* Softened quote mark */}
       <motion.span
@@ -199,17 +200,20 @@ const Voices = () => {
                     className="group relative"
                     aria-pressed={isActive}
                   >
-                    {isActive && (
-                      <motion.span
-                        layoutId="voice-picker-glow"
-                        className="absolute inset-0 bg-white/[0.04]"
-                        transition={{
-                          type: "spring",
-                          stiffness: 400,
-                          damping: 36,
-                        }}
-                      />
-                    )}
+                    {isActive &&
+                      (simplify ? (
+                        <span className="absolute inset-0 bg-white/[0.04]" />
+                      ) : (
+                        <motion.span
+                          layoutId="voice-picker-glow"
+                          className="absolute inset-0 bg-white/[0.04]"
+                          transition={{
+                            type: "spring",
+                            stiffness: 400,
+                            damping: 36,
+                          }}
+                        />
+                      ))}
 
                     <span
                       className={`relative z-10 font-display text-[0.65rem] font-semibold tracking-[0.2em] transition-colors ${

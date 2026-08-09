@@ -1,25 +1,27 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { portfolioHero } from "../../data/portfolio";
-
-const ease = [0.16, 1, 0.3, 1];
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const PortfolioHero = () => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, kenBurns, ease } = useSimplifyMotion();
   const words = portfolioHero.headline.split(" ");
 
   return (
     <section className="site-phero is-portfolio">
       <motion.div
         className="absolute inset-0"
-        initial={reduceMotion ? false : { scale: 1.12 }}
+        initial={kenBurns ? { scale: kenBurns.from } : false}
         animate={{ scale: 1 }}
-        transition={{ duration: 2, ease }}
+        transition={
+          kenBurns ? { duration: kenBurns.duration, ease } : undefined
+        }
       >
         <img
           src={portfolioHero.image}
           alt={portfolioHero.imageAlt}
           className="h-full w-full object-cover object-center"
           fetchPriority="high"
+          decoding="async"
           sizes="100vw"
         />
       </motion.div>

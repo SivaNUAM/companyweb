@@ -1,20 +1,21 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { contactHero } from "../../data/contact";
-
-const ease = [0.16, 1, 0.3, 1];
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const ContactHero = () => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, kenBurns, ease } = useSimplifyMotion();
   const words = contactHero.headline.split(" ");
 
   return (
     <section className="site-phero is-contact" data-cursor-tone="dark">
       <motion.div
         className="absolute inset-0"
-        initial={reduceMotion ? false : { scale: 1.1 }}
+        initial={kenBurns ? { scale: kenBurns.from } : false}
         animate={{ scale: 1 }}
-        transition={{ duration: 1.8, ease }}
+        transition={
+          kenBurns ? { duration: kenBurns.duration, ease } : undefined
+        }
       >
         <img
           src={contactHero.image}

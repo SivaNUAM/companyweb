@@ -1,7 +1,13 @@
 import heroVideo from "../assets/hero.mp4";
-import hero1 from "../assets/hero1.png";
-import hero2 from "../assets/hero2.png";
-import hero3 from "../assets/hero3.png";
+import hero1 from "../assets/hero1.webp";
+import hero2 from "../assets/hero2.webp";
+import hero3 from "../assets/hero3.webp";
+import productImg from "../assets/images/product.webp";
+import designImg from "../assets/images/deisgn.webp";
+import mobileImg from "../assets/images/mobile.webp";
+import devopsImg from "../assets/images/deveopspng.webp";
+import brandImg from "../assets/images/brand.webp";
+import growthImg from "../assets/images/growth.webp";
 
 export const hero = {
   brand: "NUAM",
@@ -142,48 +148,42 @@ export const services = [
     title: "Product Engineering",
     description:
       "Corporate-grade platforms engineered for scale, security, and longevity.",
-    image:
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
+    image: productImg,
   },
   {
     id: "experience",
     title: "Experience Design",
     description:
       "Interfaces researched, refined, and ready for real enterprise users.",
-    image:
-      "https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?auto=format&fit=crop&w=1200&q=80",
+    image: designImg,
   },
   {
     id: "mobile",
     title: "Mobile Platforms",
     description:
       "iOS and Android apps built for retention, performance, and brand trust.",
-    image:
-      "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1200&q=80",
+    image: mobileImg,
   },
   {
     id: "cloud",
     title: "Cloud & DevOps",
     description:
       "Reliable infrastructure and pipelines that keep releases calm under pressure.",
-    image:
-      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1200&q=80",
+    image: devopsImg,
   },
   {
     id: "brand",
     title: "Brand Systems",
     description:
       "Visual identity and digital language that travel every corporate touchpoint.",
-    image:
-      "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=1200&q=80",
+    image: brandImg,
   },
   {
     id: "growth",
     title: "Digital Transformation",
     description:
       "Strategy and execution for organizations ready to modernize with confidence.",
-    image:
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
+    image: growthImg,
   },
 ];
 

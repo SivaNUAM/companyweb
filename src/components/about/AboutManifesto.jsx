@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useMotionValueEvent,
@@ -7,6 +7,7 @@ import {
   useSpring,
 } from "framer-motion";
 import Reveal from "../ui/Reveal";
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 import { aboutManifesto } from "../../data/about";
 
 const ease = [0.16, 1, 0.3, 1];
@@ -15,11 +16,12 @@ const paragraphs = aboutManifesto.paragraphs;
 const charCounts = paragraphs.map((p) => p.length);
 const totalChars = charCounts.reduce((a, b) => a + b, 0);
 
-const revealByProgress = (progress) => {
-  const target = Math.min(
-    totalChars,
-    Math.max(0, Math.floor((progress >= 0.985 ? 1 : progress) * totalChars)),
-  );
+const charsFromProgress = (progress) => {
+  const p = progress >= 0.985 ? 1 : progress;
+  return Math.min(totalChars, Math.max(0, Math.floor(p * totalChars)));
+};
+
+const revealByChars = (target) => {
   let remaining = target;
   return paragraphs.map((text, i) => {
     const take = Math.min(remaining, charCounts[i]);
@@ -35,9 +37,11 @@ const revealByProgress = (progress) => {
 
 const AboutManifesto = () => {
   const reduceMotion = useReducedMotion();
+  const { simplify } = useSimplifyMotion();
   const trackRef = useRef(null);
+  const lastChars = useRef(-1);
   const [lines, setLines] = useState(() =>
-    reduceMotion ? revealByProgress(1) : revealByProgress(0),
+    reduceMotion ? revealByChars(totalChars) : revealByChars(0),
   );
 
   const { scrollYProgress } = useScroll({
@@ -45,16 +49,35 @@ const AboutManifesto = () => {
     offset: ["start start", "end end"],
   });
 
+  // Desktop: soft spring. Mobile: raw progress (no spring jank).
   const smooth = useSpring(scrollYProgress, {
-    stiffness: 140,
-    damping: 32,
-    mass: 0.3,
+    stiffness: simplify ? 400 : 140,
+    damping: simplify ? 40 : 32,
+    mass: simplify ? 0.2 : 0.3,
   });
 
-  useMotionValueEvent(smooth, "change", (v) => {
+  const applyProgress = (v) => {
     if (reduceMotion) return;
-    setLines(revealByProgress(v));
-  });
+    const chars = charsFromProgress(v);
+    // Only re-render when visible character count actually changes
+    if (chars === lastChars.current) return;
+    // On mobile, step by 2–3 chars to cut React work ~half
+    if (simplify && chars !== totalChars && chars - lastChars.current < 2) {
+      return;
+    }
+    lastChars.current = chars;
+    setLines(revealByChars(chars));
+  };
+
+  useMotionValueEvent(simplify ? scrollYProgress : smooth, "change", applyProgress);
+
+  // Ensure final state when scrub ends
+  useEffect(() => {
+    if (reduceMotion) {
+      setLines(revealByChars(totalChars));
+      lastChars.current = totalChars;
+    }
+  }, [reduceMotion]);
 
   const typingIndex = lines.findIndex((l) => l.typing);
   const nextIndex = lines.findIndex((l) => !l.done);
@@ -71,10 +94,10 @@ const AboutManifesto = () => {
       <motion.span
         aria-hidden
         className="site-about-manif-mark"
-        initial={reduceMotion ? false : { opacity: 0, x: 40 }}
+        initial={reduceMotion ? false : { opacity: 0, x: simplify ? 16 : 40 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 1.2, ease }}
+        transition={{ duration: simplify ? 0.55 : 1.2, ease }}
       >
         STORY
       </motion.span>
@@ -109,7 +132,10 @@ const AboutManifesto = () => {
                 ))}
               </div>
 
-              <div className="space-y-7 md:space-y-9" aria-hidden={!reduceMotion}>
+              <div
+                className="space-y-7 md:space-y-9"
+                aria-hidden={!reduceMotion}
+              >
                 {(reduceMotion
                   ? paragraphs.map((p) => ({
                       shown: p,

@@ -16,9 +16,13 @@ const luminance = (r, g, b) => (0.299 * r + 0.587 * g + 0.114 * b) / 255;
 
 const IGNORE_SEL = "[data-custom-cursor], [data-site-header], [data-mobile-nav]";
 
+/** Sections that should flip the header to light-on-dark */
+export const DARK_SURFACE_SEL =
+  '.section-ink, .bg-ink, [data-cursor-tone="dark"], .site-phero';
+
 /**
  * Detect dark surface at a viewport point.
- * Dark → use light (white) UI; light → use dark (black) UI.
+ * Used by custom cursor (desktop only) — avoid on mobile scroll paths.
  */
 export const isDarkSurfaceAt = (clientX, clientY) => {
   const stack = document.elementsFromPoint(clientX, clientY);
@@ -55,7 +59,7 @@ export const isDarkSurfaceAt = (clientX, clientY) => {
   return false;
 };
 
-/** Sample page content just under the fixed header band. */
+/** Legacy one-shot sample — prefer observeHeaderTone on scroll UIs */
 export const isDarkBehindHeader = () => {
   const header = document.querySelector("[data-site-header]");
   const midX = window.innerWidth / 2;
@@ -63,4 +67,62 @@ export const isDarkBehindHeader = () => {
     ? Math.min(window.innerHeight - 4, header.getBoundingClientRect().bottom + 12)
     : 96;
   return isDarkSurfaceAt(midX, y);
+};
+
+/**
+ * Cheap header tone: IntersectionObserver on dark surfaces in the top band.
+ * No elementsFromPoint / getComputedStyle — safe for mobile scroll.
+ */
+export const observeHeaderTone = (onChange) => {
+  const intersecting = new Set();
+  let band = Math.min(140, Math.max(72, Math.round(window.innerHeight * 0.14)));
+
+  const emit = () => onChange(intersecting.size > 0);
+
+  let observer = null;
+
+  const makeObserver = () => {
+    observer?.disconnect();
+    band = Math.min(140, Math.max(72, Math.round(window.innerHeight * 0.14)));
+    observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) intersecting.add(entry.target);
+          else intersecting.delete(entry.target);
+        }
+        emit();
+      },
+      {
+        root: null,
+        // Only the top `band` px of the viewport counts as the sampling zone
+        rootMargin: `0px 0px -${Math.max(0, window.innerHeight - band)}px 0px`,
+        threshold: 0,
+      },
+    );
+  };
+
+  const watch = () => {
+    makeObserver();
+    intersecting.clear();
+    document.querySelectorAll(DARK_SURFACE_SEL).forEach((el) => {
+      observer.observe(el);
+    });
+    emit();
+  };
+
+  watch();
+
+  let resizeTimer = 0;
+  const onResize = () => {
+    window.clearTimeout(resizeTimer);
+    resizeTimer = window.setTimeout(watch, 150);
+  };
+  window.addEventListener("resize", onResize, { passive: true });
+
+  return () => {
+    window.clearTimeout(resizeTimer);
+    window.removeEventListener("resize", onResize);
+    observer?.disconnect();
+    intersecting.clear();
+  };
 };

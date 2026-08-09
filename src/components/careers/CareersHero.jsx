@@ -1,11 +1,10 @@
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { careersHero, openings } from "../../data/careers";
-
-const ease = [0.16, 1, 0.3, 1];
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const CareersHero = () => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, kenBurns, ease } = useSimplifyMotion();
   const words = careersHero.headline.split(" ");
   const openCount = openings.length;
 
@@ -13,15 +12,18 @@ const CareersHero = () => {
     <section className="site-phero is-careers">
       <motion.div
         className="absolute inset-0"
-        initial={reduceMotion ? false : { scale: 1.14 }}
+        initial={kenBurns ? { scale: kenBurns.from } : false}
         animate={{ scale: 1 }}
-        transition={{ duration: 2.2, ease }}
+        transition={
+          kenBurns ? { duration: kenBurns.duration, ease } : undefined
+        }
       >
         <img
           src={careersHero.image}
           alt={careersHero.imageAlt}
           className="h-full w-full object-cover object-center"
           fetchPriority="high"
+          decoding="async"
           sizes="100vw"
         />
       </motion.div>

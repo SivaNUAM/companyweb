@@ -4,20 +4,20 @@ import {
   AnimatePresence,
   motion,
   useMotionValueEvent,
-  useReducedMotion,
   useScroll,
 } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Reveal from "../ui/Reveal";
 import { services, servicesSection } from "../../data/home";
-
-const ease = [0.16, 1, 0.3, 1];
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const WhatWeDo = () => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, simplify, ease } = useSimplifyMotion();
   const trackRef = useRef(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [segment, setSegment] = useState(0);
+  const lastIndex = useRef(-1);
+  const lastSegQ = useRef(-1);
   const activeService = services[activeIndex] || services[0];
 
   const { scrollYProgress } = useScroll({
@@ -30,16 +30,28 @@ const WhatWeDo = () => {
     const n = services.length;
     const raw = Math.min(0.9999, Math.max(0, v)) * n;
     const index = Math.min(n - 1, Math.floor(raw));
-    setActiveIndex(index);
-    setSegment(raw - index);
+    const seg = raw - index;
+
+    if (simplify) {
+      const q = Math.floor(seg * 6);
+      if (index === lastIndex.current && q === lastSegQ.current) return;
+      lastIndex.current = index;
+      lastSegQ.current = q;
+    }
+
+    setActiveIndex((prev) => (prev === index ? prev : index));
+    setSegment(seg);
   });
 
+  // Preload current + next only
   useEffect(() => {
-    services.forEach((s) => {
+    const next = services[(activeIndex + 1) % services.length];
+    [activeService, next].forEach((s) => {
+      if (!s?.image) return;
       const img = new Image();
       img.src = s.image;
     });
-  }, []);
+  }, [activeIndex, activeService]);
 
   const jumpTo = (index) => {
     const el = trackRef.current;
@@ -67,11 +79,23 @@ const WhatWeDo = () => {
           key={activeService.id}
           src={activeService.image}
           alt={activeService.title}
-          initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 1.06 }}
+          initial={
+            reduceMotion || simplify
+              ? { opacity: 0 }
+              : { opacity: 0, scale: 1.06 }
+          }
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 1.02 }}
-          transition={{ duration: reduceMotion ? 0.15 : 0.32, ease }}
+          exit={
+            reduceMotion || simplify
+              ? { opacity: 0 }
+              : { opacity: 0, scale: 1.02 }
+          }
+          transition={{
+            duration: reduceMotion ? 0.15 : simplify ? 0.22 : 0.32,
+            ease,
+          }}
           className="absolute inset-0 h-full w-full object-cover"
+          decoding="async"
         />
       </AnimatePresence>
 
@@ -106,13 +130,14 @@ const WhatWeDo = () => {
               className="h-[2px] flex-1 overflow-hidden rounded-full bg-white/15"
               aria-label={s.title}
             >
-              <motion.span
-                className="block h-full origin-left bg-[var(--accent)]"
-                initial={false}
-                animate={{
-                  scaleX: i < activeIndex ? 1 : i === activeIndex ? segment : 0,
+              <span
+                className="block h-full origin-left bg-[var(--accent)] will-change-transform"
+                style={{
+                  transformOrigin: "left center",
+                  transform: `scaleX(${
+                    i < activeIndex ? 1 : i === activeIndex ? segment : 0
+                  })`,
                 }}
-                transition={{ duration: 0.12, ease: "linear" }}
               />
             </button>
           ))}
@@ -136,13 +161,20 @@ const WhatWeDo = () => {
                 key={service.id}
                 className="relative border-b border-white/10 first:border-t"
               >
-                {isActive && (
-                  <motion.span
-                    layoutId="wwd-scroll-bar"
-                    className="absolute left-0 top-0 hidden h-full w-[2px] bg-[var(--accent)] lg:block"
-                    transition={{ type: "spring", stiffness: 480, damping: 38 }}
-                  />
-                )}
+                {isActive &&
+                  (simplify ? (
+                    <span className="absolute left-0 top-0 hidden h-full w-[2px] bg-[var(--accent)] lg:block" />
+                  ) : (
+                    <motion.span
+                      layoutId="wwd-scroll-bar"
+                      className="absolute left-0 top-0 hidden h-full w-[2px] bg-[var(--accent)] lg:block"
+                      transition={{
+                        type: "spring",
+                        stiffness: 480,
+                        damping: 38,
+                      }}
+                    />
+                  ))}
 
                 <button
                   type="button"

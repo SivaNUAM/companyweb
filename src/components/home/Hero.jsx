@@ -4,21 +4,20 @@ import {
   AnimatePresence,
   motion,
   useMotionValue,
-  useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
 } from "framer-motion";
 import { ArrowDown, ArrowLeft, ArrowRight } from "lucide-react";
 import { hero } from "../../data/home";
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const ease = [0.16, 1, 0.3, 1];
 const cinematic = [0.22, 1, 0.36, 1];
 const AUTO_MS = 5200;
-const SLIDE_MS = 0.95;
 
-/** Brand mark — clean letters, no frosted/blur panel */
-const BrandMark = ({ reduceMotion }) => {
+/** Brand mark — 3D tilt only on fine pointers (desktop) */
+const BrandMark = ({ reduceMotion, simplify }) => {
   const wrapRef = useRef(null);
   const letters = hero.brand.split("");
   const mx = useMotionValue(0);
@@ -32,8 +31,10 @@ const BrandMark = ({ reduceMotion }) => {
     damping: 28,
   });
 
+  const tiltEnabled = !reduceMotion && !simplify;
+
   const onMove = (e) => {
-    if (reduceMotion || !wrapRef.current) return;
+    if (!tiltEnabled || !wrapRef.current) return;
     const r = wrapRef.current.getBoundingClientRect();
     mx.set((e.clientX - r.left) / r.width - 0.5);
     my.set((e.clientY - r.top) / r.height - 0.5);
@@ -48,20 +49,20 @@ const BrandMark = ({ reduceMotion }) => {
     <div
       ref={wrapRef}
       className="site-hero-brand-wrap relative"
-      style={{ perspective: 1400 }}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
+      style={tiltEnabled ? { perspective: 1400 } : undefined}
+      onMouseMove={tiltEnabled ? onMove : undefined}
+      onMouseLeave={tiltEnabled ? onLeave : undefined}
     >
       <motion.div
         className="relative max-w-full"
         style={
-          reduceMotion
-            ? undefined
-            : { rotateX, rotateY, transformStyle: "preserve-3d" }
+          tiltEnabled
+            ? { rotateX, rotateY, transformStyle: "preserve-3d" }
+            : undefined
         }
         initial={reduceMotion ? false : { opacity: 0, y: 22, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.95, ease }}
+        transition={{ duration: simplify ? 0.55 : 0.95, ease }}
       >
         <h2 className="sr-only">{hero.brand}</h2>
         <p
@@ -77,14 +78,13 @@ const BrandMark = ({ reduceMotion }) => {
               }
               animate={{ opacity: 1, y: 0 }}
               transition={{
-                duration: 0.8,
-                delay: 0.14 + i * 0.07,
+                duration: simplify ? 0.45 : 0.8,
+                delay: (simplify ? 0.06 : 0.14) + i * (simplify ? 0.04 : 0.07),
                 ease,
               }}
               whileHover={
-                reduceMotion
-                  ? undefined
-                  : {
+                tiltEnabled
+                  ? {
                       y: -4,
                       color: "#6b8aff",
                       transition: {
@@ -93,6 +93,7 @@ const BrandMark = ({ reduceMotion }) => {
                         damping: 22,
                       },
                     }
+                  : undefined
               }
             >
               {letter}
@@ -104,7 +105,7 @@ const BrandMark = ({ reduceMotion }) => {
           className="site-hero-brand-meta relative flex flex-wrap items-center"
           initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.7, duration: 0.6, ease }}
+          transition={{ delay: simplify ? 0.35 : 0.7, duration: 0.5, ease }}
         >
           <span className="h-px w-7 bg-[var(--accent)] sm:w-8 md:w-10" />
           <span className="tag font-semibold uppercase text-white/60">
@@ -120,7 +121,7 @@ const BrandMark = ({ reduceMotion }) => {
 };
 
 const Hero = () => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, simplify, kenBurns } = useSimplifyMotion();
   const sectionRef = useRef(null);
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -130,7 +131,9 @@ const Hero = () => {
   const words = active.headline.split(" ");
   const progressRef = useRef(0);
   const lastTs = useRef(null);
+  const lastPaint = useRef(0);
   const videoRef = useRef(null);
+  const slideMs = simplify ? 0.55 : 0.95;
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -140,6 +143,9 @@ const Hero = () => {
   const mediaY = useTransform(scrollYProgress, [0, 1], ["0%", "14%"]);
   const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0]);
+
+  // Scroll parallax is desktop-only — saves compositor work on phones
+  const useParallax = !reduceMotion && !simplify;
 
   const goTo = useCallback(
     (nextIdx) => {
@@ -169,7 +175,12 @@ const Hero = () => {
       if (!el.duration || Number.isNaN(el.duration)) return;
       const p = Math.min(1, el.currentTime / el.duration);
       progressRef.current = p;
-      setProgress(p);
+      const now = performance.now();
+      // Throttle React progress paints (especially mobile)
+      if (now - lastPaint.current > (simplify ? 80 : 32)) {
+        lastPaint.current = now;
+        setProgress(p);
+      }
     };
 
     const onEnded = () => {
@@ -186,7 +197,7 @@ const Hero = () => {
       el.removeEventListener("timeupdate", onTimeUpdate);
       el.removeEventListener("ended", onEnded);
     };
-  }, [index, isVideoSlide, slides.length]);
+  }, [index, isVideoSlide, slides.length, simplify]);
 
   useEffect(() => {
     if (reduceMotion || slides.length < 2 || isVideoSlide) return;
@@ -200,7 +211,10 @@ const Hero = () => {
           1,
           progressRef.current + delta / AUTO_MS,
         );
-        setProgress(progressRef.current);
+        if (ts - lastPaint.current > (simplify ? 80 : 32)) {
+          lastPaint.current = ts;
+          setProgress(progressRef.current);
+        }
         if (progressRef.current >= 1) {
           progressRef.current = 0;
           setProgress(0);
@@ -216,7 +230,7 @@ const Hero = () => {
 
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [paused, reduceMotion, slides.length, isVideoSlide, index]);
+  }, [paused, reduceMotion, slides.length, isVideoSlide, index, simplify]);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -227,13 +241,13 @@ const Hero = () => {
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev]);
 
+  // Preload next slide only (not the whole deck)
   useEffect(() => {
-    slides.forEach((slide) => {
-      if (!slide.image) return;
-      const img = new Image();
-      img.src = slide.image;
-    });
-  }, [slides]);
+    const nextSlide = slides[(index + 1) % slides.length];
+    if (!nextSlide?.image) return;
+    const img = new Image();
+    img.src = nextSlide.image;
+  }, [index, slides]);
 
   return (
     <section
@@ -245,36 +259,33 @@ const Hero = () => {
       aria-roledescription="carousel"
       aria-label="Nuam hero"
     >
-      {/* Media carousel */}
       <motion.div
-        className="absolute inset-0 will-change-transform"
-        style={reduceMotion ? undefined : { y: mediaY }}
+        className="absolute inset-0"
+        style={useParallax ? { y: mediaY } : undefined}
       >
         <AnimatePresence initial={false} mode="sync">
           <motion.div
             key={active.id}
-            className="absolute inset-0 will-change-[opacity,transform,filter]"
+            className="absolute inset-0"
             initial={
               reduceMotion
                 ? { opacity: 0 }
-                : { opacity: 0, scale: 1.08, filter: "blur(8px)" }
+                : simplify
+                  ? { opacity: 0 }
+                  : { opacity: 0, scale: 1.06 }
             }
             animate={{
               opacity: 1,
               scale: 1,
-              filter: "blur(0px)",
             }}
             exit={
-              reduceMotion
+              reduceMotion || simplify
                 ? { opacity: 0 }
-                : { opacity: 0, scale: 1.04, filter: "blur(6px)" }
+                : { opacity: 0, scale: 1.03 }
             }
             transition={{
-              duration: SLIDE_MS,
+              duration: slideMs,
               ease: cinematic,
-              opacity: { duration: SLIDE_MS * 0.9, ease: cinematic },
-              scale: { duration: SLIDE_MS * 1.15, ease: cinematic },
-              filter: { duration: SLIDE_MS * 0.75, ease: cinematic },
             }}
           >
             {active.type === "video" && active.video && !reduceMotion ? (
@@ -285,7 +296,7 @@ const Hero = () => {
                 autoPlay
                 muted
                 playsInline
-                preload="auto"
+                preload={simplify ? "metadata" : "auto"}
                 poster={active.image}
               >
                 <source src={active.video} type="video/mp4" />
@@ -294,24 +305,29 @@ const Hero = () => {
               <motion.img
                 src={active.image}
                 alt={active.imageAlt}
-                className="h-full w-full object-cover object-[center_30%] will-change-transform sm:object-center"
+                className="h-full w-full object-cover object-[center_30%] sm:object-center"
                 fetchPriority="high"
                 decoding="async"
                 sizes="100vw"
                 draggable={false}
-                initial={reduceMotion ? false : { scale: 1.08 }}
+                initial={
+                  kenBurns && !simplify ? { scale: kenBurns.from } : false
+                }
                 animate={{ scale: 1 }}
-                transition={{
-                  duration: Math.max(AUTO_MS / 1000, SLIDE_MS + 0.5),
-                  ease: cinematic,
-                }}
+                transition={
+                  kenBurns && !simplify
+                    ? {
+                        duration: Math.max(AUTO_MS / 1000, slideMs + 0.5),
+                        ease: cinematic,
+                      }
+                    : { duration: slideMs, ease: cinematic }
+                }
               />
             )}
           </motion.div>
         </AnimatePresence>
       </motion.div>
 
-      {/* Cinematic grading */}
       <div
         className="pointer-events-none absolute inset-0 z-[1]"
         style={{
@@ -335,7 +351,6 @@ const Hero = () => {
       />
       <div className="noise-overlay pointer-events-none absolute inset-0 z-[1] opacity-[0.28]" />
 
-      {/* Film frame */}
       <div className="site-hero-frame pointer-events-none absolute z-[2]">
         <span className="absolute left-0 top-0 border-l border-t border-white/20" />
         <span className="absolute right-0 top-0 border-r border-t border-white/20" />
@@ -343,14 +358,13 @@ const Hero = () => {
         <span className="absolute bottom-0 right-0 border-b border-r border-white/20" />
       </div>
 
-      {/* Top HUD */}
       <div className="site-hero-hud pointer-events-none absolute inset-x-0 z-[3]">
         <div className="container-custom flex items-center justify-between">
           <motion.p
             className="text-[0.6rem] font-semibold uppercase tracking-[0.28em] text-white/35"
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.25 }}
           >
             Nuam · Est. 2025
           </motion.p>
@@ -358,12 +372,14 @@ const Hero = () => {
             className="flex items-center gap-2"
             initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.3 }}
           >
             {isVideoSlide && (
               <>
                 <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inset-0 animate-ping rounded-full bg-red-500/70" />
+                  {!simplify && (
+                    <span className="absolute inset-0 animate-ping rounded-full bg-red-500/70" />
+                  )}
                   <span className="relative h-1.5 w-1.5 rounded-full bg-red-500" />
                 </span>
                 <span className="text-[0.6rem] font-semibold tracking-[0.22em] text-white/45">
@@ -380,15 +396,14 @@ const Hero = () => {
         </div>
       </div>
 
-      {/* Content */}
       <motion.div
         className="site-hero-content relative z-10"
         style={
-          reduceMotion ? undefined : { y: contentY, opacity: contentOpacity }
+          useParallax ? { y: contentY, opacity: contentOpacity } : undefined
         }
       >
         <div className="site-hero-inner container-custom">
-          <BrandMark reduceMotion={reduceMotion} />
+          <BrandMark reduceMotion={reduceMotion} simplify={simplify} />
 
           <div className="site-hero-slide-label flex items-center gap-3">
             <span className="h-px w-6 bg-[var(--accent)]" />
@@ -400,7 +415,7 @@ const Hero = () => {
                   initial={reduceMotion ? false : { y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -14, opacity: 0 }}
-                  transition={{ duration: 0.55, ease: cinematic }}
+                  transition={{ duration: simplify ? 0.35 : 0.55, ease: cinematic }}
                 >
                   {active.label}
                 </motion.p>
@@ -426,8 +441,10 @@ const Hero = () => {
                           animate={{ y: "0%", opacity: 1 }}
                           exit={{ y: "-100%", opacity: 0 }}
                           transition={{
-                            duration: 0.65,
-                            delay: reduceMotion ? 0 : i * 0.04,
+                            duration: simplify ? 0.4 : 0.65,
+                            delay: reduceMotion
+                              ? 0
+                              : i * (simplify ? 0.025 : 0.04),
                             ease: cinematic,
                           }}
                         >
@@ -449,7 +466,7 @@ const Hero = () => {
                     initial={reduceMotion ? false : { opacity: 0, y: 16 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -12 }}
-                    transition={{ duration: 0.55, ease: cinematic }}
+                    transition={{ duration: simplify ? 0.35 : 0.55, ease: cinematic }}
                   >
                     {active.support}
                   </motion.p>
@@ -460,7 +477,11 @@ const Hero = () => {
                 className="site-hero-cta"
                 initial={reduceMotion ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.75, delay: 0.85, ease }}
+                transition={{
+                  duration: 0.55,
+                  delay: simplify ? 0.35 : 0.85,
+                  ease,
+                }}
               >
                 <Link
                   to={hero.cta.to}
@@ -479,7 +500,11 @@ const Hero = () => {
             className="site-hero-controls flex items-center justify-between"
             initial={reduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 1, ease }}
+            transition={{
+              duration: 0.55,
+              delay: simplify ? 0.4 : 1,
+              ease,
+            }}
           >
             <div
               className="site-hero-dots flex items-center gap-2 sm:gap-3"
@@ -531,7 +556,7 @@ const Hero = () => {
                 type="button"
                 onClick={prev}
                 aria-label="Previous slide"
-                className="site-hero-nav-btn flex items-center justify-center rounded-full border border-white/20 text-white backdrop-blur-sm transition-all duration-300 hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)]"
+                className="site-hero-nav-btn flex items-center justify-center rounded-full border border-white/20 text-white md:backdrop-blur-sm transition-all duration-300 hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)]"
               >
                 <ArrowLeft size={16} strokeWidth={2} />
               </button>
@@ -539,7 +564,7 @@ const Hero = () => {
                 type="button"
                 onClick={next}
                 aria-label="Next slide"
-                className="site-hero-nav-btn flex items-center justify-center rounded-full border border-white/20 text-white backdrop-blur-sm transition-all duration-300 hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)]"
+                className="site-hero-nav-btn flex items-center justify-center rounded-full border border-white/20 text-white md:backdrop-blur-sm transition-all duration-300 hover:border-[var(--accent)] hover:bg-[var(--accent)] hover:text-[var(--accent-ink)]"
               >
                 <ArrowRight size={16} strokeWidth={2} />
               </button>
@@ -551,12 +576,15 @@ const Hero = () => {
           className="site-hero-scroll-cue pointer-events-none absolute left-1/2 -translate-x-1/2 flex-col items-center gap-2"
           initial={reduceMotion ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.3, duration: 0.6 }}
+          transition={{ delay: simplify ? 0.55 : 1.3, duration: 0.5 }}
         >
           <span className="text-[0.55rem] font-semibold uppercase tracking-[0.28em] text-white/30">
             Scroll
           </span>
-          <ArrowDown size={14} className="animate-bounce text-[var(--accent)]/70" />
+          <ArrowDown
+            size={14}
+            className={`${simplify ? "" : "animate-bounce "}text-[var(--accent)]/70`}
+          />
         </motion.div>
       </motion.div>
     </section>

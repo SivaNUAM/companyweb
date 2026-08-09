@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import BrandLogo from "../components/ui/BrandLogo";
-import { isDarkBehindHeader } from "../utils/surfaceTone";
-
-const ease = [0.16, 1, 0.3, 1];
+import { observeHeaderTone } from "../utils/surfaceTone";
 
 const navLinks = [
   { to: "/services", label: "Services" },
@@ -17,7 +14,6 @@ const navLinks = [
 
 const Header = () => {
   const { pathname } = useLocation();
-  const reduceMotion = useReducedMotion();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [onDark, setOnDark] = useState(false);
@@ -25,50 +21,49 @@ const Header = () => {
   const lightNav = open || onDark;
   const solid = scrolled && !open && !onDark;
 
+  // Scroll class only — no tone sampling on the scroll path
   useEffect(() => {
     let raf = 0;
-    let lastSample = 0;
+    let prev = window.scrollY > 24;
 
-    const sample = () => {
+    const tick = () => {
       raf = 0;
-      lastSample = performance.now();
-      try {
-        setOnDark(isDarkBehindHeader());
-      } catch {
-        /* ignore */
+      const next = window.scrollY > 24;
+      if (next !== prev) {
+        prev = next;
+        setScrolled(next);
       }
-    };
-
-    const requestSample = () => {
-      const now = performance.now();
-      // Throttle expensive elementsFromPoint sampling (Windows/laptop jank)
-      if (now - lastSample < 120) return;
-      if (!raf) raf = requestAnimationFrame(sample);
     };
 
     const onScroll = () => {
-      setScrolled(window.scrollY > 24);
-      requestSample();
+      if (!raf) raf = requestAnimationFrame(tick);
     };
 
-    const onResize = () => {
-      if (window.matchMedia("(min-width: 1024px)").matches) {
-        setOpen(false);
-      }
-      lastSample = 0;
-      requestSample();
-    };
-
-    onScroll();
-    sample();
-
+    setScrolled(prev);
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize, { passive: true });
-
     return () => {
       if (raf) cancelAnimationFrame(raf);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  // Cheap IO tone — rebinds on route so new sections are watched
+  useEffect(() => {
+    let alive = true;
+    let stop = () => {};
+
+    // Wait a frame so route content is in the DOM
+    const id = requestAnimationFrame(() => {
+      if (!alive) return;
+      stop = observeHeaderTone((dark) => {
+        if (alive) setOnDark((prev) => (prev === dark ? prev : dark));
+      });
+    });
+
+    return () => {
+      alive = false;
+      cancelAnimationFrame(id);
+      stop();
     };
   }, [pathname]);
 
@@ -85,12 +80,19 @@ const Header = () => {
     };
   }, [open]);
 
-  // Hard unlock if component remounts mid-open (HMR / route edge cases)
   useEffect(() => {
     return () => {
       document.body.style.overflow = "";
       document.documentElement.classList.remove("mobile-nav-open");
     };
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.matchMedia("(min-width: 1024px)").matches) setOpen(false);
+    };
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   return (
@@ -114,9 +116,6 @@ const Header = () => {
               <BrandLogo
                 tone={lightNav ? "light" : "dark"}
                 size="header"
-                className={
-                  lightNav ? "drop-shadow-[0_2px_12px_rgba(0,0,0,0.35)]" : ""
-                }
               />
             </Link>
 
@@ -189,102 +188,76 @@ const Header = () => {
 
               <button
                 type="button"
-                className="site-header-menu-btn relative z-50 lg:hidden"
+                className={`site-header-menu-btn relative z-50 lg:hidden${open ? " is-open" : ""}`}
                 onClick={() => setOpen((v) => !v)}
                 aria-label={open ? "Close menu" : "Open menu"}
                 aria-expanded={open}
                 aria-controls="mobile-navigation"
               >
-                <motion.span
-                  className="block h-px w-3.5 origin-center bg-current"
-                  animate={open ? { rotate: 45, y: 3 } : { rotate: 0, y: 0 }}
-                  transition={{ duration: 0.35, ease }}
-                />
-                <motion.span
-                  className="block h-px w-3.5 origin-center bg-current"
-                  animate={open ? { rotate: -45, y: -3 } : { rotate: 0, y: 0 }}
-                  transition={{ duration: 0.35, ease }}
-                />
+                <span className="site-header-menu-bar" />
+                <span className="site-header-menu-bar" />
               </button>
             </div>
           </div>
         </div>
       </header>
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            id="mobile-navigation"
-            data-mobile-nav
-            initial={reduceMotion ? false : { opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease }}
-            className="fixed inset-0 z-40 flex flex-col overflow-y-auto overscroll-contain bg-ink text-white lg:hidden"
-          >
-            <div className="noise-overlay pointer-events-none absolute inset-0 opacity-25" />
+      {/* CSS-only mobile menu — no Framer on the hot path */}
+      <div
+        id="mobile-navigation"
+        data-mobile-nav
+        className={`site-mobile-nav-panel lg:hidden${open ? " is-open" : ""}`}
+        aria-hidden={!open}
+      >
+        <div className="noise-overlay pointer-events-none absolute inset-0 opacity-25" />
 
-            <div className="site-mobile-nav relative flex min-h-full flex-col">
-              <p className="label-premium mb-5 !text-white/30 sm:mb-8">Menu</p>
+        <div className="site-mobile-nav relative flex min-h-full flex-col">
+          <p className="label-premium mb-5 !text-white/30 sm:mb-8">Menu</p>
 
-              <nav className="flex flex-1 flex-col" aria-label="Mobile">
-                {navLinks.map((link, i) => (
-                  <motion.div
-                    key={link.to}
-                    initial={reduceMotion ? false : { opacity: 0, y: 28 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 12 }}
-                    transition={{
-                      delay: 0.06 * i,
-                      duration: 0.5,
-                      ease,
-                    }}
-                  >
-                    <NavLink
-                      to={link.to}
-                      onClick={() => setOpen(false)}
-                      className={({ isActive }) =>
-                        `site-mobile-nav-link group flex items-baseline justify-between gap-4 border-b border-white/10 ${
-                          isActive ? "text-[var(--accent)]" : "text-white"
-                        }`
-                      }
-                    >
-                      <span className="font-display font-bold tracking-[-0.03em]">
-                        {link.label}
-                      </span>
-                      <span className="shrink-0 font-display text-[0.65rem] tracking-[0.2em] text-white/30 sm:text-xs">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                    </NavLink>
-                  </motion.div>
-                ))}
-              </nav>
-
-              <motion.div
-                initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35, duration: 0.5, ease }}
-                className="mt-6 flex flex-col gap-4 sm:mt-8 sm:gap-5"
+          <nav className="flex flex-1 flex-col" aria-label="Mobile">
+            {navLinks.map((link, i) => (
+              <NavLink
+                key={link.to}
+                to={link.to}
+                onClick={() => setOpen(false)}
+                tabIndex={open ? 0 : -1}
+                className={({ isActive }) =>
+                  `site-mobile-nav-link group flex items-baseline justify-between gap-4 border-b border-white/10 ${
+                    isActive ? "text-[var(--accent)]" : "text-white"
+                  }`
+                }
+                style={{ "--i": i }}
               >
-                <Link
-                  to="/contact"
-                  className="btn-accent w-full"
-                  onClick={() => setOpen(false)}
-                >
-                  Get started
-                  <ArrowUpRight size={16} />
-                </Link>
-                <a
-                  href="mailto:nuamtechnologies@gmail.com"
-                  className="break-all text-center text-sm text-white/45 transition-colors hover:text-[var(--accent)]"
-                >
-                  nuamtechnologies@gmail.com
-                </a>
-              </motion.div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                <span className="font-display font-bold tracking-[-0.03em]">
+                  {link.label}
+                </span>
+                <span className="shrink-0 font-display text-[0.65rem] tracking-[0.2em] text-white/30 sm:text-xs">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+              </NavLink>
+            ))}
+          </nav>
+
+          <div className="site-mobile-nav-cta mt-6 flex flex-col gap-4 sm:mt-8 sm:gap-5">
+            <Link
+              to="/contact"
+              className="btn-accent w-full"
+              onClick={() => setOpen(false)}
+              tabIndex={open ? 0 : -1}
+            >
+              Get started
+              <ArrowUpRight size={16} />
+            </Link>
+            <a
+              href="mailto:nuamtechnologies@gmail.com"
+              className="break-all text-center text-sm text-white/45 transition-colors hover:text-[var(--accent)]"
+              tabIndex={open ? 0 : -1}
+            >
+              nuamtechnologies@gmail.com
+            </a>
+          </div>
+        </div>
+      </div>
     </>
   );
 };

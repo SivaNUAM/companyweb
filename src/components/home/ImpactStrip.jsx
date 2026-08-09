@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import Reveal from "../ui/Reveal";
 import { impactSection, stats } from "../../data/home";
-
-const ease = [0.16, 1, 0.3, 1];
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const parseStat = (value) => {
   const match = String(value).match(/^(\d+)(.*)$/);
@@ -12,7 +11,7 @@ const parseStat = (value) => {
 };
 
 const StatValue = ({ value, active }) => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, simplify } = useSimplifyMotion();
   const { target, suffix } = parseStat(value);
   const [display, setDisplay] = useState(reduceMotion ? target : 0);
 
@@ -24,7 +23,7 @@ const StatValue = ({ value, active }) => {
 
     let frame;
     let lastShown = -1;
-    const duration = 900;
+    const duration = simplify ? 550 : 900;
     const start = performance.now();
 
     const tick = (now) => {
@@ -40,7 +39,7 @@ const StatValue = ({ value, active }) => {
 
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [active, reduceMotion, target]);
+  }, [active, reduceMotion, simplify, target]);
 
   return (
     <span className="tabular-nums">
@@ -53,7 +52,7 @@ const StatValue = ({ value, active }) => {
 const StatItem = ({ stat, index }) => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.35 });
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, simplify, ease } = useSimplifyMotion();
   const number = String(index + 1).padStart(2, "0");
   const digitLen = String(stat.value).replace(/\D/g, "").length;
   const isWide = digitLen >= 4;
@@ -62,10 +61,14 @@ const StatItem = ({ stat, index }) => {
     <motion.div
       ref={ref}
       className="site-impact-item group"
-      initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+      initial={reduceMotion ? false : { opacity: 0, y: simplify ? 10 : 18 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.55, delay: index * 0.05, ease }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{
+        duration: simplify ? 0.4 : 0.55,
+        delay: index * (simplify ? 0.03 : 0.05),
+        ease,
+      }}
     >
       <div className="site-impact-meta">
         <span className="font-display text-[0.6rem] font-semibold tracking-[0.22em] text-white/30 sm:text-[0.65rem]">

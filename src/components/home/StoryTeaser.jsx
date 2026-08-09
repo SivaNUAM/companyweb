@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Reveal from "../ui/Reveal";
 import { story } from "../../data/home";
-
-const ease = [0.16, 1, 0.3, 1];
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const sentences = story.body
   .split(/(?<=\.)\s+/)
@@ -15,7 +14,7 @@ const sentences = story.body
 /**
  * Types story lines one character at a time when the block enters view.
  */
-const TypewriterStory = ({ lines, reduceMotion }) => {
+const TypewriterStory = ({ lines, reduceMotion, simplify }) => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, amount: 0.3 });
   const [lineIndex, setLineIndex] = useState(0);
@@ -33,8 +32,17 @@ const TypewriterStory = ({ lines, reduceMotion }) => {
 
     const current = lines[lineIndex] ?? "";
     if (charIndex < current.length) {
-      const lag = current[charIndex] === " " ? 18 : 28;
-      const id = window.setTimeout(() => setCharIndex((c) => c + 1), lag);
+      // Mobile: type in larger steps so fewer React updates
+      const step = simplify ? (current[charIndex] === " " ? 2 : 3) : 1;
+      const lag = simplify
+        ? 16
+        : current[charIndex] === " "
+          ? 18
+          : 28;
+      const id = window.setTimeout(
+        () => setCharIndex((c) => Math.min(current.length, c + step)),
+        lag,
+      );
       return () => clearTimeout(id);
     }
 
@@ -42,13 +50,13 @@ const TypewriterStory = ({ lines, reduceMotion }) => {
       const id = window.setTimeout(() => {
         setLineIndex((i) => i + 1);
         setCharIndex(0);
-      }, 420);
+      }, simplify ? 220 : 420);
       return () => clearTimeout(id);
     }
 
     setDone(true);
     return undefined;
-  }, [inView, reduceMotion, lineIndex, charIndex, done, lines]);
+  }, [inView, reduceMotion, simplify, lineIndex, charIndex, done, lines]);
 
   return (
     <h2
@@ -75,17 +83,11 @@ const TypewriterStory = ({ lines, reduceMotion }) => {
           >
             {visible}
             {showCursor && (
-              <motion.span
+              <span
                 aria-hidden
-                className="ml-0.5 inline-block h-[0.85em] w-[0.08em] translate-y-[0.08em] bg-[var(--accent)] align-baseline"
-                animate={
-                  reduceMotion ? { opacity: 1 } : { opacity: [1, 0, 1] }
-                }
-                transition={
-                  reduceMotion
-                    ? undefined
-                    : { duration: 0.85, repeat: Infinity, ease: "linear" }
-                }
+                className={`ml-0.5 inline-block h-[0.85em] w-[0.08em] translate-y-[0.08em] bg-[var(--accent)] align-baseline${
+                  reduceMotion || simplify ? "" : " site-story-caret"
+                }`}
               />
             )}
           </span>
@@ -96,7 +98,7 @@ const TypewriterStory = ({ lines, reduceMotion }) => {
 };
 
 const StoryTeaser = () => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, simplify, ease } = useSimplifyMotion();
 
   return (
     <section className="site-story section-surface">
@@ -106,7 +108,7 @@ const StoryTeaser = () => {
         initial={reduceMotion ? false : { opacity: 0, y: 12 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 1, ease }}
+        transition={{ duration: simplify ? 0.5 : 1, ease }}
       >
         NUAM
       </motion.span>
@@ -131,7 +133,11 @@ const StoryTeaser = () => {
                 </span>
               </Reveal>
 
-              <TypewriterStory lines={sentences} reduceMotion={reduceMotion} />
+              <TypewriterStory
+                lines={sentences}
+                reduceMotion={reduceMotion}
+                simplify={simplify}
+              />
 
               <Reveal delay={0.2}>
                 <div className="site-story-foot">

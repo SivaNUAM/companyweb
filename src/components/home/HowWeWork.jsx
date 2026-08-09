@@ -2,16 +2,15 @@ import { useEffect, useState } from "react";
 import {
   AnimatePresence,
   motion,
-  useReducedMotion,
 } from "framer-motion";
 import Reveal from "../ui/Reveal";
 import { process, processSection } from "../../data/home";
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
-const ease = [0.16, 1, 0.3, 1];
 const AUTO_MS = 4200;
 
 const HowWeWork = () => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, simplify, freezeLoops, ease } = useSimplifyMotion();
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const current = process[active] || process[0];
@@ -20,9 +19,9 @@ const HowWeWork = () => {
     if (reduceMotion || paused) return undefined;
     const id = window.setInterval(() => {
       setActive((i) => (i + 1) % process.length);
-    }, AUTO_MS);
+    }, simplify ? AUTO_MS + 1200 : AUTO_MS);
     return () => clearInterval(id);
-  }, [reduceMotion, paused, active]);
+  }, [reduceMotion, paused, active, simplify]);
 
   return (
     <section
@@ -32,27 +31,31 @@ const HowWeWork = () => {
     >
       <div className="noise-overlay pointer-events-none absolute inset-0 opacity-[0.2]" />
 
-      {/* Atmosphere */}
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -left-1/4 top-0 h-[70%] w-[70%] rounded-full bg-[var(--accent)]/[0.07] blur-[120px]"
-        animate={
-          reduceMotion
-            ? undefined
-            : { x: [0, 40, 0], y: [0, 30, 0], opacity: [0.5, 0.85, 0.5] }
-        }
-        transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        aria-hidden
-        className="pointer-events-none absolute -right-1/4 bottom-0 h-[55%] w-[55%] rounded-full bg-white/[0.04] blur-[100px]"
-        animate={
-          reduceMotion
-            ? undefined
-            : { x: [0, -30, 0], opacity: [0.3, 0.55, 0.3] }
-        }
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-      />
+      {/* Atmosphere — static on mobile (animated blurs are a major jank source) */}
+      {!simplify && (
+        <>
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -left-1/4 top-0 h-[70%] w-[70%] rounded-full bg-[var(--accent)]/[0.07] blur-[120px]"
+            animate={
+              freezeLoops
+                ? undefined
+                : { x: [0, 40, 0], y: [0, 30, 0], opacity: [0.5, 0.85, 0.5] }
+            }
+            transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute -right-1/4 bottom-0 h-[55%] w-[55%] rounded-full bg-white/[0.04] blur-[100px]"
+            animate={
+              freezeLoops
+                ? undefined
+                : { x: [0, -30, 0], opacity: [0.3, 0.55, 0.3] }
+            }
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </>
+      )}
 
       {/* Softened watermark step */}
       <AnimatePresence mode="wait">
@@ -125,7 +128,7 @@ const HowWeWork = () => {
                         : "border-white/25 bg-ink"
                     }`}
                   >
-                    {i === active && !reduceMotion && (
+                    {i === active && !freezeLoops && (
                       <motion.span
                         className="absolute inset-0 rounded-full border border-[var(--accent)]"
                         initial={{ scale: 1, opacity: 0.7 }}
@@ -151,13 +154,20 @@ const HowWeWork = () => {
               const isActive = i === active;
               return (
                 <li key={item.step} className="relative">
-                  {isActive && (
-                    <motion.span
-                      layoutId="hww-active-bar"
-                      className="absolute left-0 top-0 hidden h-full w-[2px] bg-[var(--accent)] lg:block"
-                      transition={{ type: "spring", stiffness: 480, damping: 38 }}
-                    />
-                  )}
+                  {isActive &&
+                    (simplify ? (
+                      <span className="absolute left-0 top-0 hidden h-full w-[2px] bg-[var(--accent)] lg:block" />
+                    ) : (
+                      <motion.span
+                        layoutId="hww-active-bar"
+                        className="absolute left-0 top-0 hidden h-full w-[2px] bg-[var(--accent)] lg:block"
+                        transition={{
+                          type: "spring",
+                          stiffness: 480,
+                          damping: 38,
+                        }}
+                      />
+                    ))}
                   <button
                     type="button"
                     onMouseEnter={() => setActive(i)}

@@ -1,46 +1,69 @@
-import { useEffect, useState } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useMotionValue,
-  animate,
-  useReducedMotion,
-} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { animate, useReducedMotion } from "framer-motion";
 import BrandLogo from "./BrandLogo";
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
-const ease = [0.76, 0, 0.24, 1];
 const SESSION_KEY = "nuam-welcome-seen";
 
 /**
- * Standard agency preloader — logo, counter, line, slide-up reveal.
+ * Agency preloader — logo, counter, line, slide-up reveal.
  * Runs once per browser session.
+ * Mobile: DOM-driven progress (no per-frame React re-renders) + shorter timing.
  */
 const WelcomeLoader = ({ onDone }) => {
   const reduceMotion = useReducedMotion();
+  const { simplify } = useSimplifyMotion();
   const [phase, setPhase] = useState("load"); // load | exit | gone
   const [visible, setVisible] = useState(true);
-  const [count, setCount] = useState(0);
-  const progress = useMotionValue(0);
+  const countRef = useRef(null);
+  const barRef = useRef(null);
+  const lastCount = useRef(-1);
+  const doneRef = useRef(false);
+
+  const loadMs = reduceMotion ? 700 : simplify ? 1400 : 2400;
+  const holdMs = reduceMotion ? 60 : simplify ? 140 : 280;
+  const exitMs = reduceMotion ? 280 : simplify ? 480 : 850;
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
 
-    if (sessionStorage.getItem(SESSION_KEY)) {
-      setVisible(false);
-      setPhase("gone");
-      onDone?.();
-      return undefined;
+    try {
+      if (sessionStorage.getItem(SESSION_KEY)) {
+        setVisible(false);
+        setPhase("gone");
+        onDone?.();
+        return undefined;
+      }
+    } catch {
+      /* private mode */
     }
 
     document.documentElement.classList.add("welcome-loading");
 
-    const duration = reduceMotion ? 0.9 : 2.4;
-    const controls = animate(progress, 100, {
-      duration,
+    // Paint counter/bar via refs — avoid 100 React re-renders
+    if (countRef.current) countRef.current.textContent = "00";
+    if (barRef.current) barRef.current.style.transform = "scaleX(0)";
+
+    const controls = animate(0, 100, {
+      duration: loadMs / 1000,
       ease: [0.45, 0, 0.15, 1],
-      onUpdate: (v) => setCount(Math.round(v)),
+      onUpdate: (v) => {
+        const n = Math.round(v);
+        if (n === lastCount.current) return;
+        // Mobile: update every 2% to cut paint work in half
+        if (simplify && n !== 100 && n - lastCount.current < 2) return;
+        lastCount.current = n;
+        if (countRef.current) {
+          countRef.current.textContent = String(n).padStart(2, "0");
+        }
+        if (barRef.current) {
+          barRef.current.style.transform = `scaleX(${n / 100})`;
+        }
+      },
       onComplete: () => {
-        window.setTimeout(() => setPhase("exit"), reduceMotion ? 80 : 320);
+        if (countRef.current) countRef.current.textContent = "100";
+        if (barRef.current) barRef.current.style.transform = "scaleX(1)";
+        window.setTimeout(() => setPhase("exit"), holdMs);
       },
     });
 
@@ -48,120 +71,81 @@ const WelcomeLoader = ({ onDone }) => {
       controls.stop();
       document.documentElement.classList.remove("welcome-loading");
     };
-  }, [onDone, progress, reduceMotion]);
+  }, [onDone, reduceMotion, simplify, loadMs, holdMs]);
 
   useEffect(() => {
     if (phase !== "exit") return undefined;
 
-    // Unlock the page as soon as the slide-up starts so the real UI
-    // is already painted underneath (no white flash).
-    onDone?.();
+    // Unlock + mount app under the panel as soon as the slide starts
+    if (!doneRef.current) {
+      doneRef.current = true;
+      onDone?.();
+    }
 
-    const exitMs = reduceMotion ? 300 : 900;
     const t = window.setTimeout(() => {
-      sessionStorage.setItem(SESSION_KEY, "1");
+      try {
+        sessionStorage.setItem(SESSION_KEY, "1");
+      } catch {
+        /* ignore */
+      }
       document.documentElement.classList.remove("welcome-loading");
       setVisible(false);
       setPhase("gone");
     }, exitMs);
-    return () => clearTimeout(t);
-  }, [phase, onDone, reduceMotion]);
+
+    return () => window.clearTimeout(t);
+  }, [phase, onDone, exitMs]);
 
   if (!visible && phase === "gone") return null;
+  if (!visible) return null;
 
   const exiting = phase === "exit";
 
   return (
-    <AnimatePresence>
-      {visible && (
-        <motion.div
-          className="fixed inset-0 z-[200] flex flex-col bg-[var(--ink)] text-white"
-          role="status"
-          aria-live="polite"
-          aria-label="Loading Nuam Technologies"
-          initial={{ y: "0%" }}
-          animate={exiting ? { y: "-100%" } : { y: "0%" }}
-          exit={{ y: "-100%" }}
-          transition={{ duration: reduceMotion ? 0.35 : 0.85, ease }}
-        >
-          {/* Top */}
-          <div className="flex items-center justify-between px-6 pt-7 md:px-10 md:pt-9 lg:px-14">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-            >
-              <BrandLogo
-                tone="light"
-                size="header"
-                className="!h-9 !w-auto md:!h-11"
-              />
-            </motion.div>
-            <p className="text-[0.65rem] font-medium uppercase tracking-[0.22em] text-white/35">
-              Loading
-            </p>
-          </div>
+    <div
+      className={`site-welcome${exiting ? " is-exit" : ""}${simplify ? " is-simple" : ""}`}
+      role="status"
+      aria-live="polite"
+      aria-label="Loading Nuam Technologies"
+      style={{
+        // Drive exit duration from JS budget
+        ["--welcome-exit-ms"]: `${exitMs}ms`,
+      }}
+    >
+      <div className="site-welcome-top">
+        <BrandLogo
+          tone="light"
+          size="header"
+          className="site-welcome-logo-sm"
+        />
+        <p className="site-welcome-label">Loading</p>
+      </div>
 
-          {/* Center logo */}
-          <div className="flex flex-1 flex-col items-center justify-center px-6">
-            <motion.div
-              className="flex flex-col items-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: reduceMotion ? 0.25 : 0.75,
-                ease: [0.16, 1, 0.3, 1],
-                delay: reduceMotion ? 0 : 0.1,
-              }}
-            >
-              <BrandLogo tone="light" size="loader" />
+      <div className="site-welcome-center">
+        <div className="site-welcome-brand">
+          <BrandLogo
+            tone="light"
+            size="loader"
+            className="site-welcome-logo"
+          />
+          <div className="site-welcome-rule" />
+          <p className="site-welcome-sub">Technologies</p>
+        </div>
+      </div>
 
-              <motion.div
-                className="mt-6 h-px w-12 origin-center bg-[var(--accent)] md:mt-8"
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{
-                  duration: 0.55,
-                  delay: reduceMotion ? 0 : 0.4,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-              />
-
-              <motion.p
-                className="mt-5 text-[0.65rem] font-medium uppercase tracking-[0.32em] text-white/40 md:mt-6"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: reduceMotion ? 0 : 0.5, duration: 0.45 }}
-              >
-                Technologies
-              </motion.p>
-            </motion.div>
-          </div>
-
-          {/* Bottom */}
-          <div className="px-6 pb-8 md:px-10 md:pb-10 lg:px-14">
-            <div className="mb-4 flex items-end justify-between">
-              <p className="text-[0.65rem] uppercase tracking-[0.2em] text-white/30">
-                Please wait
-              </p>
-              <p className="font-display text-[clamp(2rem,6vw,3.25rem)] font-bold leading-none tracking-[-0.04em] tabular-nums">
-                {String(count).padStart(2, "0")}
-                <span className="text-[0.45em] font-semibold text-[var(--accent)]">
-                  %
-                </span>
-              </p>
-            </div>
-
-            <div className="h-[2px] w-full overflow-hidden bg-white/10">
-              <motion.div
-                className="h-full origin-left bg-white"
-                style={{ scaleX: count / 100 }}
-              />
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+      <div className="site-welcome-bottom">
+        <div className="site-welcome-meta">
+          <p className="site-welcome-wait">Please wait</p>
+          <p className="site-welcome-count font-display">
+            <span ref={countRef}>00</span>
+            <span className="site-welcome-pct">%</span>
+          </p>
+        </div>
+        <div className="site-welcome-track">
+          <div ref={barRef} className="site-welcome-bar" />
+        </div>
+      </div>
+    </div>
   );
 };
 

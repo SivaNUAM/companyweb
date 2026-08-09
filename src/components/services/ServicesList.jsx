@@ -1,13 +1,12 @@
 import { Link } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Reveal from "../ui/Reveal";
 import { serviceOfferings } from "../../data/services";
-
-const ease = [0.16, 1, 0.3, 1];
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
 const ServiceRow = ({ service, index }) => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, simplify, kenBurns, ease } = useSimplifyMotion();
   const number = String(index + 1).padStart(2, "0");
   const reverse = index % 2 === 1;
 
@@ -30,11 +29,19 @@ const ServiceRow = ({ service, index }) => {
                   aria-hidden
                   className="site-svc-media-img h-full w-full object-cover transition-transform duration-[1.2s] ease-expo group-hover/row:scale-[1.05]"
                   loading="lazy"
+                  decoding="async"
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  initial={reduceMotion ? false : { scale: 1.12 }}
-                  whileInView={{ scale: 1 }}
-                  viewport={{ once: true, amount: 0.35 }}
-                  transition={{ duration: 1.15, ease }}
+                  initial={
+                    kenBurns
+                      ? { opacity: 0, scale: simplify ? 1 : kenBurns.from }
+                      : false
+                  }
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true, amount: simplify ? 0.2 : 0.35 }}
+                  transition={{
+                    duration: simplify ? 0.45 : 1.15,
+                    ease,
+                  }}
                 />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-ink/55 via-transparent to-[var(--accent)]/10" />
                 <div className="noise-overlay pointer-events-none absolute inset-0 opacity-25" />

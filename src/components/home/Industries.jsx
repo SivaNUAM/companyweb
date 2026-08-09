@@ -2,34 +2,35 @@ import { useEffect, useState } from "react";
 import {
   AnimatePresence,
   motion,
-  useReducedMotion,
 } from "framer-motion";
 import Reveal from "../ui/Reveal";
 import { industries, industriesSection } from "../../data/home";
+import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
-const ease = [0.16, 1, 0.3, 1];
 const AUTO_MS = 4800;
 
 const Industries = () => {
-  const reduceMotion = useReducedMotion();
+  const { reduceMotion, simplify, ease } = useSimplifyMotion();
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const current = industries[active] || industries[0];
 
   useEffect(() => {
-    industries.forEach((item) => {
+    const next = industries[(active + 1) % industries.length];
+    [current, next].forEach((item) => {
+      if (!item?.image) return;
       const img = new Image();
       img.src = item.image;
     });
-  }, []);
+  }, [active, current]);
 
   useEffect(() => {
     if (reduceMotion || paused) return undefined;
     const id = window.setInterval(() => {
       setActive((i) => (i + 1) % industries.length);
-    }, AUTO_MS);
+    }, simplify ? AUTO_MS + 1200 : AUTO_MS);
     return () => clearInterval(id);
-  }, [reduceMotion, paused, active]);
+  }, [reduceMotion, paused, active, simplify]);
 
   return (
     <section
@@ -94,13 +95,21 @@ const Industries = () => {
                   alt={current.name}
                   className="absolute inset-0 h-full w-full object-cover"
                   initial={
-                    reduceMotion
+                    reduceMotion || simplify
                       ? { opacity: 0 }
                       : { opacity: 0, scale: 1.1 }
                   }
+                  decoding="async"
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.04 }}
-                  transition={{ duration: reduceMotion ? 0.2 : 0.75, ease }}
+                  exit={
+                    reduceMotion || simplify
+                      ? { opacity: 0 }
+                      : { opacity: 0, scale: 1.04 }
+                  }
+                  transition={{
+                    duration: reduceMotion ? 0.2 : simplify ? 0.35 : 0.75,
+                    ease,
+                  }}
                 />
               </AnimatePresence>
 
@@ -165,17 +174,20 @@ const Industries = () => {
 
                 return (
                   <li key={item.id} className="relative">
-                    {isActive && (
-                      <motion.span
-                        layoutId="ind-active-bar"
-                        className="absolute left-0 top-0 hidden h-full w-[2px] bg-[var(--accent)] lg:block"
-                        transition={{
-                          type: "spring",
-                          stiffness: 480,
-                          damping: 38,
-                        }}
-                      />
-                    )}
+                    {isActive &&
+                      (simplify ? (
+                        <span className="absolute left-0 top-0 hidden h-full w-[2px] bg-[var(--accent)] lg:block" />
+                      ) : (
+                        <motion.span
+                          layoutId="ind-active-bar"
+                          className="absolute left-0 top-0 hidden h-full w-[2px] bg-[var(--accent)] lg:block"
+                          transition={{
+                            type: "spring",
+                            stiffness: 480,
+                            damping: 38,
+                          }}
+                        />
+                      ))}
                     <button
                       type="button"
                       onMouseEnter={() => setActive(i)}
