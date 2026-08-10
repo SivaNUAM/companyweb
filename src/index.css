@@ -3645,9 +3645,74 @@
 
   .site-svc-media-img {
     /* Slight zoom crops residual AI watermark corners */
-    transform: scale(1.04);
     transform-origin: center center;
     object-position: center 46%;
+  }
+
+  .site-svc-door {
+    background: #0b0b0b;
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  .site-svc-door-left {
+    background:
+      linear-gradient(
+        105deg,
+        #070708 0%,
+        #0e1016 55%,
+        #151a2c 88%,
+        #1c2540 100%
+      );
+    box-shadow: inset -18px 0 40px rgba(0, 0, 0, 0.45);
+  }
+
+  .site-svc-door-right {
+    background:
+      linear-gradient(
+        255deg,
+        #070708 0%,
+        #0e1016 55%,
+        #151a2c 88%,
+        #1c2540 100%
+      );
+    box-shadow: inset 18px 0 40px rgba(0, 0, 0, 0.45);
+  }
+
+  .site-svc-door-edge {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(107, 138, 255, 0.55) 20%,
+      rgba(167, 186, 255, 0.85) 50%,
+      rgba(107, 138, 255, 0.55) 80%,
+      transparent 100%
+    );
+    box-shadow: 0 0 18px rgba(107, 138, 255, 0.35);
+  }
+
+  .site-svc-door-edge-left {
+    right: 0;
+  }
+
+  .site-svc-door-edge-right {
+    left: 0;
+  }
+
+  .site-svc-door-seam {
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(107, 138, 255, 0.95),
+      transparent
+    );
+    box-shadow:
+      0 0 24px rgba(107, 138, 255, 0.65),
+      0 0 48px rgba(107, 138, 255, 0.25);
   }
 
   .site-svc-ghost {
@@ -3713,9 +3778,16 @@
   /* ——— Portfolio ——— */
   .site-folio {
     position: relative;
-    overflow: hidden;
+    overflow-x: clip;
     width: 100%;
     max-width: 100%;
+  }
+
+  .site-folio-intro {
+    padding-left: var(--site-gutter);
+    padding-right: var(--site-gutter);
+    padding-top: 3rem;
+    padding-bottom: 1.25rem;
   }
 
   .site-folio-title {
@@ -3726,19 +3798,39 @@
   }
 
   .site-folio-deck {
-    display: grid;
-    gap: 0.75rem;
-    padding-inline: var(--site-gutter);
-    padding-bottom: max(2.5rem, env(safe-area-inset-bottom, 0px));
+    position: relative;
+    isolation: isolate;
+    padding-bottom: 0;
+  }
+
+  .site-folio-card-slot {
+    padding-left: 0.65rem;
+    padding-right: 0.65rem;
+    /* Promote sticky layers — cuts paint glitches with Lenis */
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
 
   .site-folio-card {
-    position: relative;
     overflow: hidden;
+    border-radius: 1rem;
+    background: var(--ink);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .site-folio-media {
+    position: relative;
     aspect-ratio: 4 / 5;
+    width: 100%;
+    overflow: hidden;
   }
 
   .site-folio-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     padding: 1.15rem;
   }
 
@@ -3749,25 +3841,55 @@
     line-height: 1.05;
   }
 
+  .site-folio-desc {
+    margin-top: 0.65rem;
+    max-width: 36ch;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .site-folio-summary {
+    display: none;
+  }
+
   .site-folio-arrow {
     width: 2.75rem;
     height: 2.75rem;
   }
 
   @media (min-width: 640px) {
-    .site-folio-card {
+    .site-folio-media {
       aspect-ratio: 16 / 10;
+    }
+
+    .site-folio-card-slot {
+      padding-left: 1rem;
+      padding-right: 1rem;
     }
   }
 
   @media (min-width: 768px) {
+    .site-folio-intro {
+      padding-top: 4rem;
+      padding-bottom: 1.5rem;
+    }
+
     .site-folio-title {
       font-size: clamp(2.5rem, 5vw, 4rem);
     }
 
     .site-folio-deck {
-      gap: 1rem;
-      padding-bottom: 4rem;
+      padding-bottom: 1rem;
+    }
+
+    .site-folio-card-slot {
+      padding-left: var(--site-gutter);
+      padding-right: var(--site-gutter);
+    }
+
+    .site-folio-card {
+      border-radius: 1.25rem;
     }
 
     .site-folio-overlay {
@@ -3778,9 +3900,45 @@
       font-size: clamp(1.65rem, 3.5vw, 3.25rem);
     }
 
+    .site-folio-desc {
+      margin-top: 0.85rem;
+      font-size: 0.95rem;
+      max-width: 42ch;
+    }
+
+    .site-folio-summary {
+      display: block;
+      margin-top: 0.5rem;
+      max-width: 40ch;
+      font-size: 0.875rem;
+      line-height: 1.55;
+      color: rgba(255, 255, 255, 0.45);
+      transform: translateY(0.5rem);
+      opacity: 0;
+      transition:
+        opacity 0.5s var(--ease-out-expo),
+        transform 0.5s var(--ease-out-expo);
+    }
+
+    .group:hover .site-folio-summary {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
     .site-folio-arrow {
       width: 3rem;
       height: 3rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .site-folio-card-slot {
+      padding-left: max(1.5rem, var(--site-gutter));
+      padding-right: max(1.5rem, var(--site-gutter));
+    }
+
+    .site-folio-media {
+      aspect-ratio: 21 / 10;
     }
   }
 

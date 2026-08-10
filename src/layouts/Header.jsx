@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Download } from "lucide-react";
 import BrandLogo from "../components/ui/BrandLogo";
 import { observeHeaderTone } from "../utils/surfaceTone";
 
@@ -11,6 +11,9 @@ const navLinks = [
   { to: "/careers", label: "Careers" },
   { to: "/contact", label: "Contact" },
 ];
+
+const BROCHURE_HREF = "/nuam-brochure.pdf";
+const BROCHURE_NAME = "Nuam-Technologies-Brochure.pdf";
 
 const Header = () => {
   const { pathname } = useLocation();
@@ -158,6 +161,21 @@ const Header = () => {
             </nav>
 
             <div className="relative z-50 flex items-center gap-2 sm:gap-3">
+              <a
+                href={BROCHURE_HREF}
+                download={BROCHURE_NAME}
+                className={`site-header-brochure group hidden items-center gap-2 rounded-full pl-3.5 pr-1.5 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.14em] transition-all duration-300 lg:inline-flex ${
+                  lightNav
+                    ? "bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_0_0_1px_rgba(255,255,255,0.12),0_8px_24px_rgba(107,138,255,0.35)] hover:brightness-110"
+                    : "bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_8px_22px_rgba(107,138,255,0.28)] hover:brightness-110"
+                }`}
+              >
+                Brochure
+                <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20 transition-transform duration-500 ease-expo group-hover:translate-y-0.5">
+                  <Download size={13} strokeWidth={2.5} />
+                </span>
+              </a>
+
               <Link
                 to="/contact"
                 className={`group hidden items-center gap-2 text-[0.7rem] font-semibold uppercase tracking-[0.16em] transition-colors duration-300 lg:inline-flex ${
@@ -178,7 +196,7 @@ const Header = () => {
                 <span
                   className={`inline-flex h-8 w-8 items-center justify-center rounded-full transition-all duration-500 ease-expo group-hover:translate-x-0.5 ${
                     lightNav
-                      ? "bg-[var(--accent)] text-[var(--accent-ink)]"
+                      ? "bg-white text-[var(--ink)]"
                       : "bg-ink text-white group-hover:bg-[var(--accent)] group-hover:text-[var(--accent-ink)]"
                   }`}
                 >
@@ -239,9 +257,19 @@ const Header = () => {
           </nav>
 
           <div className="site-mobile-nav-cta mt-6 flex flex-col gap-4 sm:mt-8 sm:gap-5">
+            <a
+              href={BROCHURE_HREF}
+              download={BROCHURE_NAME}
+              className="btn-accent w-full"
+              onClick={() => setOpen(false)}
+              tabIndex={open ? 0 : -1}
+            >
+              Download brochure
+              <Download size={16} strokeWidth={2.25} />
+            </a>
             <Link
               to="/contact"
-              className="btn-accent w-full"
+              className="inline-flex w-full items-center justify-center gap-2 border border-white/20 px-5 py-3.5 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:border-white/45"
               onClick={() => setOpen(false)}
               tabIndex={open ? 0 : -1}
             >

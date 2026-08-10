@@ -1,52 +1,63 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Reveal from "../ui/Reveal";
 import { portfolioFilters, portfolioWorks } from "../../data/portfolio";
 import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
-const WorkCard = ({ work, index, simplify, reduceMotion, ease }) => {
+/** Shared pin line under the fixed header — every card sticks here */
+const STICKY_TOP = "calc(var(--nav-height) + 0.75rem)";
+
+/**
+ * Same deck curve as SelectedWorks (keeps cover feel identical).
+ * Longer archives only damp early gaps — end taper unchanged — so Lenis doesn’t hang.
+ */
+const coverGap = (index, total, simplify) => {
+  if (index >= total - 1) return 0;
+  const fromEnd = total - 1 - index;
+
+  if (simplify) {
+    if (fromEnd === 1) return 4;
+    if (fromEnd === 2) return 5;
+    const base = Math.max(6, 10 - index);
+    return total > 6 ? Math.max(6, Math.round(base * 0.85)) : base;
+  }
+
+  if (fromEnd === 1) return 5;
+  if (fromEnd === 2) return 7;
+  if (fromEnd === 3) return 9;
+  const base = Math.max(8, 16 - index * 2);
+  return total > 6 ? Math.max(8, Math.round(base * 0.72)) : base;
+};
+
+const WorkCardShell = ({
+  work,
+  index,
+  scaleStyle,
+  overlayOpacity,
+  showOverlay,
+}) => {
   const number = String(index + 1).padStart(2, "0");
 
   return (
-    <motion.div
-      layout={!simplify}
-      initial={reduceMotion ? false : { opacity: 0, y: simplify ? 12 : 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={reduceMotion ? undefined : { opacity: 0, y: simplify ? 8 : 16 }}
-      transition={{ duration: simplify ? 0.35 : 0.5, ease }}
-    >
+    <motion.div style={scaleStyle} className="origin-center">
       <Link
         to="/contact"
         className="group relative block outline-none"
         aria-label={`${work.client} — ${work.industry}`}
       >
-        <article className="relative overflow-hidden bg-ink">
-          <div className="site-folio-card w-full">
-            <motion.div
-              className="absolute inset-0"
-              initial={
-                reduceMotion
-                  ? false
-                  : simplify
-                    ? { opacity: 0 }
-                    : { scale: 1.1 }
-              }
-              whileInView={simplify ? { opacity: 1 } : { scale: 1 }}
-              viewport={{ once: true, amount: 0.25 }}
-              transition={{ duration: simplify ? 0.4 : 1.2, ease }}
-            >
-              <img
-                src={work.image}
-                alt=""
-                aria-hidden
-                className="h-full w-full object-cover transition-transform duration-[1.4s] ease-expo md:group-hover:scale-[1.05]"
-                loading="lazy"
-                decoding="async"
-                sizes="100vw"
-              />
-            </motion.div>
+        <article className="site-folio-card relative">
+          <div className="site-folio-media">
+            <img
+              src={work.image}
+              alt=""
+              aria-hidden
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.4s] ease-expo md:group-hover:scale-[1.04]"
+              loading={index < 2 ? "eager" : "lazy"}
+              decoding="async"
+              sizes="100vw"
+            />
 
             <div
               className="pointer-events-none absolute inset-0"
@@ -57,12 +68,20 @@ const WorkCard = ({ work, index, simplify, reduceMotion, ease }) => {
             />
             <div className="pointer-events-none absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/25" />
             <div className="noise-overlay pointer-events-none absolute inset-0 opacity-20" />
+
+            {showOverlay && (
+              <motion.div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 bg-black"
+                style={{ opacity: overlayOpacity }}
+              />
+            )}
           </div>
 
-          <div className="site-folio-overlay absolute inset-0 flex flex-col justify-between">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <span className="font-display text-sm font-semibold tracking-[0.2em] text-white/45">
+          <div className="site-folio-overlay">
+            <div className="flex items-start justify-between gap-3 sm:gap-4">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <span className="font-display text-xs font-semibold tracking-[0.2em] text-white/45 sm:text-sm md:text-base">
                   {number}
                 </span>
                 <span className="text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-white/40">
@@ -74,19 +93,15 @@ const WorkCard = ({ work, index, simplify, reduceMotion, ease }) => {
               </span>
             </div>
 
-            <div className="flex items-end justify-between gap-6">
+            <div className="flex items-end justify-between gap-4 sm:gap-6">
               <div className="min-w-0 max-w-3xl">
                 <h3 className="site-folio-client font-display text-white transition-transform duration-500 ease-expo group-hover:-translate-y-1">
                   {work.client}
                 </h3>
-                <div className="mt-3 h-px w-0 bg-[var(--accent)] transition-all duration-500 ease-expo group-hover:w-16" />
-                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/70 md:text-base">
-                  {work.title}
-                </p>
-                <p className="mt-2 hidden max-w-xl text-sm text-white/45 md:block md:translate-y-2 md:opacity-0 md:transition-all md:duration-500 md:ease-expo md:group-hover:translate-y-0 md:group-hover:opacity-100">
-                  {work.summary}
-                </p>
-                <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1">
+                <div className="mt-2 h-px w-0 bg-[var(--accent)] transition-all duration-500 ease-expo group-hover:w-16 sm:mt-3" />
+                <p className="site-folio-desc">{work.title}</p>
+                <p className="site-folio-summary">{work.summary}</p>
+                <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 sm:mt-4">
                   {work.services.map((s) => (
                     <li
                       key={s}
@@ -100,7 +115,7 @@ const WorkCard = ({ work, index, simplify, reduceMotion, ease }) => {
 
               <span className="site-folio-arrow relative flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/25 text-white transition-all duration-500 ease-expo group-hover:border-[var(--accent)] group-hover:bg-[var(--accent)] group-hover:text-[var(--accent-ink)]">
                 <ArrowUpRight
-                  size={20}
+                  size={18}
                   className="transition-transform duration-500 ease-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                 />
               </span>
@@ -114,9 +129,90 @@ const WorkCard = ({ work, index, simplify, reduceMotion, ease }) => {
   );
 };
 
+const CardSlot = ({ children, isLast, index, gap, cardRef }) => (
+  <>
+    <div
+      ref={cardRef}
+      className={`site-folio-card-slot ${isLast ? "relative" : "sticky"}`}
+      style={{
+        top: isLast ? undefined : STICKY_TOP,
+        zIndex: index + 1,
+      }}
+    >
+      {children}
+    </div>
+    {gap > 0 && (
+      <div
+        aria-hidden
+        className="pointer-events-none"
+        style={{ height: `${gap}vh` }}
+      />
+    )}
+  </>
+);
+
+/** Sticky slot without scroll scrub — no useScroll cost */
+const WorkCardPlain = ({ work, index, total, simplify }) => {
+  const isLast = index === total - 1;
+  const gap = coverGap(index, total, !!simplify);
+
+  return (
+    <CardSlot isLast={isLast} index={index} gap={gap}>
+      <WorkCardShell work={work} index={index} />
+    </CardSlot>
+  );
+};
+
+/** Desktop scrub only while a later card is covering this one */
+const WorkCardTracked = ({ work, index, total }) => {
+  const cardRef = useRef(null);
+  const gap = coverGap(index, total, false);
+
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start start", "end start"],
+  });
+
+  const scale = useTransform(scrollYProgress, [0, 0.35, 1], [1, 1, 0.97]);
+  const overlayOpacity = useTransform(
+    scrollYProgress,
+    [0, 0.35, 1],
+    [0, 0, 0.22],
+  );
+
+  return (
+    <CardSlot isLast={false} index={index} gap={gap} cardRef={cardRef}>
+      <WorkCardShell
+        work={work}
+        index={index}
+        scaleStyle={{ scale }}
+        overlayOpacity={overlayOpacity}
+        showOverlay
+      />
+    </CardSlot>
+  );
+};
+
+const WorkCard = ({ work, index, total }) => {
+  const { simplify, reduceMotion } = useSimplifyMotion();
+  const trackScroll = !simplify && !reduceMotion && index < total - 2;
+
+  if (trackScroll) {
+    return <WorkCardTracked work={work} index={index} total={total} />;
+  }
+
+  return (
+    <WorkCardPlain
+      work={work}
+      index={index}
+      total={total}
+      simplify={simplify || reduceMotion}
+    />
+  );
+};
+
 const PortfolioGrid = () => {
   const [filter, setFilter] = useState("All");
-  const { simplify, reduceMotion, ease } = useSimplifyMotion();
 
   const filtered = useMemo(() => {
     if (filter === "All") return portfolioWorks;
@@ -125,10 +221,10 @@ const PortfolioGrid = () => {
 
   return (
     <section className="site-folio section-surface">
-      <div className="section-padding pb-8 md:pb-10">
+      <div className="site-folio-intro">
         <div className="container-custom">
           <Reveal>
-            <div className="mb-10 flex flex-col gap-8 border-b border-[var(--border-subtle)] pb-10 md:mb-12 md:flex-row md:items-end md:justify-between md:pb-12">
+            <div className="mb-8 flex flex-col gap-6 border-b border-[var(--border-subtle)] pb-8 md:mb-10 md:flex-row md:items-end md:justify-between md:pb-10">
               <div>
                 <p className="label-premium mb-4">Case studies</p>
                 <h2 className="site-folio-title font-display">
@@ -139,7 +235,7 @@ const PortfolioGrid = () => {
                 </h2>
               </div>
               <p className="max-w-xs text-sm leading-relaxed text-[var(--text-secondary)] md:text-right">
-                Filter by industry. Hover a case for the fuller story.
+                Filter by industry. Scroll the stack — each case covers the last.
               </p>
             </div>
           </Reveal>
@@ -174,19 +270,15 @@ const PortfolioGrid = () => {
         </div>
       </div>
 
-      <div className="site-folio-deck">
-        <AnimatePresence mode={simplify ? "sync" : "popLayout"}>
-          {filtered.map((work, index) => (
-            <WorkCard
-              key={work.id}
-              work={work}
-              index={index}
-              simplify={simplify}
-              reduceMotion={reduceMotion}
-              ease={ease}
-            />
-          ))}
-        </AnimatePresence>
+      <div className="site-folio-deck" key={filter}>
+        {filtered.map((work, index) => (
+          <WorkCard
+            key={work.id}
+            work={work}
+            index={index}
+            total={filtered.length}
+          />
+        ))}
       </div>
     </section>
   );

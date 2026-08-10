@@ -31,11 +31,11 @@ const socialLinks = [
     href: "https://www.linkedin.com/",
     icon: Linkedin,
   },
-  {
-    label: "YouTube",
-    href: "https://www.youtube.com/",
-    icon: Youtube,
-  },
+  // {
+  //   label: "YouTube",
+  //   href: "https://www.youtube.com/",
+  //   icon: Youtube,
+  // },
   {
     label: "Instagram",
     href: "https://www.instagram.com/",
@@ -46,16 +46,16 @@ const socialLinks = [
     href: "https://www.facebook.com/",
     icon: Facebook,
   },
-  {
-    label: "Dribbble",
-    href: "https://dribbble.com/",
-    icon: Dribbble,
-  },
-  {
-    label: "Behance",
-    href: "https://www.behance.net/",
-    icon: "behance",
-  },
+  // {
+  //   label: "Dribbble",
+  //   href: "https://dribbble.com/",
+  //   icon: Dribbble,
+  // },
+  // {
+  //   label: "Behance",
+  //   href: "https://www.behance.net/",
+  //   icon: "behance",
+  // },
   {
     label: "X",
     href: "https://x.com/",

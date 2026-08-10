@@ -1,12 +1,170 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+import { useRef } from "react";
 import { ArrowUpRight } from "lucide-react";
 import Reveal from "../ui/Reveal";
 import { serviceOfferings } from "../../data/services";
 import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
+/** Soft cinematic open — decelerates into rest */
+const openEase = [0.16, 1, 0.3, 1];
+
+const ServiceMedia = ({ service, number, reverse }) => {
+  const { reduceMotion, simplify } = useSimplifyMotion();
+  const frameRef = useRef(null);
+  const inView = useInView(frameRef, {
+    amount: simplify ? 0.28 : 0.4,
+    once: true,
+    margin: "0px 0px -6% 0px",
+  });
+
+  const open = reduceMotion || inView;
+  const doorDuration = simplify ? 0.7 : 1.15;
+  const imgDuration = simplify ? 0.85 : 1.45;
+
+  return (
+    <div
+      className={`lg:col-span-6 ${reverse ? "lg:order-2" : "lg:order-1"}`}
+    >
+      <div
+        ref={frameRef}
+        className="relative overflow-hidden rounded-2xl bg-ink shadow-[0_24px_60px_rgba(0,0,0,0.12)]"
+      >
+        <div className="relative aspect-[4/3] overflow-hidden md:aspect-[16/11]">
+          <div className="h-full w-full overflow-hidden transition-transform duration-[1.2s] ease-expo will-change-transform group-hover/row:scale-[1.03]">
+            <motion.img
+              src={service.image}
+              alt=""
+              aria-hidden
+              className="site-svc-media-img h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              initial={
+                reduceMotion
+                  ? false
+                  : {
+                      scale: simplify ? 1.08 : 1.14,
+                      opacity: 0.55,
+                      filter: simplify ? "blur(2px)" : "blur(6px)",
+                    }
+              }
+              animate={
+                open
+                  ? {
+                      scale: 1.04,
+                      opacity: 1,
+                      filter: "blur(0px)",
+                    }
+                  : undefined
+              }
+              transition={{
+                duration: imgDuration,
+                ease: openEase,
+              }}
+            />
+          </div>
+
+          <motion.div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-[5] bg-gradient-to-tr from-ink/55 via-transparent to-[var(--accent)]/10"
+            initial={false}
+            animate={{ opacity: 1 }}
+          />
+          <div className="noise-overlay pointer-events-none absolute inset-0 z-[6] opacity-25" />
+
+          {/* Center accent flash as doors part */}
+          {!reduceMotion && (
+            <motion.span
+              aria-hidden
+              className="site-svc-door-seam pointer-events-none absolute inset-y-0 left-1/2 z-[25] w-px -translate-x-1/2"
+              initial={{ opacity: 0.85, scaleY: 0.45 }}
+              animate={
+                open
+                  ? { opacity: [0.9, 0.35, 0], scaleY: [0.45, 1, 1] }
+                  : undefined
+              }
+              transition={{
+                duration: doorDuration * 0.85,
+                ease: openEase,
+                times: [0, 0.35, 1],
+              }}
+            />
+          )}
+
+          {/* Dual doors — open once on enter */}
+          {!reduceMotion && (
+            <>
+              <motion.div
+                aria-hidden
+                className="site-svc-door site-svc-door-left pointer-events-none absolute inset-y-0 left-0 z-20 w-[52%]"
+                initial={{ x: "0%" }}
+                animate={open ? { x: "-101%" } : undefined}
+                transition={{
+                  duration: doorDuration,
+                  ease: openEase,
+                }}
+              >
+                <span className="site-svc-door-edge site-svc-door-edge-left" />
+              </motion.div>
+              <motion.div
+                aria-hidden
+                className="site-svc-door site-svc-door-right pointer-events-none absolute inset-y-0 right-0 z-20 w-[52%]"
+                initial={{ x: "0%" }}
+                animate={open ? { x: "101%" } : undefined}
+                transition={{
+                  duration: doorDuration,
+                  ease: openEase,
+                  delay: simplify ? 0.05 : 0.09,
+                }}
+              >
+                <span className="site-svc-door-edge site-svc-door-edge-right" />
+              </motion.div>
+            </>
+          )}
+
+          {/* Corners */}
+          <span className="pointer-events-none absolute left-4 top-4 z-30 h-7 w-7 border-l border-t border-white/30" />
+          <span className="pointer-events-none absolute right-4 top-4 z-30 h-7 w-7 border-r border-t border-white/30" />
+          <span className="pointer-events-none absolute bottom-4 left-4 z-30 h-7 w-7 border-b border-l border-white/30" />
+          <span className="pointer-events-none absolute bottom-4 right-4 z-30 h-7 w-7 border-b border-r border-white/30" />
+
+          <motion.div
+            className="absolute left-5 top-5 z-30 flex items-center gap-3 md:left-6 md:top-6"
+            initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+            animate={open ? { opacity: 1, y: 0 } : undefined}
+            transition={{
+              duration: simplify ? 0.4 : 0.65,
+              ease: openEase,
+              delay: open ? doorDuration * 0.35 : 0,
+            }}
+          >
+            <span className="font-display text-sm font-bold tracking-[0.2em] text-white/80">
+              {number}
+            </span>
+            <span className="h-px w-8 bg-[var(--accent)]" />
+          </motion.div>
+
+          <motion.span
+            aria-hidden
+            className="site-svc-ghost z-10 select-none"
+            initial={reduceMotion ? false : { opacity: 0, scale: 0.92 }}
+            animate={open ? { opacity: 1, scale: 1 } : undefined}
+            transition={{
+              duration: simplify ? 0.45 : 0.75,
+              ease: openEase,
+              delay: open ? doorDuration * 0.25 : 0,
+            }}
+          >
+            {number}
+          </motion.span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ServiceRow = ({ service, index }) => {
-  const { reduceMotion, simplify, kenBurns, ease } = useSimplifyMotion();
   const number = String(index + 1).padStart(2, "0");
   const reverse = index % 2 === 1;
 
@@ -17,54 +175,11 @@ const ServiceRow = ({ service, index }) => {
         className="site-svc-row group/row scroll-mt-28 border-t border-[var(--border-subtle)]"
       >
         <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-16">
-          {/* Media */}
-          <div
-            className={`lg:col-span-6 ${reverse ? "lg:order-2" : "lg:order-1"}`}
-          >
-            <div className="relative overflow-hidden rounded-2xl bg-ink shadow-[0_24px_60px_rgba(0,0,0,0.12)]">
-              <div className="relative aspect-[4/3] md:aspect-[16/11]">
-                <motion.img
-                  src={service.image}
-                  alt=""
-                  aria-hidden
-                  className="site-svc-media-img h-full w-full object-cover transition-transform duration-[1.2s] ease-expo group-hover/row:scale-[1.05]"
-                  loading="lazy"
-                  decoding="async"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  initial={
-                    kenBurns
-                      ? { opacity: 0, scale: simplify ? 1 : kenBurns.from }
-                      : false
-                  }
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true, amount: simplify ? 0.2 : 0.35 }}
-                  transition={{
-                    duration: simplify ? 0.45 : 1.15,
-                    ease,
-                  }}
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-ink/55 via-transparent to-[var(--accent)]/10" />
-                <div className="noise-overlay pointer-events-none absolute inset-0 opacity-25" />
-
-                {/* Corners */}
-                <span className="pointer-events-none absolute left-4 top-4 h-7 w-7 border-l border-t border-white/30" />
-                <span className="pointer-events-none absolute right-4 top-4 h-7 w-7 border-r border-t border-white/30" />
-                <span className="pointer-events-none absolute bottom-4 left-4 h-7 w-7 border-b border-l border-white/30" />
-                <span className="pointer-events-none absolute bottom-4 right-4 h-7 w-7 border-b border-r border-white/30" />
-
-                <div className="absolute left-5 top-5 flex items-center gap-3 md:left-6 md:top-6">
-                  <span className="font-display text-sm font-bold tracking-[0.2em] text-white/80">
-                    {number}
-                  </span>
-                  <span className="h-px w-8 bg-[var(--accent)]" />
-                </div>
-
-                <span aria-hidden className="site-svc-ghost select-none">
-                  {number}
-                </span>
-              </div>
-            </div>
-          </div>
+          <ServiceMedia
+            service={service}
+            number={number}
+            reverse={reverse}
+          />
 
           {/* Copy */}
           <div
