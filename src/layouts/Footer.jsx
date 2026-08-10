@@ -14,7 +14,7 @@ const companyLinks = [
   { to: "/about", label: "About" },
   { to: "/services", label: "Services" },
   { to: "/portfolio", label: "Works" },
-  { to: "/brochure", label: "Brochure" },
+  { action: "brochure", label: "Brochure" },
   { to: "/careers", label: "Careers" },
   { to: "/contact", label: "Contact" },
 ];
@@ -114,17 +114,32 @@ const SocialIcon = ({ item }) => {
   );
 };
 
-const FooterLink = ({ to, label }) => (
+const linkClass =
+  "group inline-flex min-h-11 items-center gap-2 py-1 text-[0.9rem] text-white/55 transition-colors duration-300 hover:text-white sm:min-h-0 sm:text-[0.95rem]";
+
+const FooterLink = ({ to, label, action }) => (
   <li>
-    <Link
-      to={to}
-      className="group inline-flex min-h-11 items-center gap-2 py-1 text-[0.9rem] text-white/55 transition-colors duration-300 hover:text-white sm:min-h-0 sm:text-[0.95rem]"
-    >
-      <span className="relative">
-        {label}
-        <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-[var(--accent)] transition-all duration-500 ease-expo group-hover:w-full" />
-      </span>
-    </Link>
+    {action === "brochure" ? (
+      <button
+        type="button"
+        className={linkClass}
+        onClick={() =>
+          window.dispatchEvent(new CustomEvent("nuam:open-brochure"))
+        }
+      >
+        <span className="relative">
+          {label}
+          <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-[var(--accent)] transition-all duration-500 ease-expo group-hover:w-full" />
+        </span>
+      </button>
+    ) : (
+      <Link to={to} className={linkClass}>
+        <span className="relative">
+          {label}
+          <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-[var(--accent)] transition-all duration-500 ease-expo group-hover:w-full" />
+        </span>
+      </Link>
+    )}
   </li>
 );
 

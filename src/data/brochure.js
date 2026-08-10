@@ -9,7 +9,7 @@ export const brochureMeta = {
   phoneHref: "tel:+918089623759",
   web: "www.nuamtechnologies.com",
   webHref: "https://www.nuamtechnologies.com",
-  pdfHref: "/Nuam-Brochure.pdf",
+  pdfHref: "/nuam-brochure.pdf",
   pdfName: "Nuam-Brochure.pdf",
   company: "Nuam Technologies Pvt Ltd",
   legalStatus: "Active",

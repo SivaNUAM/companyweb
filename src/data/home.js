@@ -104,7 +104,7 @@ export const works = [
   //   industry: "Education",
   //   title: "A digital campus rebuilt for students, faculty, and operations.",
   //   image:
-  //     "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1800&q=80",
+  //     "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1800&q=80",
   // },
   // {
   //   id: "harbor",
@@ -185,6 +185,30 @@ export const services = [
       "Strategy and execution for organizations ready to modernize with confidence.",
     image: growthImg,
   },
+];
+
+export const technologiesSection = {
+  label: "Stack",
+  title: ["Technologies", "we ship with."],
+  support:
+    "Modern frameworks, cloud, and AI tooling — chosen for reliability, not novelty.",
+};
+
+export const technologies = [
+  { id: "react", name: "React", group: "Frontend" },
+  { id: "typescript", name: "TypeScript", group: "Language" },
+  { id: "nodejs", name: "Node.js", group: "Runtime" },
+  { id: "python", name: "Python", group: "Language" },
+  { id: "nextjs", name: "Next.js", group: "Framework" },
+  { id: "flutter", name: "Flutter", group: "Mobile" },
+  { id: "aws", name: "AWS", group: "Cloud" },
+  { id: "docker", name: "Docker", group: "DevOps" },
+  { id: "kubernetes", name: "Kubernetes", group: "DevOps" },
+  { id: "postgres", name: "PostgreSQL", group: "Data" },
+  { id: "mongodb", name: "MongoDB", group: "Data" },
+  { id: "tailwind", name: "Tailwind", group: "UI" },
+  { id: "figma", name: "Figma", group: "Design" },
+  { id: "openai", name: "OpenAI", group: "AI" },
 ];
 
 export const clientsSection = {
@@ -272,7 +296,7 @@ export const industries = [
     name: "Education",
     detail: "Digital campuses for students, faculty, and operations alike.",
     image:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1600&q=80",
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1600&q=80",
   },
   {
     id: "enterprise",

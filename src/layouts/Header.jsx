@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { ArrowUpRight, BookOpen } from "lucide-react";
 import BrandLogo from "../components/ui/BrandLogo";
+import BrochurePdfModal, {
+  downloadBrochurePdf,
+} from "../components/brochure/BrochurePdfModal";
 import { observeHeaderTone } from "../utils/surfaceTone";
 
 const navLinks = [
@@ -13,17 +16,26 @@ const navLinks = [
   { to: "/contact", label: "Contact" },
 ];
 
-const desktopNavLinks = navLinks;
-const mobileNavLinks = navLinks.filter((link) => link.to !== "/brochure");
-
 const Header = () => {
   const { pathname } = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [onDark, setOnDark] = useState(false);
+  const [brochureOpen, setBrochureOpen] = useState(false);
+
+  const confirmBrochure = useCallback(() => {
+    downloadBrochurePdf();
+    setBrochureOpen(false);
+  }, []);
 
   const lightNav = open || onDark;
   const solid = scrolled && !open && !onDark;
+
+  useEffect(() => {
+    const onOpen = () => setBrochureOpen(true);
+    window.addEventListener("nuam:open-brochure", onOpen);
+    return () => window.removeEventListener("nuam:open-brochure", onOpen);
+  }, []);
 
   useEffect(() => {
     let raf = 0;
@@ -73,13 +85,14 @@ const Header = () => {
   }, [pathname]);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    const lock = open || brochureOpen;
+    document.body.style.overflow = lock ? "hidden" : "";
     document.documentElement.classList.toggle("mobile-nav-open", open);
     return () => {
       document.body.style.overflow = "";
       document.documentElement.classList.remove("mobile-nav-open");
     };
-  }, [open]);
+  }, [open, brochureOpen]);
 
   useEffect(() => {
     return () => {
@@ -124,7 +137,7 @@ const Header = () => {
               className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-0.5 lg:flex xl:gap-1"
               aria-label="Primary"
             >
-              {desktopNavLinks.map((link) => (
+              {navLinks.map((link) => (
                 <NavLink
                   key={link.to}
                   to={link.to}
@@ -159,19 +172,25 @@ const Header = () => {
             </nav>
 
             <div className="relative z-50 flex items-center gap-2 sm:gap-3">
-              <Link
-                to="/brochure"
+              <button
+                type="button"
                 className={`site-header-brochure group inline-flex items-center gap-2 rounded-full pl-3 pr-1.5 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.14em] transition-all duration-300 sm:pl-3.5 sm:text-[0.68rem] ${
                   lightNav
                     ? "bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_0_0_1px_rgba(255,255,255,0.12),0_8px_24px_rgba(107,138,255,0.35)] hover:brightness-110"
                     : "bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_8px_22px_rgba(107,138,255,0.28)] hover:brightness-110"
                 }`}
+                onClick={() => {
+                  setOpen(false);
+                  setBrochureOpen(true);
+                }}
+                aria-haspopup="dialog"
+                aria-expanded={brochureOpen}
               >
                 Brochure
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20 transition-transform duration-500 ease-expo group-hover:translate-y-0.5">
                   <BookOpen size={13} strokeWidth={2.5} />
                 </span>
-              </Link>
+              </button>
 
               <Link
                 to="/contact"
@@ -229,7 +248,7 @@ const Header = () => {
           <p className="label-premium mb-5 !text-white/30 sm:mb-8">Menu</p>
 
           <nav className="flex flex-1 flex-col" aria-label="Mobile">
-            {mobileNavLinks.map((link, i) => (
+            {navLinks.map((link, i) => (
               <NavLink
                 key={link.to}
                 to={link.to}
@@ -272,6 +291,12 @@ const Header = () => {
           </div>
         </div>
       </div>
+
+      <BrochurePdfModal
+        open={brochureOpen}
+        onClose={() => setBrochureOpen(false)}
+        onConfirm={confirmBrochure}
+      />
     </>
   );
 };

@@ -77,7 +77,7 @@ export const portfolioWorks = [
       "Information architecture and visual identity refreshed for a world-class institution online.",
     services: ["Experience Design", "Brand Systems"],
     image:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=2000&q=85",
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=2000&q=85",
   },
   // {
   //   id: "harbor",
