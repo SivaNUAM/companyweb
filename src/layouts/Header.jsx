@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { ArrowUpRight, Download } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight, Download, FileText, X } from "lucide-react";
 import BrandLogo from "../components/ui/BrandLogo";
 import { observeHeaderTone } from "../utils/surfaceTone";
 
@@ -12,17 +13,146 @@ const navLinks = [
   { to: "/contact", label: "Contact" },
 ];
 
-const BROCHURE_HREF = "/nuam-brochure.pdf";
-const BROCHURE_NAME = "Nuam-Technologies-Brochure.pdf";
+const BROCHURE_HREF = "/Nuam-Brochure.pdf";
+const BROCHURE_NAME = "Nuam-Brochure.pdf";
+const ease = [0.16, 1, 0.3, 1];
+
+const BrochureModal = ({ open, onClose, onConfirm }) => {
+  const titleId = useId();
+  const descId = useId();
+  const confirmRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    const onKey = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    const t = window.setTimeout(() => confirmRef.current?.focus(), 40);
+
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.clearTimeout(t);
+    };
+  }, [open, onClose]);
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="site-brochure-modal"
+          role="presentation"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.28, ease }}
+        >
+          <button
+            type="button"
+            className="site-brochure-modal-backdrop"
+            aria-label="Close brochure dialog"
+            onClick={onClose}
+          />
+
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={titleId}
+            aria-describedby={descId}
+            className="site-brochure-modal-panel"
+            initial={{ opacity: 0, y: 18, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 12, scale: 0.97 }}
+            transition={{ duration: 0.38, ease }}
+          >
+            <div className="noise-overlay pointer-events-none absolute inset-0 opacity-20" />
+            <div className="site-brochure-modal-glow" aria-hidden />
+
+            <button
+              type="button"
+              className="site-brochure-modal-close"
+              onClick={onClose}
+              aria-label="Cancel"
+            >
+              <X size={16} strokeWidth={2.25} />
+            </button>
+
+            <div className="relative z-10">
+              <div className="site-brochure-modal-icon" aria-hidden>
+                <FileText size={22} strokeWidth={2} />
+              </div>
+
+              <p className="label-premium mb-3 !text-[var(--text-muted)]">
+                Company brochure
+              </p>
+              <h2 id={titleId} className="site-brochure-modal-title font-display">
+                Download Nuam brochure?
+              </h2>
+              <p id={descId} className="site-brochure-modal-copy">
+                Get our company profile PDF — services, approach, and how we
+                partner with corporate teams.
+              </p>
+
+              <div className="site-brochure-modal-meta">
+                <span>PDF · 11 pages</span>
+                <span aria-hidden>·</span>
+                <span>{BROCHURE_NAME}</span>
+              </div>
+
+              <div className="site-brochure-modal-actions">
+                <button
+                  type="button"
+                  className="site-brochure-modal-cancel"
+                  onClick={onClose}
+                >
+                  Not now
+                </button>
+                <button
+                  ref={confirmRef}
+                  type="button"
+                  className="btn-accent site-brochure-modal-confirm"
+                  onClick={onConfirm}
+                >
+                  Download
+                  <Download size={15} strokeWidth={2.25} />
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 const Header = () => {
   const { pathname } = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [onDark, setOnDark] = useState(false);
+  const [brochureOpen, setBrochureOpen] = useState(false);
 
   const lightNav = open || onDark;
   const solid = scrolled && !open && !onDark;
+
+  const openBrochure = () => {
+    setOpen(false);
+    setBrochureOpen(true);
+  };
+
+  const closeBrochure = () => setBrochureOpen(false);
+
+  const confirmBrochure = () => {
+    const a = document.createElement("a");
+    a.href = BROCHURE_HREF;
+    a.download = BROCHURE_NAME;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setBrochureOpen(false);
+  };
 
   // Scroll class only — no tone sampling on the scroll path
   useEffect(() => {
@@ -55,7 +185,6 @@ const Header = () => {
     let alive = true;
     let stop = () => {};
 
-    // Wait a frame so route content is in the DOM
     const id = requestAnimationFrame(() => {
       if (!alive) return;
       stop = observeHeaderTone((dark) => {
@@ -72,16 +201,18 @@ const Header = () => {
 
   useEffect(() => {
     setOpen(false);
+    setBrochureOpen(false);
   }, [pathname]);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    const lock = open || brochureOpen;
+    document.body.style.overflow = lock ? "hidden" : "";
     document.documentElement.classList.toggle("mobile-nav-open", open);
     return () => {
       document.body.style.overflow = "";
       document.documentElement.classList.remove("mobile-nav-open");
     };
-  }, [open]);
+  }, [open, brochureOpen]);
 
   useEffect(() => {
     return () => {
@@ -161,9 +292,9 @@ const Header = () => {
             </nav>
 
             <div className="relative z-50 flex items-center gap-2 sm:gap-3">
-              <a
-                href={BROCHURE_HREF}
-                download={BROCHURE_NAME}
+              <button
+                type="button"
+                onClick={openBrochure}
                 className={`site-header-brochure group hidden items-center gap-2 rounded-full pl-3.5 pr-1.5 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.14em] transition-all duration-300 lg:inline-flex ${
                   lightNav
                     ? "bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_0_0_1px_rgba(255,255,255,0.12),0_8px_24px_rgba(107,138,255,0.35)] hover:brightness-110"
@@ -174,7 +305,7 @@ const Header = () => {
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20 transition-transform duration-500 ease-expo group-hover:translate-y-0.5">
                   <Download size={13} strokeWidth={2.5} />
                 </span>
-              </a>
+              </button>
 
               <Link
                 to="/contact"
@@ -220,7 +351,6 @@ const Header = () => {
         </div>
       </header>
 
-      {/* CSS-only mobile menu — no Framer on the hot path */}
       <div
         id="mobile-navigation"
         data-mobile-nav
@@ -257,16 +387,15 @@ const Header = () => {
           </nav>
 
           <div className="site-mobile-nav-cta mt-6 flex flex-col gap-4 sm:mt-8 sm:gap-5">
-            <a
-              href={BROCHURE_HREF}
-              download={BROCHURE_NAME}
+            <button
+              type="button"
               className="btn-accent w-full"
-              onClick={() => setOpen(false)}
+              onClick={openBrochure}
               tabIndex={open ? 0 : -1}
             >
               Download brochure
               <Download size={16} strokeWidth={2.25} />
-            </a>
+            </button>
             <Link
               to="/contact"
               className="inline-flex w-full items-center justify-center gap-2 border border-white/20 px-5 py-3.5 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:border-white/45"
@@ -286,6 +415,12 @@ const Header = () => {
           </div>
         </div>
       </div>
+
+      <BrochureModal
+        open={brochureOpen}
+        onClose={closeBrochure}
+        onConfirm={confirmBrochure}
+      />
     </>
   );
 };
