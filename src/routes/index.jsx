@@ -7,6 +7,7 @@ import Services from "../pages/Services";
 import Portfolio from "../pages/Portfolio";
 import Careers from "../pages/Careers";
 import Contact from "../pages/Contact";
+import Brochure from "../pages/Brochure";
 import Privacy from "../pages/Privacy";
 import Terms from "../pages/Terms";
 import NotFound from "../pages/NotFound";
@@ -22,6 +23,7 @@ const AppRoutes = () => {
           <Route path="portfolio" element={<Portfolio />} />
           <Route path="careers" element={<Careers />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="brochure" element={<Brochure />} />
           <Route path="privacy" element={<Privacy />} />
           <Route path="terms" element={<Terms />} />
           <Route path="*" element={<NotFound />} />

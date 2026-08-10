@@ -98,22 +98,22 @@ export const works = [
     image:
       "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1800&q=80",
   },
-  {
-    id: "lumen",
-    client: "Lumen University",
-    industry: "Education",
-    title: "A digital campus rebuilt for students, faculty, and operations.",
-    image:
-      "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1800&q=80",
-  },
-  {
-    id: "harbor",
-    client: "Harbor Foods",
-    industry: "E-commerce",
-    title: "A branded commerce channel launched with precision and appetite.",
-    image:
-      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1800&q=80",
-  },
+  // {
+  //   id: "lumen",
+  //   client: "Lumen University",
+  //   industry: "Education",
+  //   title: "A digital campus rebuilt for students, faculty, and operations.",
+  //   image:
+  //     "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1800&q=80",
+  // },
+  // {
+  //   id: "harbor",
+  //   client: "Harbor Foods",
+  //   industry: "E-commerce",
+  //   title: "A branded commerce channel launched with precision and appetite.",
+  //   image:
+  //     "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1800&q=80",
+  // },
 ];
 
 export const impactSection = {

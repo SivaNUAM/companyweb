@@ -14,6 +14,7 @@ const companyLinks = [
   { to: "/about", label: "About" },
   { to: "/services", label: "Services" },
   { to: "/portfolio", label: "Works" },
+  { to: "/brochure", label: "Brochure" },
   { to: "/careers", label: "Careers" },
   { to: "/contact", label: "Contact" },
 ];

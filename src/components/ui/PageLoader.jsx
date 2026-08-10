@@ -9,6 +9,7 @@ const LABELS = {
   "/portfolio": "Works",
   "/careers": "Careers",
   "/contact": "Contact",
+  "/brochure": "Brochure",
   "/privacy": "Privacy",
   "/terms": "Terms",
 };

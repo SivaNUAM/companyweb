@@ -76,7 +76,7 @@ const AboutHero = () => {
             transition={{ duration: 0.9 * d, ease, delay: 0.35 * d }}
           />
 
-          <h1 className="site-phero-headline font-display">
+          <h1 className="site-phero-headline font-display font-bold">
             {words.map((word, i) => (
               <span
                 key={`${word}-${i}`}

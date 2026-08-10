@@ -79,18 +79,18 @@ export const portfolioWorks = [
     image:
       "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=2000&q=85",
   },
-  {
-    id: "harbor",
-    client: "Harbor Foods",
-    industry: "E-commerce",
-    year: "2026",
-    title: "Launching a branded commerce channel with precision and appetite.",
-    summary:
-      "A branded storefront and growth stack that opened a new sales channel without diluting the brand.",
-    services: ["Growth & Transformation", "Product Engineering"],
-    image:
-      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=2000&q=85",
-  },
+  // {
+  //   id: "harbor",
+  //   client: "Harbor Foods",
+  //   industry: "E-commerce",
+  //   year: "2026",
+  //   title: "Launching a branded commerce channel with precision and appetite.",
+  //   summary:
+  //     "A branded storefront and growth stack that opened a new sales channel without diluting the brand.",
+  //   services: ["Growth & Transformation", "Product Engineering"],
+  //   image:
+  //     "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=2000&q=85",
+  // },
   {
     id: "vertex",
     client: "Vertex Logistics",

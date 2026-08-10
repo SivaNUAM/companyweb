@@ -1,7 +1,6 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import { ArrowUpRight, Download, FileText, X } from "lucide-react";
+import { ArrowUpRight, BookOpen } from "lucide-react";
 import BrandLogo from "../components/ui/BrandLogo";
 import { observeHeaderTone } from "../utils/surfaceTone";
 
@@ -9,152 +8,23 @@ const navLinks = [
   { to: "/services", label: "Services" },
   { to: "/portfolio", label: "Works" },
   { to: "/about", label: "About" },
+  { to: "/brochure", label: "Brochure" },
   { to: "/careers", label: "Careers" },
   { to: "/contact", label: "Contact" },
 ];
 
-const BROCHURE_HREF = "/Nuam-Brochure.pdf";
-const BROCHURE_NAME = "Nuam-Brochure.pdf";
-const ease = [0.16, 1, 0.3, 1];
-
-const BrochureModal = ({ open, onClose, onConfirm }) => {
-  const titleId = useId();
-  const descId = useId();
-  const confirmRef = useRef(null);
-
-  useEffect(() => {
-    if (!open) return undefined;
-
-    const onKey = (e) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    const t = window.setTimeout(() => confirmRef.current?.focus(), 40);
-
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      window.clearTimeout(t);
-    };
-  }, [open, onClose]);
-
-  return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          className="site-brochure-modal"
-          role="presentation"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.28, ease }}
-        >
-          <button
-            type="button"
-            className="site-brochure-modal-backdrop"
-            aria-label="Close brochure dialog"
-            onClick={onClose}
-          />
-
-          <motion.div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={titleId}
-            aria-describedby={descId}
-            className="site-brochure-modal-panel"
-            initial={{ opacity: 0, y: 18, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 12, scale: 0.97 }}
-            transition={{ duration: 0.38, ease }}
-          >
-            <div className="noise-overlay pointer-events-none absolute inset-0 opacity-20" />
-            <div className="site-brochure-modal-glow" aria-hidden />
-
-            <button
-              type="button"
-              className="site-brochure-modal-close"
-              onClick={onClose}
-              aria-label="Cancel"
-            >
-              <X size={16} strokeWidth={2.25} />
-            </button>
-
-            <div className="relative z-10">
-              <div className="site-brochure-modal-icon" aria-hidden>
-                <FileText size={22} strokeWidth={2} />
-              </div>
-
-              <p className="label-premium mb-3 !text-[var(--text-muted)]">
-                Company brochure
-              </p>
-              <h2 id={titleId} className="site-brochure-modal-title font-display">
-                Download Nuam brochure?
-              </h2>
-              <p id={descId} className="site-brochure-modal-copy">
-                Get our company profile PDF — services, approach, and how we
-                partner with corporate teams.
-              </p>
-
-              <div className="site-brochure-modal-meta">
-                <span>PDF · 11 pages</span>
-                <span aria-hidden>·</span>
-                <span>{BROCHURE_NAME}</span>
-              </div>
-
-              <div className="site-brochure-modal-actions">
-                <button
-                  type="button"
-                  className="site-brochure-modal-cancel"
-                  onClick={onClose}
-                >
-                  Not now
-                </button>
-                <button
-                  ref={confirmRef}
-                  type="button"
-                  className="btn-accent site-brochure-modal-confirm"
-                  onClick={onConfirm}
-                >
-                  Download
-                  <Download size={15} strokeWidth={2.25} />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  );
-};
+const desktopNavLinks = navLinks;
+const mobileNavLinks = navLinks.filter((link) => link.to !== "/brochure");
 
 const Header = () => {
   const { pathname } = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [onDark, setOnDark] = useState(false);
-  const [brochureOpen, setBrochureOpen] = useState(false);
 
   const lightNav = open || onDark;
   const solid = scrolled && !open && !onDark;
 
-  const openBrochure = () => {
-    setOpen(false);
-    setBrochureOpen(true);
-  };
-
-  const closeBrochure = () => setBrochureOpen(false);
-
-  const confirmBrochure = () => {
-    const a = document.createElement("a");
-    a.href = BROCHURE_HREF;
-    a.download = BROCHURE_NAME;
-    a.rel = "noopener";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setBrochureOpen(false);
-  };
-
-  // Scroll class only — no tone sampling on the scroll path
   useEffect(() => {
     let raf = 0;
     let prev = window.scrollY > 24;
@@ -180,7 +50,6 @@ const Header = () => {
     };
   }, []);
 
-  // Cheap IO tone — rebinds on route so new sections are watched
   useEffect(() => {
     let alive = true;
     let stop = () => {};
@@ -201,18 +70,16 @@ const Header = () => {
 
   useEffect(() => {
     setOpen(false);
-    setBrochureOpen(false);
   }, [pathname]);
 
   useEffect(() => {
-    const lock = open || brochureOpen;
-    document.body.style.overflow = lock ? "hidden" : "";
+    document.body.style.overflow = open ? "hidden" : "";
     document.documentElement.classList.toggle("mobile-nav-open", open);
     return () => {
       document.body.style.overflow = "";
       document.documentElement.classList.remove("mobile-nav-open");
     };
-  }, [open, brochureOpen]);
+  }, [open]);
 
   useEffect(() => {
     return () => {
@@ -257,7 +124,7 @@ const Header = () => {
               className="absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 items-center gap-0.5 lg:flex xl:gap-1"
               aria-label="Primary"
             >
-              {navLinks.map((link) => (
+              {desktopNavLinks.map((link) => (
                 <NavLink
                   key={link.to}
                   to={link.to}
@@ -292,10 +159,9 @@ const Header = () => {
             </nav>
 
             <div className="relative z-50 flex items-center gap-2 sm:gap-3">
-              <button
-                type="button"
-                onClick={openBrochure}
-                className={`site-header-brochure group hidden items-center gap-2 rounded-full pl-3.5 pr-1.5 py-1.5 text-[0.68rem] font-bold uppercase tracking-[0.14em] transition-all duration-300 lg:inline-flex ${
+              <Link
+                to="/brochure"
+                className={`site-header-brochure group inline-flex items-center gap-2 rounded-full pl-3 pr-1.5 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.14em] transition-all duration-300 sm:pl-3.5 sm:text-[0.68rem] ${
                   lightNav
                     ? "bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_0_0_1px_rgba(255,255,255,0.12),0_8px_24px_rgba(107,138,255,0.35)] hover:brightness-110"
                     : "bg-[var(--accent)] text-[var(--accent-ink)] shadow-[0_8px_22px_rgba(107,138,255,0.28)] hover:brightness-110"
@@ -303,9 +169,9 @@ const Header = () => {
               >
                 Brochure
                 <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/20 transition-transform duration-500 ease-expo group-hover:translate-y-0.5">
-                  <Download size={13} strokeWidth={2.5} />
+                  <BookOpen size={13} strokeWidth={2.5} />
                 </span>
-              </button>
+              </Link>
 
               <Link
                 to="/contact"
@@ -363,7 +229,7 @@ const Header = () => {
           <p className="label-premium mb-5 !text-white/30 sm:mb-8">Menu</p>
 
           <nav className="flex flex-1 flex-col" aria-label="Mobile">
-            {navLinks.map((link, i) => (
+            {mobileNavLinks.map((link, i) => (
               <NavLink
                 key={link.to}
                 to={link.to}
@@ -387,15 +253,6 @@ const Header = () => {
           </nav>
 
           <div className="site-mobile-nav-cta mt-6 flex flex-col gap-4 sm:mt-8 sm:gap-5">
-            <button
-              type="button"
-              className="btn-accent w-full"
-              onClick={openBrochure}
-              tabIndex={open ? 0 : -1}
-            >
-              Download brochure
-              <Download size={16} strokeWidth={2.25} />
-            </button>
             <Link
               to="/contact"
               className="inline-flex w-full items-center justify-center gap-2 border border-white/20 px-5 py-3.5 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white transition-colors hover:border-white/45"
@@ -415,12 +272,6 @@ const Header = () => {
           </div>
         </div>
       </div>
-
-      <BrochureModal
-        open={brochureOpen}
-        onClose={closeBrochure}
-        onConfirm={confirmBrochure}
-      />
     </>
   );
 };

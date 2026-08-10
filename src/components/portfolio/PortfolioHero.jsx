@@ -53,7 +53,7 @@ const PortfolioHero = () => {
             transition={{ duration: 0.9, ease, delay: 0.2 }}
           />
 
-          <h1 className="site-phero-headline">
+          <h1 className="site-phero-headline font-display font-bold">
             {words.map((word, i) => (
               <span
                 key={`${word}-${i}`}
