@@ -28,14 +28,8 @@ const TechRow = ({ items, reverse = false, running, variant = "solid" }) => {
 
   return (
     <div className="site-tech-row">
-      <div
-        className="site-tech-fade is-left"
-        aria-hidden
-      />
-      <div
-        className="site-tech-fade is-right"
-        aria-hidden
-      />
+      <div className="site-tech-fade is-left" aria-hidden />
+      <div className="site-tech-fade is-right" aria-hidden />
 
       <div
         className={`${
@@ -56,9 +50,7 @@ const TechRow = ({ items, reverse = false, running, variant = "solid" }) => {
 
 const Technologies = () => {
   const sectionRef = useRef(null);
-  const [inView, setInView] = useState(true);
-  const [hovered, setHovered] = useState(false);
-  const running = inView && !hovered;
+  const [running, setRunning] = useState(true);
   const mid = Math.ceil(technologies.length / 2);
   const rowA = technologies.slice(0, mid);
   const rowB = [
@@ -71,7 +63,7 @@ const Technologies = () => {
     if (!el || typeof IntersectionObserver === "undefined") return undefined;
 
     const io = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
+      ([entry]) => setRunning(entry.isIntersecting),
       { rootMargin: "100px 0px", threshold: 0.04 },
     );
     io.observe(el);
@@ -79,12 +71,7 @@ const Technologies = () => {
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="site-tech section-surface"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
+    <section ref={sectionRef} className="site-tech">
       <div className="site-tech-atmosphere" aria-hidden>
         <span className="site-tech-orb is-a" />
         <span className="site-tech-orb is-b" />
@@ -120,12 +107,7 @@ const Technologies = () => {
           <TechRow items={rowA} running={running} variant="solid" />
         </Reveal>
         <Reveal delay={0.06}>
-          <TechRow
-            items={rowB}
-            reverse
-            running={running}
-            variant="ghost"
-          />
+          <TechRow items={rowB} reverse running={running} variant="ghost" />
         </Reveal>
       </div>
     </section>
