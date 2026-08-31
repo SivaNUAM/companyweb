@@ -10,7 +10,7 @@ import { observeHeaderTone } from "../utils/surfaceTone";
 const navLinks = [
   { to: "/services", label: "Services" },
   { to: "/products", label: "Products" },
-  { to: "/portfolio", label: "Works" },
+  // { to: "/portfolio", label: "Works" },
   { to: "/about", label: "About" },
   { to: "/careers", label: "Careers" },
   { to: "/contact", label: "Contact" },

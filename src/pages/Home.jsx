@@ -14,7 +14,7 @@ const Home = () => {
   return (
     <>
       <Hero />
-      <SelectedWorks />
+      {/* <SelectedWorks /> */}
       <ImpactStrip />
       <StoryTeaser />
       <WhatWeDo />
