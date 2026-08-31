@@ -633,9 +633,11 @@
   }
 
   .container-custom {
+    width: 100%;
     max-width: 90rem;
     margin-left: auto;
     margin-right: auto;
+    box-sizing: border-box;
   }
 
   .label-premium {
@@ -3784,9 +3786,36 @@
   }
 
   /* ——— Products / CLMS ——— */
+  .site-products-hero,
+  .site-products-overview,
+  .site-clms,
+  .site-products-flow,
+  .site-products-features,
+  .site-products-modules,
+  .site-products-specs,
+  .site-products-trust,
+  .site-products-faq {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+
+  .site-products-hero .container-custom,
+  .site-products-overview .container-custom,
+  .site-clms .container-custom,
+  .site-products-flow .container-custom,
+  .site-products-features .container-custom,
+  .site-products-modules .container-custom,
+  .site-products-specs .container-custom,
+  .site-products-trust .container-custom,
+  .site-products-faq .container-custom {
+    padding-left: var(--site-gutter);
+    padding-right: var(--site-gutter);
+  }
+
   .site-products-hero {
     position: relative;
-    overflow: hidden;
+    overflow: clip;
     min-height: min(92svh, 54rem);
     display: flex;
     align-items: flex-end;
@@ -3828,8 +3857,9 @@
     position: absolute;
     left: -10%;
     bottom: -20%;
-    width: 55vw;
-    height: 45vw;
+    width: min(22rem, 55vw);
+    height: min(18rem, 45vw);
+    max-width: 100%;
     border-radius: 9999px;
     background: rgba(107, 138, 255, 0.18);
     filter: blur(90px);
@@ -3895,7 +3925,9 @@
   .site-products-hero-inner {
     position: relative;
     z-index: 2;
+    width: 100%;
     max-width: 48rem;
+    min-width: 0;
   }
 
   .site-products-hero-meta {
@@ -3930,8 +3962,10 @@
   .site-products-hero-brand {
     margin: 0.35rem 0 0;
     display: flex;
+    flex-wrap: nowrap;
+    max-width: 100%;
     overflow: hidden;
-    font-size: clamp(4.5rem, 18vw, 9.5rem);
+    font-size: clamp(2.6rem, 18vw, 9.5rem);
     font-weight: 800;
     letter-spacing: -0.06em;
     line-height: 0.88;
@@ -3967,11 +4001,12 @@
 
   .site-products-hero-headline {
     margin: 0 0 1rem;
-    max-width: 16ch;
-    font-size: clamp(1.65rem, 5vw, 2.75rem);
+    max-width: min(16ch, 100%);
+    font-size: clamp(1.35rem, 6.2vw, 2.75rem);
     font-weight: 700;
     letter-spacing: -0.035em;
     line-height: 1.08;
+    overflow-wrap: anywhere;
   }
 
   .site-products-hero-word {
@@ -4058,6 +4093,7 @@
 
   .site-clms-shell {
     overflow: hidden;
+    max-width: 100%;
     border-radius: 1.25rem;
     border: 1px solid rgba(11, 11, 11, 0.08);
     background: #10131a;
@@ -4089,6 +4125,10 @@
   .site-clms-chrome-title {
     margin-left: 0.65rem;
     margin-right: auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-size: 0.68rem;
     font-weight: 600;
     letter-spacing: 0.08em;
@@ -4196,8 +4236,9 @@
 
   .site-clms-app {
     display: grid;
-    grid-template-columns: 1fr;
-    min-height: 28rem;
+    grid-template-columns: minmax(0, 1fr);
+    min-width: 0;
+    min-height: 22rem;
   }
 
   .site-clms-rail {
@@ -4221,6 +4262,7 @@
   }
 
   .site-clms-main {
+    min-width: 0;
     padding: 1rem 1rem 1.25rem;
     color: #fff;
   }
@@ -4347,6 +4389,7 @@
     display: flex;
     align-items: center;
     gap: 0.7rem;
+    min-width: 0;
     padding: 0.65rem 0.7rem;
     border-radius: 0.7rem;
     background: rgba(255, 255, 255, 0.035);
@@ -5015,9 +5058,11 @@
   }
 
   .site-products-faq-q span {
+    min-width: 0;
     font-size: 1.05rem;
     font-weight: 700;
     letter-spacing: -0.02em;
+    overflow-wrap: anywhere;
   }
 
   .site-products-faq-icon {
@@ -5037,6 +5082,42 @@
     color: var(--text-secondary);
   }
 
+  @media (max-width: 1023px), (pointer: coarse) {
+    .site-products-hero-glow,
+    .site-products-hero-sweep {
+      display: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .site-products-overview-grid,
+    .site-products-features-grid,
+    .site-products-specs-grid,
+    .site-products-modules-grid,
+    .site-products-trust-grid,
+    .site-clms-panels {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .site-clms-app {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .site-clms-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .site-products-hero-actions {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .site-products-hero-actions .btn-accent {
+      width: 100%;
+      max-width: 20rem;
+    }
+  }
+
   @media (min-width: 768px) {
     .site-products-overview {
       padding: 5.5rem 0 6rem;
@@ -5050,7 +5131,7 @@
     }
 
     .site-products-overview-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 1.5rem;
     }
 
@@ -5095,7 +5176,7 @@
     }
 
     .site-products-trust-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .site-products-faq {
@@ -5138,12 +5219,12 @@
     }
 
     .site-clms-app {
-      grid-template-columns: 11.5rem 1fr;
-      min-height: 34rem;
+      grid-template-columns: minmax(0, 1fr);
+      min-height: 28rem;
     }
 
     .site-clms-rail {
-      display: block;
+      display: none;
     }
 
     .site-clms-main {
@@ -5186,7 +5267,7 @@
     }
 
     .site-products-features-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .site-products-feature {
@@ -5198,7 +5279,7 @@
     }
 
     .site-products-specs-grid {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 2rem;
     }
   }
@@ -5209,7 +5290,22 @@
     }
 
     .site-clms-app {
-      grid-template-columns: 13rem 1fr;
+      grid-template-columns: 13rem minmax(0, 1fr);
+      min-height: 34rem;
+    }
+
+    .site-clms-rail {
+      display: block;
+    }
+
+    .site-products-overview-grid,
+    .site-products-trust-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .site-products-features-grid,
+    .site-products-specs-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
     }
   }
 
