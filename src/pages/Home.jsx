@@ -3,6 +3,7 @@ import SelectedWorks from "../components/home/SelectedWorks";
 import ImpactStrip from "../components/home/ImpactStrip";
 import StoryTeaser from "../components/home/StoryTeaser";
 import WhatWeDo from "../components/home/WhatWeDo";
+import ProductBrief from "../components/home/ProductBrief";
 import Technologies from "../components/home/Technologies";
 import HowWeWork from "../components/home/HowWeWork";
 import Industries from "../components/home/Industries";
@@ -17,6 +18,7 @@ const Home = () => {
       <ImpactStrip />
       <StoryTeaser />
       <WhatWeDo />
+      <ProductBrief />
       <Technologies />
       <HowWeWork />
       <Industries />

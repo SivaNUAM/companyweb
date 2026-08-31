@@ -8,6 +8,7 @@ import Portfolio from "../pages/Portfolio";
 import Careers from "../pages/Careers";
 import Contact from "../pages/Contact";
 import Brochure from "../pages/Brochure";
+import Products from "../pages/Products";
 import Privacy from "../pages/Privacy";
 import Terms from "../pages/Terms";
 import NotFound from "../pages/NotFound";
@@ -20,6 +21,7 @@ const AppRoutes = () => {
           <Route index element={<Home />} />
           <Route path="about" element={<About />} />
           <Route path="services" element={<Services />} />
+          <Route path="products" element={<Products />} />
           <Route path="portfolio" element={<Portfolio />} />
           <Route path="careers" element={<Careers />} />
           <Route path="contact" element={<Contact />} />

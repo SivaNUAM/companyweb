@@ -57,6 +57,9 @@ const botReply = (text) => {
   if (t.includes("hi") || t.includes("hello") || t.includes("hey")) {
     return "Hiiii! I’m Nuam Bot — smile mode ON. What are we building today?";
   }
+  if (t.includes("clms") || t.includes("clinic") || t.includes("product")) {
+    return "CLMS is our Clinic Management System — appointments, patients, and billing for dental, psych, and cosmetic clinics. Tour it on /products.";
+  }
   if (t.includes("who is nuam") || t.includes("about") || t.includes("founded")) {
     return "Nuam Technologies Pvt Ltd — founded 2025, corporate in 2026. We partner on strategy, design, and engineering. Full story on /about.";
   }

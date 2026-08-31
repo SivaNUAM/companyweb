@@ -136,6 +136,39 @@ export const story = {
   cta: { label: "About us", to: "/about" },
 };
 
+export const productBrief = {
+  label: "Featured product",
+  brand: "CLMS",
+  poweredBy: "Powered by Nuam",
+  title: "Clinic care, calmly managed.",
+  body: "Our Clinic Management System keeps appointments, patient records, and billing in one calm operating surface — built for dental, psychological, and cosmetic clinics.",
+  note: "From front-desk check-in to day-end collections — without WhatsApp chaos or paper registers.",
+  points: [
+    { title: "Smart scheduling", detail: "Rooms, chairs, and clinician buffers" },
+    { title: "Patient records", detail: "History, alerts, and visit notes" },
+    { title: "Billing clarity", detail: "Invoices, advances, day-end totals" },
+  ],
+  specialties: ["Dental", "Psychological", "Cosmetic"],
+  metrics: [
+    { value: "24", label: "Today’s slots" },
+    { value: "3", label: "Specialties" },
+    { value: "1", label: "Clinic OS" },
+  ],
+  preview: {
+    title: "CLMS · Live desk",
+    kicker: "Today",
+    stat: "24",
+    statLabel: "Appointments booked",
+    rows: [
+      { time: "09:30", label: "Dental · Cleaning", status: "In chair", tone: "live" },
+      { time: "11:00", label: "Psychology · Session", status: "Waiting", tone: "wait" },
+      { time: "14:00", label: "Cosmetic · Consult", status: "Confirmed", tone: "ok" },
+    ],
+  },
+  cta: { label: "Explore CLMS", to: "/products" },
+  secondaryCta: { label: "Request a demo", to: "/contact" },
+};
+
 export const servicesSection = {
   label: "Capabilities",
   title: "What we do",

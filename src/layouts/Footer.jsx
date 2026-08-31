@@ -13,6 +13,7 @@ import BrandLogo from "../components/ui/BrandLogo";
 const companyLinks = [
   { to: "/about", label: "About" },
   { to: "/services", label: "Services" },
+  { to: "/products", label: "Products" },
   { to: "/portfolio", label: "Works" },
   { action: "brochure", label: "Brochure" },
   { to: "/careers", label: "Careers" },
