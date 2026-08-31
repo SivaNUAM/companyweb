@@ -1,9 +1,19 @@
 import { useSyncExternalStore } from "react";
-import { useReducedMotion } from "framer-motion";
 
 let simplify = false;
 const listeners = new Set();
 let bound = false;
+
+const subscribeReducedMotion = (listener) => {
+  if (typeof window === "undefined") return () => {};
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", listener);
+  return () => mq.removeEventListener("change", listener);
+};
+
+const getReducedMotion = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const readSimplify = () => {
   if (typeof window === "undefined") return false;
@@ -42,7 +52,11 @@ const getServerSnapshot = () => false;
  * One media-query subscription for the whole app.
  */
 export function useSimplifyMotion() {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotion,
+    () => false,
+  );
   const simplifyMotion = useSyncExternalStore(
     subscribe,
     getSnapshot,

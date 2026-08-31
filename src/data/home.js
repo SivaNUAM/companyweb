@@ -343,30 +343,30 @@ export const industries = [
 export const voicesSection = {
   label: "Voices",
   title: ["What partners", "say."],
-  support: "Feedback from teams we’ve shipped with since 2025.",
+  support: "Feedback from clinics and local businesses we’ve shipped with.",
 };
 
 export const voices = [
   {
-    id: "orbit",
+    id: "alphadent",
     quote:
-      "Nuam treated our banking product like it was their own — sharp UX, clean delivery, and zero drama at launch.",
-    name: "Priya Menon",
-    role: "Head of Product, Orbit Finance",
+      "Nuam built our Hyderabad dental clinic website with online appointment booking — patients can book in minutes, and the practice looks as professional as the care we give.",
+    name: "AlphaDent",
+    role: "Dental clinic · Hyderabad",
   },
   {
-    id: "northline",
+    id: "identity-pest",
     quote:
-      "They rebuilt our retail platform for peak season and it held. Clear process, honest timelines, corporate-grade craft.",
-    name: "James Okonkwo",
-    role: "CTO, Northline Commerce",
+      "They built a clear, local-first website for our Kochi pest control company. Easy for customers to find us, understand the service, and get in touch.",
+    name: "Identity Pest Control",
+    role: "Pest control · Kochi",
   },
   {
-    id: "pulse",
+    id: "anjana-ra",
     quote:
-      "Calm interfaces for a high-stakes care product. Nuam understood both the users and the regulators.",
-    name: "Dr. Anika Shah",
-    role: "Founder, Pulse Health",
+      "We needed a calm, simple way for clients to book sessions. Nuam delivered an appointment-booking website that feels as considered as the practice itself.",
+    name: "Anjana R. A.",
+    role: "Psychologist · Appointment booking",
   },
 ];
 

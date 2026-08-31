@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { animate, useReducedMotion } from "framer-motion";
+import { animate } from "framer-motion";
 import BrandLogo from "./BrandLogo";
 import { useSimplifyMotion } from "../../hooks/useSimplifyMotion";
 
@@ -11,8 +11,7 @@ const SESSION_KEY = "nuam-welcome-seen";
  * Mobile: DOM-driven progress (no per-frame React re-renders) + shorter timing.
  */
 const WelcomeLoader = ({ onDone }) => {
-  const reduceMotion = useReducedMotion();
-  const { simplify } = useSimplifyMotion();
+  const { simplify, reduceMotion } = useSimplifyMotion();
   const [phase, setPhase] = useState("load"); // load | exit | gone
   const [visible, setVisible] = useState(true);
   const countRef = useRef(null);
