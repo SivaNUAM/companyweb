@@ -30,7 +30,7 @@ const serviceLinks = [
 const socialLinks = [
   {
     label: "LinkedIn",
-    href: "https://www.linkedin.com/",
+    href: "https://www.linkedin.com/company/nuam-technologies-pvt-ltd/?viewAsMember=true",
     icon: Linkedin,
   },
   // {
@@ -40,12 +40,12 @@ const socialLinks = [
   // },
   {
     label: "Instagram",
-    href: "https://www.instagram.com/",
+    href: "https://www.instagram.com/nuam_technologies",
     icon: Instagram,
   },
   {
     label: "Facebook",
-    href: "https://www.facebook.com/",
+    href: "https://www.facebook.com/profile.php?id=61583803799538",
     icon: Facebook,
   },
   // {
